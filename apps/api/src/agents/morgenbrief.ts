@@ -1,9 +1,13 @@
-import { clock, greetingFor, nextAlarm, type Alarm, type Briefing, type MissedItem } from '@life/shared';
-import type { Snapshot } from '../connectors/index.js';
+import {
+  clock, greetingFor, nextAlarm,
+  type Alarm, type Briefing, type CalendarEvent, type MailItem, type MessageItem, type MissedItem, type UpdateItem, type Weather,
+} from '@life/shared';
+
+type Input = { mail: MailItem[]; messages: MessageItem[]; calendar: CalendarEvent[]; updates: UpdateItem[]; weather: Weather | null };
 
 /** Morgenbrief-agenten: én rolig oppsummering av dagen, på norsk. */
 export function runBriefing(
-  snap: Pick<Snapshot, 'mail' | 'messages' | 'calendar' | 'updates' | 'weather'>,
+  snap: Input,
   missed: MissedItem[],
   alarms: Alarm[],
   opts: { ownerName?: string; now?: Date } = {},

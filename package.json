@@ -17,7 +17,8 @@
     "start": "npm run start --workspace @life/api",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "check:secrets": "node scripts/check-secrets.mjs"
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "build:demo": "node scripts/build-demo.mjs"
   },
   "engines": {
     "node": ">=20"

@@ -10,6 +10,7 @@ import { Login } from './components/Login';
 import { applyTheme, loadThemePref, resolveTheme, saveThemePref, type ThemePref } from './theme';
 
 const REFRESH_MS = 2 * 60_000;
+const DEMO = import.meta.env.MODE === 'demo';
 
 export function App() {
   const [data, setData] = useState<Dashboard | null>(null);
@@ -80,13 +81,18 @@ export function App() {
           <span className="clock" aria-hidden>{now.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })}</span>
           <button className="btn ghost small" onClick={() => void load(true)} disabled={loading} aria-label="Oppdater">{loading ? '…' : '↻'}</button>
           <button className="btn ghost small" onClick={() => setTheme(nextTheme[theme])} aria-label={`Tema: ${themeLabel}`}>{themeLabel}</button>
-          {'Notification' in window && Notification.permission === 'default' && (
+          {!DEMO && 'Notification' in window && Notification.permission === 'default' && (
             <button className="btn ghost small" onClick={() => void Notification.requestPermission()}>Slå på varsler</button>
           )}
-          <button className="btn ghost small" onClick={() => void api.logout().then(() => setAuthed(false))}>Logg ut</button>
+          {!DEMO && <button className="btn ghost small" onClick={() => void api.logout().then(() => setAuthed(false))}>Logg ut</button>}
         </div>
       </header>
 
+      {DEMO && (
+        <div className="demo-note">
+          <p className="small">Demo med fiktive data. Alt kjører i nettleseren din og ingenting sendes noe sted. Trykk «Test alarm» for å se morgenbriefen.</p>
+        </div>
+      )}
       {error && <p className="error banner" role="alert">{error}</p>}
 
       <main className="grid">
@@ -102,6 +108,7 @@ export function App() {
           onCreate={(a: AlarmInput) => mutate(() => api.createAlarm(a))}
           onUpdate={(id, a) => mutate(() => api.updateAlarm(id, a))}
           onDelete={(id) => mutate(() => api.deleteAlarm(id))}
+          onTest={() => alarm.ring(data.alarms.find((a) => a.enabled) ?? data.alarms[0] ?? { id: 'test', time: '07:00', days: [], label: 'Test', enabled: true, briefing: true })}
         />
         <AgentsCard agents={data.agents} onRun={(id: AgentId) => void mutate(() => api.runAgent(id))} />
         <SourcesCard sources={data.sources} />

@@ -68,5 +68,11 @@ export function useAlarmClock(alarms: Alarm[]) {
     if (a) target.current = { alarm: a, at: Date.now() + minutes * 60_000 };
   }
 
-  return { ringing, stop, snooze };
+  /** Start alarmen nå (testknappen). Lyd krever et klikk, og det har vi her. */
+  function ring(a: Alarm) {
+    setRinging(a);
+    startSound();
+  }
+
+  return { ringing, stop, snooze, ring };
 }

@@ -4,8 +4,9 @@ import { Card } from './Cards';
 
 const WEEK = [1, 2, 3, 4, 5, 6, 0];
 
-export function AlarmsCard({ alarms, onCreate, onUpdate, onDelete }: {
+export function AlarmsCard({ alarms, onCreate, onUpdate, onDelete, onTest }: {
   alarms: Alarm[];
+  onTest: () => void;
   onCreate: (a: AlarmInput) => Promise<void>;
   onUpdate: (id: string, a: AlarmInput) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
@@ -25,7 +26,12 @@ export function AlarmsCard({ alarms, onCreate, onUpdate, onDelete }: {
   const toggleDay = (d: number) => setDays((ds) => (ds.includes(d) ? ds.filter((x) => x !== d) : [...ds, d]));
   return (
     <Card title="Alarmer" count={alarms.filter((a) => a.enabled).length}
-      action={<button className="btn ghost small" onClick={() => setAdding((v) => !v)} aria-expanded={adding}>{adding ? 'Avbryt' : '+ Ny'}</button>}>
+      action={
+        <div className="card-actions">
+          <button className="btn ghost small" onClick={onTest}>Test alarm</button>
+          <button className="btn ghost small" onClick={() => setAdding((v) => !v)} aria-expanded={adding}>{adding ? 'Avbryt' : '+ Ny'}</button>
+        </div>
+      }>
       {adding && (
         <form className="alarm-form" onSubmit={submit}>
           <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required aria-label="Tid" />

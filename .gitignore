@@ -1,6 +1,7 @@
 # Avhengigheter og bygg
 node_modules/
 dist/
+dist-demo/
 build/
 .expo/
 web-build/
