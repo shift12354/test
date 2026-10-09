@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moen Trebåtbyggeri</title>
+<meta name="description" content="Moen Trebåtbyggeri AS bygger, reparerer og vedlikeholder trebåter ved de historiske båtbyggeriene på Moen i Risør.">
+<meta name="theme-color" content="#F2F4F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1620" media="(prefers-color-scheme: dark)">
+<link rel="preload" href="fonts/big-shoulders-stencil-display-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="scene-fallback" aria-hidden="true"></div>
+
+<a class="skip" href="#innhold">Hopp til innholdet</a>
+
+<header class="topbar">
+  <a class="wordmark" href="#top" aria-label="Moen Trebåtbyggeri, til toppen">
+    <span class="wordmark__main">Moen</span>
+    <span class="wordmark__sub">Trebåtbyggeri</span>
+  </a>
+  <nav class="nav" aria-label="Hovedmeny">
+    <a href="#handverket">Håndverket</a>
+    <a href="#tjenester">Tjenester</a>
+    <a href="#historien">Historien</a>
+    <a href="#kontakt">Kontakt</a>
+  </nav>
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Bytt mellom dag og blåtime">
+    <span class="theme-toggle__dot" aria-hidden="true"></span>
+    <span class="theme-toggle__label">Dag</span>
+  </button>
+</header>
+
+<main id="innhold">
+
+  <!-- Stage 0 -->
+  <section class="stage stage--hero" id="top" data-stage="0">
+    <div class="panel panel--hero">
+      <p class="eyebrow">Risør · Søndeledfjorden</p>
+      <h1>Trebåter, bygd bord&nbsp;for&nbsp;bord.</h1>
+      <p class="lead">Vi bygger, reparerer og tar vare på trebåter ved de gamle båtbyggeriene på Moen, innerst i Søndeledfjorden.</p>
+      <div class="actions">
+        <a class="btn btn--primary" href="#kontakt">Ta kontakt</a>
+        <a class="btn btn--ghost" href="#tjenester">Se hva vi gjør</a>
+      </div>
+    </div>
+    <p class="scroll-hint" aria-hidden="true"><span>Rull ned og se båten bli bygd</span></p>
+  </section>
+
+  <!-- Stage 1 -->
+  <section class="stage stage--tall" id="handverket" data-stage="1">
+    <div class="panel panel--sticky">
+      <p class="eyebrow">Håndverket</p>
+      <h2>Klinkbygd, slik det alltid er gjort på Sørlandet.</h2>
+      <p>En klinkbygd båt starter med ryggraden: kjølen og stevnene. Spantene gir formen. Så legges bordgangene én etter én nedenfra. Hver bordgang ligger litt over den forrige og klinkes fast. Det er omlegget som gir de karakteristiske linjene langs skroget.</p>
+      <div class="build-meter" aria-hidden="true">
+        <span class="build-meter__label">Bordganger lagt</span>
+        <span class="build-meter__value" id="build-count">10 / 10</span>
+        <span class="build-meter__bar"><span id="build-bar"></span></span>
+      </div>
+      <dl class="glossary">
+        <div><dt>Kjøl</dt><dd>Bjelken langs bunnen som bærer hele båten.</dd></div>
+        <div><dt>Stevn</dt><dd>Den reiste delen i baugen og akterut. En snekke er spiss i begge ender.</dd></div>
+        <div><dt>Spant</dt><dd>Ribbene som gir skroget form og styrke.</dd></div>
+        <div><dt>Bordgang</dt><dd>Én rad med bord langs skroget, lagt med omlegg.</dd></div>
+        <div><dt>Ripa</dt><dd>Den øverste kanten av skroget.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Stage 2 -->
+  <section class="stage" id="tjenester" data-stage="2">
+    <div class="panel">
+      <p class="eyebrow">Tjenester</p>
+      <h2>Fra nytt bord til ferdig sjøsatt.</h2>
+      <ul class="services">
+        <li>
+          <h3>Bygging og restaurering</h3>
+          <p>Nye trebåter og istandsetting av eldre båter, med materialer og metoder som passer båten.</p>
+        </li>
+        <li>
+          <h3>Reparasjon og vedlikehold</h3>
+          <p>Utskifting av bord og spant, tetting, maling og annet vedlikehold på skrog og innredning.</p>
+        </li>
+        <li>
+          <h3>Vinterlagring</h3>
+          <p>Opptak og lagring gjennom vinteren, så båten er klar til sesongen.</p>
+        </li>
+        <li>
+          <h3>Motorservice</h3>
+          <p>Service og ettersyn av motoren, gjerne samtidig med vinteropplaget.</p>
+        </li>
+        <li>
+          <h3>Metall- og snekkerarbeid</h3>
+          <p>Beslag, smijern og tilpassede deler, og snekkerarbeid om bord og på land.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Stage 3 -->
+  <section class="stage" id="historien" data-stage="3">
+    <div class="panel">
+      <p class="eyebrow">Historien</p>
+      <h2>Båtbyggeriene på Moen.</h2>
+      <p>Moen ved Søndeledfjorden er et av de største samlede båtbyggeriområdene i Norge. I generasjoner var båtbyggingen her en av de største arbeidsplassene i Risør. Byggene regnes i dag som et kulturminne av nasjonal interesse.</p>
+      <ol class="timeline">
+        <li><span class="timeline__year">1875</span><span>Det eldste verftet på Moen starter opp. Fram til 1968 bygger det rundt 300 større fartøy, blant dem redningsskøyter.</span></li>
+        <li><span class="timeline__year">1980-tallet</span><span>Plastbåtene tar over markedet, og den store trebåtproduksjonen ved fjorden går mot slutten.</span></li>
+        <li><span class="timeline__year">2005</span><span>Moen Trebåtbyggeri AS blir stiftet og fører håndverket videre på det gamle verftsområdet.</span></li>
+        <li><span class="timeline__year">I dag</span><span>Trebåter blir fortsatt tatt opp på slippen, reparert og satt på sjøen igjen.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Stage 4 -->
+  <section class="stage stage--last" id="kontakt" data-stage="4">
+    <div class="panel">
+      <p class="eyebrow">Kontakt</p>
+      <h2>Har du en trebåt som trenger en hånd?</h2>
+      <p>Ring for en prat om båten din. Ring gjerne før du kommer innom verftet.</p>
+      <div class="contact">
+        <div class="contact__row">
+          <span class="contact__label">Telefon</span>
+          <span class="contact__value">
+            <a href="tel:+4795462149" id="phone">954 62 149</a>
+            <button class="copy" type="button" data-copy="954 62 149" aria-label="Kopier telefonnummeret">Kopier</button>
+          </span>
+        </div>
+        <div class="contact__row">
+          <span class="contact__label">Besøk</span>
+          <span class="contact__value">Moensveien 38<br>4950 Risør</span>
+        </div>
+        <div class="contact__row">
+          <span class="contact__label">Facebook</span>
+          <span class="contact__value"><a href="https://www.facebook.com/p/Moen-Treb%C3%A5tbyggeri-As-100057241278509/" target="_blank" rel="noopener">Moen Trebåtbyggeri AS</a></span>
+        </div>
+        <div class="contact__row">
+          <span class="contact__label">Org.nr.</span>
+          <span class="contact__value mono">987 795 603</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p><strong>Konseptforslag.</strong> Denne siden er et uoffisielt forslag til nettside, laget uten tilknytning til Moen Trebåtbyggeri AS. Opplysningene er hentet fra offentlige kilder og må kontrolleres med bedriften før siden eventuelt tas i bruk.</p>
+</footer>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
