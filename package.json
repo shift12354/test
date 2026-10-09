@@ -1,0 +1,29 @@
+{
+  "name": "life-dashboard",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Personlig life dashboard: alarm, morgenbrief, mail, meldinger, kalender og alt du har g\u00e5tt glipp av.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "setup": "node scripts/setup-env.mjs",
+    "dev": "npm run dev --workspace @life/api & npm run dev --workspace @life/web",
+    "dev:api": "npm run dev --workspace @life/api",
+    "dev:web": "npm run dev --workspace @life/web",
+    "dev:mobile": "npm run start --workspace @life/mobile",
+    "build": "npm run build --workspace @life/web",
+    "start": "npm run start --workspace @life/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "check:secrets": "node scripts/check-secrets.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "overrides": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  }
+}

@@ -1,0 +1,31 @@
+# Avhengigheter og bygg
+node_modules/
+dist/
+build/
+.expo/
+web-build/
+*.tsbuildinfo
+
+# Hemmeligheter: skal ALDRI inn i git
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.mobileprovision
+google-services.json
+GoogleService-Info.plist
+credentials.json
+token.json
+
+# Lokale data (alarmer, push-tokens)
+apps/api/data/
+data/
+
+# Diverse
+.DS_Store
+npm-debug.log*
+coverage/
+.vscode/
+.idea/

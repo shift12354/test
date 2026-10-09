@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Life Dashboard",
+    "slug": "life-dashboard",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#0e1014",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "no.example.lifedashboard",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
+    },
+    "android": {
+      "package": "no.example.lifedashboard",
+      "permissions": ["android.permission.SCHEDULE_EXACT_ALARM", "android.permission.POST_NOTIFICATIONS", "android.permission.VIBRATE"],
+      "blockedPermissions": ["android.permission.READ_SMS", "android.permission.READ_CONTACTS"]
+    },
+    "plugins": [
+      ["expo-notifications", { "color": "#8aa4ff" }],
+      "expo-secure-store"
+    ]
+  }
+}
