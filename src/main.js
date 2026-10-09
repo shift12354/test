@@ -1,4 +1,8 @@
-import { createScene } from './scene.js';
+import * as Scene from './scene.js';
+
+const { createScene } = Scene;
+const STRAKES = Scene.STRAKES ?? 10;
+const BUILD = Scene.BUILD ?? { start: 1.0, cleared: 1.2, end: 1.75 };
 
 const root = document.documentElement;
 const canvas = document.getElementById('scene');
@@ -11,8 +15,6 @@ const buildBar = document.getElementById('build-bar');
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const systemDark = matchMedia('(prefers-color-scheme: dark)');
 
-// Must match the strake count in scene.js
-const STRAKES = 10;
 
 /* ---------- Theme: Dag / Blåtime ---------- */
 function storedTheme() {
@@ -60,10 +62,12 @@ function progress() {
   return last;
 }
 
+// Mirrors the strake build window in scene.js
 function strakesShown(t) {
-  if (t <= 0.05 || t >= 1) return STRAKES;
-  if (t < 0.35) return Math.round(STRAKES * (1 - (t - 0.05) / 0.3));
-  return Math.round(STRAKES * ((t - 0.35) / 0.65));
+  const { start, cleared, end } = BUILD;
+  if (t <= start || t >= end) return STRAKES;
+  if (t < cleared) return Math.round(STRAKES * (1 - (t - start) / (cleared - start)));
+  return Math.round(STRAKES * ((t - cleared) / (end - cleared)));
 }
 
 let ticking = false;
