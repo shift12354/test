@@ -17,6 +17,18 @@ const list = (v: string | undefined) =>
 
 const env = process.env;
 
+/**
+ * Hvilke proxyer vi stoler på for X-Forwarded-For (påvirker req.ip og dermed rate limit).
+ * Standard i produksjon er kun loopback (reverse proxy på samme maskin). `true` betyr at alle
+ * kan forfalske IP-en sin, så det brukes bare hvis du eksplisitt skriver TRUST_PROXY=true.
+ */
+function parseTrustProxy(v: string | undefined, isProd: boolean): boolean | string {
+  if (v === undefined || v.trim() === '') return isProd ? 'loopback' : false;
+  if (v === 'false') return false;
+  if (v === 'true') return true;
+  return v.trim();
+}
+
 export type Config = ReturnType<typeof loadConfig>;
 
 export function loadConfig(overrides: Record<string, string | undefined> = {}) {
@@ -26,6 +38,7 @@ export function loadConfig(overrides: Record<string, string | undefined> = {}) {
     isProd,
     port: Number(e.PORT ?? 8787),
     host: e.HOST ?? '127.0.0.1',
+    trustProxy: parseTrustProxy(e.TRUST_PROXY, isProd),
     token: e.DASHBOARD_TOKEN ?? '',
     corsOrigins: list(e.CORS_ORIGINS ?? 'http://localhost:5173'),
     tz: e.TZ_NAME ?? 'Europe/Oslo',

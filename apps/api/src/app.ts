@@ -15,6 +15,16 @@ import { safeEqual, SESSION_COOKIE, verifySession } from './lib/auth.js';
 import { Store } from './lib/store.js';
 import { apiRoutes } from './routes/api.js';
 
+/** Ugyldig eller "null"-origin (sandboxed iframe, file://) regnes som fremmed, ikke som en 500-feil. */
+const sameHost = (origin: string, host: string | undefined): boolean => {
+  if (!host) return false;
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+};
+
 export type AppOptions = { cfg: Config; connectors?: Connector[]; logger?: boolean };
 
 export async function buildApp({ cfg, connectors, logger = true }: AppOptions): Promise<FastifyInstance> {
@@ -27,7 +37,7 @@ export async function buildApp({ cfg, connectors, logger = true }: AppOptions): 
       redact: ['req.headers.authorization', 'req.headers.cookie', 'res.headers["set-cookie"]'],
     },
     bodyLimit: 64 * 1024,
-    trustProxy: cfg.isProd,
+    trustProxy: cfg.trustProxy,
   });
 
   await app.register(helmet, {
@@ -77,8 +87,7 @@ export async function buildApp({ cfg, connectors, logger = true }: AppOptions): 
     // CSRF-vern for cookie-sesjoner: endringer må komme fra en tillatt origin.
     if (via === 'cookie' && req.method !== 'GET') {
       const origin = req.headers.origin;
-      const sameHost = origin && req.headers.host && new URL(origin).host === req.headers.host;
-      if (!origin || (!sameHost && !cfg.corsOrigins.includes(origin))) {
+      if (!origin || (!sameHost(origin, req.headers.host) && !cfg.corsOrigins.includes(origin))) {
         return reply.code(403).send({ error: { code: 'forbidden', message: 'Ugyldig opprinnelse' } });
       }
     }

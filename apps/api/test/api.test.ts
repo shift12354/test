@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
+import { isLocalHost, validateApiUrl } from '@life/shared';
 import { buildApp } from '../src/app.js';
 import { loadConfig } from '../src/config.js';
 
@@ -54,6 +55,39 @@ describe('sikkerhet', () => {
     expect((await app.inject({ url: '/api/v1/agents', headers: { cookie } })).statusCode).toBe(200);
     const csrf = await app.inject({ method: 'POST', url: '/api/v1/alarms', headers: { cookie, origin: 'https://evil.example' }, payload: { time: '06:00', days: [] } });
     expect(csrf.statusCode).toBe(403);
+  });
+  it('ugyldig eller "null"-origin gir 403, ikke 500', async () => {
+    const ok = await app.inject({ method: 'POST', url: '/api/v1/session', payload: { token: TOKEN } });
+    const cookie = String(ok.headers['set-cookie']).split(';')[0]!;
+    for (const origin of ['null', 'ikke en url']) {
+      const res = await app.inject({ method: 'POST', url: '/api/v1/alarms', headers: { cookie, origin }, payload: { time: '06:00', days: [] } });
+      expect(res.statusCode).toBe(403);
+    }
+  });
+  it('forfalsket X-Forwarded-For omgår ikke rate limit på login i produksjon', async () => {
+    const cfg = loadConfig({ DASHBOARD_TOKEN: TOKEN, NODE_ENV: 'production', DATA_DIR: mkdtempSync(path.join(tmpdir(), 'ld-')) });
+    expect(cfg.trustProxy).toBe('loopback');
+    const prod = await buildApp({ cfg, logger: false });
+    const codes: number[] = [];
+    for (let i = 0; i < 7; i++) {
+      const res = await prod.inject({
+        method: 'POST', url: '/api/v1/session', payload: { token: 'feil' },
+        remoteAddress: '203.0.113.7', headers: { 'x-forwarded-for': `198.51.100.${i}` },
+      });
+      codes.push(res.statusCode);
+    }
+    await prod.close();
+    expect(codes.at(-1)).toBe(429);
+  });
+  it('mobil-URL: http kun mot ekte lokale adresser', () => {
+    expect(validateApiUrl('http://192.168.1.10:8787/x')).toBe('http://192.168.1.10:8787');
+    expect(validateApiUrl('http://localhost:8787')).toBe('http://localhost:8787');
+    expect(validateApiUrl('https://dashboard.example.com')).toBe('https://dashboard.example.com');
+    for (const bad of ['http://localhost.evil.com', 'http://10.evil.com', 'http://192.168.1.10.evil.com', 'http://172.32.0.1', 'http://dashboard.example.com', 'https://u:p@example.com', 'javascript:alert(1)']) {
+      expect(validateApiUrl(bad), bad).toBeNull();
+    }
+    expect(isLocalHost('172.16.0.1')).toBe(true);
+    expect(isLocalHost('999.168.0.1')).toBe(false);
   });
   it('500-feil lekker ikke detaljer', async () => {
     const res = await app.inject({ method: 'POST', url: '/api/v1/alarms', headers: auth, payload: { time: '25:99', days: [] } });
