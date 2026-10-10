@@ -1,37 +1,27 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google"
+import { Inter } from "next/font/google"
 
 import { Providers } from "@/components/site/providers"
 
 import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// SF Pro is used where the platform has it; Inter is the cross-platform fallback.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-})
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-})
-
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
+  axes: ["opsz"],
 })
 
 export const metadata: Metadata = {
-  title: "Nordlys — nettsider som lyser",
+  title: "Nordlys — nettsider som føles levende",
   description:
-    "Nordlys er et lite studio som bygger raske, vakre og tilgjengelige nettsider.",
+    "Nordlys er et lite studio som bygger raske, rolige og tilgjengelige nettsider.",
 }
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f9fafc" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0e1a" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
   ],
 }
 
@@ -40,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="nb"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
         <Providers>{children}</Providers>

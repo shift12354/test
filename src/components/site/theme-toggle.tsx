@@ -1,33 +1,34 @@
 "use client"
 
-import { useSyncExternalStore } from "react"
+import { flushSync } from "react-dom"
+import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
-
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler"
-
-const subscribe = () => () => {}
-
-// next-themes reads the stored theme on the client only, so render the
-// server's guess until hydration is done to keep the icon in sync.
-function useHydrated() {
-  return useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false
-  )
-}
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-  const hydrated = useHydrated()
-  const theme = hydrated && resolvedTheme === "light" ? "light" : "dark"
+
+  function toggle() {
+    const next = resolvedTheme === "dark" ? "light" : "dark"
+    const apply = () => {
+      // Flip the class ourselves so the transition snapshots the new theme.
+      document.documentElement.classList.toggle("dark", next === "dark")
+      document.documentElement.style.colorScheme = next
+      flushSync(() => setTheme(next))
+    }
+    if (!document.startViewTransition) return apply()
+    document.startViewTransition(apply)
+  }
 
   return (
-    <AnimatedThemeToggler
-      theme={theme}
-      onThemeChange={setTheme}
+    <button
+      type="button"
+      onClick={toggle}
       aria-label="Bytt mellom lyst og mørkt tema"
-      className="text-muted-foreground hover:text-foreground hover:bg-accent focus-visible:ring-ring/50 inline-flex size-9 items-center justify-center rounded-full transition-colors outline-none focus-visible:ring-[3px] [&_svg]:size-4"
-    />
+      className="press text-muted-foreground hover:text-foreground hover:bg-tile focus-visible:ring-ring inline-flex size-8 items-center justify-center rounded-full outline-none focus-visible:ring-4"
+    >
+      {/* Both icons render; CSS picks one, so there is no hydration mismatch. */}
+      <Sun aria-hidden="true" className="hidden size-4 dark:block" />
+      <Moon aria-hidden="true" className="size-4 dark:hidden" />
+    </button>
   )
 }

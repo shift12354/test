@@ -1,104 +1,136 @@
-import { CheckIcon } from "@radix-ui/react-icons"
+"use client"
+
+import { useId, useState } from "react"
+import { motion } from "motion/react"
+import { Check } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { BorderBeam } from "@/components/ui/border-beam"
-import { Button } from "@/components/ui/button"
-import { MagicCard } from "@/components/ui/magic-card"
+import { OpenSheetButton } from "@/components/site/contact-sheet"
+import { Reveal } from "@/components/site/reveal"
 import { SectionHeading } from "@/components/site/section-heading"
 
-const NOK = new Intl.NumberFormat("nb-NO", {
-  style: "currency",
-  currency: "NOK",
-  maximumFractionDigits: 0,
-})
+const NOK = new Intl.NumberFormat("nb-NO", { style: "currency", currency: "NOK", maximumFractionDigits: 0 })
+
+type Billing = "monthly" | "yearly"
+const BILLING: { value: Billing; label: string }[] = [
+  { value: "monthly", label: "Månedlig" },
+  { value: "yearly", label: "Årlig −20 %" },
+]
 
 const PLANS = [
-  {
-    name: "Start",
-    price: 0,
-    blurb: "For hobbyprosjekter og første utkast.",
-    features: ["1 nettside", "Eget domene", "SSL og CDN inkludert"],
-    featured: false,
-  },
-  {
-    name: "Pro",
-    price: 290,
-    blurb: "For små team som vil vokse raskt.",
-    features: ["10 nettsider", "Analyse i sanntid", "Forhåndsvisning per endring", "Prioritert støtte"],
-    featured: true,
-  },
-  {
-    name: "Bedrift",
-    price: 1490,
-    blurb: "For organisasjoner med store krav.",
-    features: ["Ubegrenset nettsider", "SSO og revisjonslogg", "99,99 % SLA", "Dedikert kontakt"],
-    featured: false,
-  },
+  { name: "Start", monthly: 0, blurb: "For første utkast og hobbyprosjekter.", features: ["1 nettside", "Eget domene", "SSL og CDN"] },
+  { name: "Pro", monthly: 290, blurb: "For små team som vil vokse.", features: ["10 nettsider", "Analyse i sanntid", "Forhåndsvisning per endring", "Prioritert støtte"], featured: true },
+  { name: "Bedrift", monthly: 1490, blurb: "For organisasjoner med store krav.", features: ["Ubegrenset nettsider", "SSO og revisjonslogg", "99,99 % SLA", "Dedikert kontakt"] },
 ]
 
 export function Pricing() {
+  const [billing, setBilling] = useState<Billing>("monthly")
+
   return (
-    <section aria-labelledby="priser" className="px-4 py-28">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeading id="priser" eyebrow="Priser" title="Enkle priser som vokser med deg">
+    <section aria-labelledby="priser" className="py-24 sm:py-32">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <SectionHeading id="priser" eyebrow="Priser" title="Enkle priser.">
           Ingen bindingstid. Alle priser er per måned, eks. mva.
         </SectionHeading>
-        <div className="grid gap-6 md:grid-cols-3">
-          {PLANS.map((plan) => (
-            <div key={plan.name} className="relative rounded-3xl">
-              <MagicCard
-                gradientFrom="#34d399"
-                gradientTo="#818cf8"
-                gradientColor="color-mix(in oklch, var(--aurora-2) 12%, transparent)"
-                className="h-full rounded-3xl"
+
+        <Reveal className="mb-10 flex justify-center">
+          <SegmentedControl label="Fakturering" value={billing} options={BILLING} onChange={setBilling} />
+        </Reveal>
+
+        <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
+          {PLANS.map((plan, i) => {
+            const price = billing === "yearly" ? Math.round(plan.monthly * 0.8) : plan.monthly
+            return (
+              <Reveal
+                key={plan.name}
+                delay={i * 0.06}
+                className={cn(
+                  "bg-tile flex flex-col rounded-[1.75rem] p-8",
+                  plan.featured && "ring-accent ring-2"
+                )}
               >
-                <div className="flex h-full flex-col p-8">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-lg font-semibold">{plan.name}</h3>
-                    {plan.featured ? (
-                      <span className="bg-aurora-1/15 text-aurora-1 rounded-full px-2.5 py-0.5 text-xs font-medium">
-                        Mest populær
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="text-muted-foreground mt-2 text-sm">{plan.blurb}</p>
-                  <p className="mt-6 flex items-baseline gap-1">
-                    <span className="text-4xl font-semibold tracking-tighter tabular-nums">
-                      {NOK.format(plan.price)}
-                    </span>
-                    <span className="text-muted-foreground text-sm">/mnd</span>
-                  </p>
-                  <ul className="mt-6 flex flex-1 flex-col gap-3 text-sm">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2">
-                        <CheckIcon aria-hidden="true" className="text-aurora-1 size-4 shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button
-                    asChild
-                    size="lg"
-                    variant={plan.featured ? "default" : "outline"}
-                    className={cn("mt-8 w-full rounded-full")}
-                  >
-                    <a href="#kontakt">Velg {plan.name}</a>
-                  </Button>
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="type-tile">{plan.name}</h3>
+                  {plan.featured ? (
+                    <span className="text-accent dark:text-link type-caption font-semibold">Mest valgt</span>
+                  ) : null}
                 </div>
-              </MagicCard>
-              {plan.featured ? (
-                <BorderBeam
-                  duration={10}
-                  size={180}
-                  colorFrom="#34d399"
-                  colorTo="#818cf8"
-                  borderWidth={1.5}
-                />
-              ) : null}
-            </div>
-          ))}
+                <p className="text-muted-foreground mt-2">{plan.blurb}</p>
+                <p className="mt-8 flex items-baseline gap-1.5">
+                  <span className="type-title tabular-nums">{NOK.format(price)}</span>
+                  <span className="text-muted-foreground">/mnd</span>
+                </p>
+                <p className="text-muted-foreground type-caption mt-1 min-h-4">
+                  {billing === "yearly" && plan.monthly > 0 ? "Faktureres årlig" : ""}
+                </p>
+                <ul className="mt-6 flex flex-1 flex-col gap-3">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check aria-hidden="true" className="text-aurora-1 mt-1 size-4 shrink-0" strokeWidth={2.5} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <OpenSheetButton
+                  variant={plan.featured ? "filled" : "tinted"}
+                  className={cn("mt-8 w-full", !plan.featured && "bg-background hover:bg-background/60")}
+                >
+                  Velg {plan.name}
+                </OpenSheetButton>
+              </Reveal>
+            )
+          })}
         </div>
       </div>
     </section>
+  )
+}
+
+function SegmentedControl<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: T
+  options: { value: T; label: string }[]
+  onChange: (value: T) => void
+}) {
+  const name = useId()
+  return (
+    <fieldset className="bg-tile relative inline-flex rounded-full p-1">
+      <legend className="sr-only">{label}</legend>
+      {options.map((option) => {
+        const checked = option.value === value
+        return (
+          <label
+            key={option.value}
+            className={cn(
+              "press relative cursor-pointer rounded-full px-5 py-2 text-sm font-medium has-focus-visible:ring-4 has-focus-visible:ring-ring",
+              checked ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={checked}
+              onChange={() => onChange(option.value)}
+              className="sr-only"
+            />
+            {checked ? (
+              // The thumb slides between segments on a critically damped spring.
+              <motion.span
+                layoutId={`${name}-thumb`}
+                aria-hidden="true"
+                className="bg-background absolute inset-0 rounded-full shadow-[0_1px_4px_rgb(0_0_0/0.12)] dark:bg-[#3a3a3c]"
+              />
+            ) : null}
+            <span className="relative">{option.label}</span>
+          </label>
+        )
+      })}
+    </fieldset>
   )
 }

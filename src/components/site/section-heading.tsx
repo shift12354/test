@@ -1,30 +1,30 @@
-import { BlurFade } from "@/components/ui/blur-fade"
+import { cn } from "@/lib/utils"
+import { Reveal } from "@/components/site/reveal"
 
 export function SectionHeading({
   id,
   eyebrow,
   title,
   children,
+  align = "center",
 }: {
   id: string
-  eyebrow: string
+  eyebrow?: string
   title: React.ReactNode
   children?: React.ReactNode
+  align?: "center" | "start"
 }) {
   return (
-    <BlurFade inView className="mx-auto mb-14 max-w-2xl text-center">
-      <p className="text-aurora-1 font-mono text-xs font-medium tracking-widest uppercase">
-        {eyebrow}
-      </p>
-      <h2
-        id={id}
-        className="mt-3 text-4xl font-semibold tracking-tighter text-balance sm:text-5xl"
-      >
+    <Reveal className={cn("mb-12 max-w-3xl sm:mb-16", align === "center" && "mx-auto text-center")}>
+      {eyebrow ? (
+        <p className="text-muted-foreground type-subhead font-semibold">{eyebrow}</p>
+      ) : null}
+      <h2 id={id} className="type-headline mt-1 text-balance">
         {title}
       </h2>
       {children ? (
-        <p className="text-muted-foreground mt-4 text-lg text-pretty">{children}</p>
+        <p className="text-muted-foreground type-subhead mt-5 font-normal text-pretty">{children}</p>
       ) : null}
-    </BlurFade>
+    </Reveal>
   )
 }
