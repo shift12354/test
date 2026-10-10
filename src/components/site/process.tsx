@@ -1,31 +1,36 @@
-import { Reveal } from "@/components/site/reveal"
-import { SectionHeading } from "@/components/site/section-heading"
+import { Section } from "@/components/site/section"
 
 const STEPS = [
-  { title: "Lytt", body: "Vi starter med hva du vil oppnå — ikke hvilke knapper du vil ha." },
-  { title: "Form", body: "Prototyper du kan ta på, med ekte innhold. Du ser fremgang hver uke." },
-  { title: "Lanser", body: "Én kommando, og siden er ute. Vi følger med og finjusterer etterpå." },
+  {
+    when: "Uke 1",
+    text: "Vi kommer på besøk, eller tar en videosamtale hvis dere holder til langt unna. Vi vil se hvordan dere jobber og høre hva kundene spør om.",
+  },
+  {
+    when: "Uke 2 til 4",
+    text: "Vi lager en prototype med ekte tekst og bilder. Dere prøver den på mobilen og sier fra om det som skurrer.",
+  },
+  {
+    when: "Uke 5",
+    text: "Siden går ut. Den første måneden følger vi med og retter det som dukker opp.",
+  },
+  {
+    when: "Før hver sesong",
+    text: "Før vinteren og før sommeren går vi gjennom siden med dere og bytter ut priser, bilder og tekster som har gått ut på dato.",
+  },
 ]
 
 export function Process() {
   return (
-    <section aria-labelledby="prosess" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <SectionHeading id="prosess" eyebrow="Prosess" title="Tre steg. Uker, ikke måneder." />
-        <ol className="grid gap-10 sm:grid-cols-3 sm:gap-8">
-          {STEPS.map((step, i) => (
-            <li key={step.title}>
-              <Reveal delay={i * 0.08}>
-                <span aria-hidden="true" className="type-headline text-muted-foreground/40 block tabular-nums">
-                  {i + 1}
-                </span>
-                <h3 className="type-title mt-3">{step.title}</h3>
-                <p className="text-muted-foreground mt-2 text-pretty">{step.body}</p>
-              </Reveal>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
+    <Section id="prosess" title="Slik jobber vi" intro="En vanlig nettside tar rundt fem uker fra første møte til den er ute.">
+      <ol className="border-l-2 border-current/15">
+        {STEPS.map((step) => (
+          <li key={step.when} className="relative pb-10 pl-8 last:pb-0">
+            <span aria-hidden="true" className="bg-lavsol absolute top-2 -left-[7px] size-3 rounded-full" />
+            <h3 className="type-small font-bold">{step.when}</h3>
+            <p className="mt-1 max-w-[56ch] text-pretty">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </Section>
   )
 }

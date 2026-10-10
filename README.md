@@ -1,7 +1,7 @@
 # Nordlys
 
-En enkel landingsside for et fiktivt webstudio, i Apple-inspirert stil.
-Bygget med Next.js 16, Tailwind CSS 4 og Motion.
+Landingsside for et oppdiktet nettstudio i Tromsø. Bygget med Next.js 16,
+Tailwind CSS 4 og Motion.
 
 ```bash
 npm install
@@ -10,32 +10,29 @@ npm run build   # produksjonsbygg
 npm run lint
 ```
 
-## Designprinsipper
+Designvalgene står i [`DESIGN.md`](DESIGN.md).
 
-- **Typografi:** systemfonten (SF Pro på Apple-enheter, Inter ellers) med
-  størrelsesavhengig sporing og linjeavstand — se `type-*` i `src/app/globals.css`.
-- **Materialer:** gjennomskinnelig navigasjon (`material`) med en myk skygge
-  som bare vises når innhold ligger under den.
-- **Bevegelse:** kritisk dempede fjærer som standard, litt sprett bare etter
-  et kast (`src/lib/motion.ts`). Alt kan avbrytes og starter fra posisjonen
-  elementet faktisk har på skjermen.
-- **Gester:**
-  - Karusellen (`work-carousel.tsx`) følger fingeren 1:1, regner ut hvor
-    kastet ender (Apples projeksjonsformel), stopper på nærmeste kort og
-    gjør myk motstand i kantene. Den kan også styres med piltaster og knapper.
-  - Kontaktarket (`contact-sheet.tsx`) glir opp fra bunnen, kan dras ned for
-    å lukkes, demper bakgrunnen og gjør resten av siden inaktiv.
-- **Tilgjengelighet:** `prefers-reduced-motion` gir toning i stedet for
-  sklibevegelse, `prefers-reduced-transparency` gir ugjennomsiktige flater og
-  `prefers-contrast: more` gir tydeligere kanter.
+## Hva som skjer på siden
 
-## Komponenter
+Øverst vises soloppgang og solnedgang i Tromsø for en dato, og under det en
+søyle per dag i året med høyde etter timer dagslys. Du kan dra i søylene, trykke
+på en dag eller bruke piltastene. Himmelen bak søylene skifter farge med lyset.
+Soltidene regnes ut i nettleseren med NOAAs formler (`src/lib/daylight.ts`), så
+siden trenger ingen tjeneste utenfra.
 
-- `src/components/site/` — sidens seksjoner og interaksjoner.
-- `src/components/ui/` — `blur-fade` og `number-ticker` fra Magic UI.
+Prosjektkortene kan dras og kastes. Kontaktskjemaet åpnes som et ark fra bunnen
+og kan dras ned for å lukkes. Skjemaet sender ingenting; det er et eksempel.
+
+## Filer
+
+- `src/components/site/daylight-hero.tsx`: dagslyset og datovelgeren.
+- `src/components/site/work-carousel.tsx`: prosjektkortene.
+- `src/components/site/contact-sheet.tsx`: kontaktarket og skjemaet.
+- `src/lib/motion.ts`: fjærinnstillinger og hjelpere for gester.
 
 ## Agent-skills
 
-Installert i `.claude/skills/` (se `skills-lock.json`): `magic-ui`,
+I `.claude/skills/` (se `skills-lock.json`): `frontend-design`, `magic-ui`,
 `vercel-react-best-practices`, `vercel-composition-patterns`,
-`web-design-guidelines` og `find-skills`.
+`web-design-guidelines` og `find-skills`. `humanizer` er installert globalt for
+Claude Code og ble brukt på tekstene.

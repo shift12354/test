@@ -12,8 +12,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Vendored Magic UI / shadcn registry components, kept as upstream ships them.
-    "src/components/ui/**",
   ]),
 ]);
 

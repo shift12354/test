@@ -245,7 +245,7 @@ function ContactSheet({ onClosed }: { onClosed: () => void }) {
                 Book en prat
               </h2>
               <p className="text-muted-foreground mt-1">
-                Fortell litt om prosjektet, så svarer vi innen én arbeidsdag.
+                Fortell kort hva dere trenger. Vi svarer innen én arbeidsdag.
               </p>
             </div>
             <button
@@ -279,6 +279,7 @@ function ContactForm({
 }) {
   const [status, setStatus] = useState<Status>("idle")
   const [errors, setErrors] = useState<Errors>({})
+  const [sentTo, setSentTo] = useState("")
   const doneRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -300,6 +301,7 @@ function ContactForm({
       form.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)?.focus()
       return
     }
+    setSentTo(email)
     setStatus("sending")
     // Demo only: there is no backend, so pretend the request took a moment.
     setTimeout(() => setStatus("sent"), 700)
@@ -308,12 +310,13 @@ function ContactForm({
   if (status === "sent") {
     return (
       <div className="flex flex-col items-center px-6 pt-6 pb-8 text-center" aria-live="polite">
-        <span className="bg-aurora-1/15 text-aurora-1 flex size-14 items-center justify-center rounded-full">
+        <span className="bg-lavsol text-morketid flex size-14 items-center justify-center rounded-full">
           <Check aria-hidden="true" className="size-7" strokeWidth={2.5} />
         </span>
-        <p className="type-subhead mt-4">Takk! Vi hører fra oss snart.</p>
+        <p className="type-lead mt-4">Forespørselen er sendt.</p>
+        <p className="text-muted-foreground mt-1 break-all">Svaret kommer til {sentTo}.</p>
         <button ref={doneRef} type="button" onClick={onDone} className={cn(pill({ size: "lg" }), "mt-6 w-full")}>
-          Ferdig
+          Lukk
         </button>
       </div>
     )
@@ -341,13 +344,13 @@ function ContactForm({
       />
       <label className="flex flex-col gap-1.5">
         <span className="text-sm font-medium">
-          Prosjektet <span className="text-muted-foreground font-normal">(valgfritt)</span>
+          Hva gjelder det? <span className="text-muted-foreground font-normal">(valgfritt)</span>
         </span>
         <textarea
           name="message"
           rows={3}
           autoComplete="off"
-          placeholder="Ny nettbutikk, lansering i mars…"
+          placeholder="Booking til vintersesongen…"
           className="bg-tile placeholder:text-muted-foreground focus-visible:ring-ring resize-none rounded-xl px-4 py-3 outline-none focus-visible:ring-4"
         />
       </label>

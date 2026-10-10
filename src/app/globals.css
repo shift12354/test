@@ -2,54 +2,47 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Apple-inspired neutrals: near-white canvas, soft grey tiles, one blue accent. */
+/* Light from Tromsø: snow and rime by day, polar-night ink after dark, low winter sun as the only accent. */
 :root {
-  --radius: 1.125rem;
-  --background: #ffffff;
-  --foreground: #1d1d1f;
-  --tile: #f5f5f7;
-  --tile-foreground: #1d1d1f;
-  --muted-foreground: #6e6e73;
-  --hairline: rgb(0 0 0 / 0.08);
-  --accent: #0071e3;
-  --accent-hover: #0077ed;
-  --accent-foreground: #ffffff;
-  --link: #0066cc;
-  --ring: rgb(0 113 227 / 0.6);
-  --scrim: rgb(0 0 0 / 0.32);
-  --aurora-1: #34c77b;
-  --aurora-2: #30b0c7;
-  --aurora-3: #5e5ce6;
-  --aurora-4: #bf5af2;
+  --radius: 1.25rem;
+  --morketid: #172038;
+  --blatime: #3e5683;
+  --sno: #eef1f4;
+  --rim: #dce2e9;
+  --lavsol: #f2b84b;
+
+  --background: var(--sno);
+  --foreground: var(--morketid);
+  --tile: var(--rim);
+  --tile-foreground: var(--morketid);
+  --muted-foreground: #4f5d78;
+  --hairline: rgb(23 32 56 / 0.14);
+  --accent: var(--lavsol);
+  --accent-hover: #f5c56a;
+  --accent-foreground: var(--morketid);
+  --link: var(--blatime);
+  --ring: rgb(62 86 131 / 0.55);
+  --scrim: rgb(23 32 56 / 0.4);
 }
 
 .dark {
-  --background: #000000;
-  --foreground: #f5f5f7;
-  --tile: #161617;
-  --tile-foreground: #f5f5f7;
-  --muted-foreground: #86868b;
-  --hairline: rgb(255 255 255 / 0.12);
-  --accent: #0071e3;
-  --accent-hover: #0077ed;
-  --accent-foreground: #ffffff;
-  --link: #2997ff;
-  --ring: rgb(41 151 255 / 0.7);
-  --scrim: rgb(0 0 0 / 0.55);
-  --aurora-1: #30d158;
-  --aurora-2: #40c8e0;
-  --aurora-3: #7d7aff;
-  --aurora-4: #da8fff;
+  --background: var(--morketid);
+  --foreground: var(--sno);
+  --tile: #222c48;
+  --tile-foreground: var(--sno);
+  --muted-foreground: #a9b6c8;
+  --hairline: rgb(238 241 244 / 0.14);
+  --link: #a9c1e8;
+  --ring: rgb(242 184 75 / 0.6);
+  --scrim: rgb(8 12 24 / 0.6);
 }
 
 @theme inline {
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
-    var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 8px);
   --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 10px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-tile: var(--tile);
@@ -62,55 +55,49 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-link: var(--link);
   --color-ring: var(--ring);
-  --color-aurora-1: var(--aurora-1);
-  --color-aurora-2: var(--aurora-2);
-  --color-aurora-3: var(--aurora-3);
-  --color-aurora-4: var(--aurora-4);
+  --color-morketid: var(--morketid);
+  --color-blatime: var(--blatime);
+  --color-sno: var(--sno);
+  --color-lavsol: var(--lavsol);
 }
 
 /*
- * Type scale. Tracking is size-specific: large text tightens, small text
- * opens up slightly. Leading runs the other way.
+ * Type scale after Bringhurst's classic sizes: 14, 18, 24, 36, 48, 72.
+ * Large text tightens and sits on short leading; small text opens up.
  */
 @utility type-display {
-  font-size: clamp(3.5rem, 11vw, 8rem);
-  line-height: 1.02;
-  letter-spacing: -0.03em;
-  font-weight: 700;
+  font-size: clamp(2.25rem, 7.2vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-weight: 800;
 }
 @utility type-headline {
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  line-height: 1.06;
+  font-size: clamp(2.25rem, 4.4vw, 3rem);
+  line-height: 1.05;
   letter-spacing: -0.025em;
-  font-weight: 700;
+  font-weight: 800;
 }
 @utility type-title {
-  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
   line-height: 1.1;
   letter-spacing: -0.02em;
-  font-weight: 600;
+  font-weight: 700;
 }
-@utility type-tile {
-  font-size: clamp(1.5rem, 2.4vw, 1.875rem);
-  line-height: 1.15;
-  letter-spacing: -0.016em;
-  font-weight: 600;
-}
-@utility type-subhead {
-  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-  line-height: 1.25;
+@utility type-lead {
+  font-size: 1.5rem;
+  line-height: 1.3;
   letter-spacing: -0.012em;
   font-weight: 500;
 }
 @utility type-body {
-  font-size: 1.0625rem;
-  line-height: 1.5;
-  letter-spacing: 0;
+  font-size: 1.125rem;
+  line-height: 1.55;
+  letter-spacing: -0.003em;
 }
-@utility type-caption {
-  font-size: 0.75rem;
-  line-height: 1.35;
-  letter-spacing: 0.01em;
+@utility type-small {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  letter-spacing: 0.005em;
 }
 
 /* Instant feedback on press, before the click commits. */
@@ -229,12 +216,12 @@
 
 @media (prefers-contrast: more) {
   :root {
-    --hairline: rgb(0 0 0 / 0.45);
-    --muted-foreground: #4a4a4f;
+    --hairline: rgb(23 32 56 / 0.5);
+    --muted-foreground: #2f3b55;
   }
   .dark {
     --hairline: rgb(255 255 255 / 0.5);
-    --muted-foreground: #b4b4b9;
+    --muted-foreground: #c9d2df;
   }
   .material,
   .material-thick {

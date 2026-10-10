@@ -17,14 +17,51 @@ import {
   type PointerSample,
 } from "@/lib/motion"
 
-// Fictional client work for the demo.
+// Fictional clients. `busy` lists the months (0 = January) when their site matters most.
 const PROJECTS = [
-  { client: "Fjordline", kind: "Nettbutikk", line: "Billetter på tre trykk, også offline på fergen.", from: "#30b0c7", to: "#0a3d62" },
-  { client: "Isbre", kind: "Programvare", line: "Et dashbord som laster før du rekker å blunke.", from: "#7d7aff", to: "#1c1b4d" },
-  { client: "Midnattsol", kind: "Magasin", line: "Lange lesestykker med typografi som puster.", from: "#ff9f0a", to: "#5c2a00" },
-  { client: "Vidde", kind: "Turapp", line: "Kart du kan dra, klype og kaste med fingeren.", from: "#34c77b", to: "#0d3b24" },
-  { client: "Skjærgård", kind: "Booking", line: "Ledige hytter, betalt og bekreftet på ett minutt.", from: "#bf5af2", to: "#3a0f4d" },
+  {
+    client: "Fjellgnist Guiding",
+    place: "Lyngen",
+    work: "Booking av toppturer, med dagens snøskredvarsel ved siden av hver tur.",
+    busy: [1, 2, 3, 4],
+    season: "Travlest februar til mai",
+    color: "#3e5683",
+  },
+  {
+    client: "Havbris Sjømat",
+    place: "Senja",
+    work: "Nettbutikk for tørrfisk og klippfisk, med frakt til hele Europa.",
+    busy: [9, 10, 11],
+    season: "Travlest oktober til desember",
+    color: "#2f5552",
+  },
+  {
+    client: "Ishavsferja",
+    place: "Tromsø",
+    work: "Rutetider og billetter som virker selv med dårlig dekning ute på fjorden.",
+    busy: [5, 6, 7],
+    season: "Travlest juni til august",
+    color: "#1f2f52",
+  },
+  {
+    client: "Kulturhuset Isfjell",
+    place: "Alta",
+    work: "Program og billettsalg for rundt 200 arrangementer i året.",
+    busy: [8, 9, 10, 11, 0, 1, 2],
+    season: "Travlest september til mars",
+    color: "#5a3d5c",
+  },
+  {
+    client: "Nordnatt Camp",
+    place: "Kvaløya",
+    work: "Nordlysvarsel på forsiden, og SMS til gjestene når himmelen klarner.",
+    busy: [8, 9, 10, 11, 0, 1, 2],
+    season: "Travlest september til mars",
+    color: "#24304f",
+  },
 ]
+
+const MONTH_INITIALS = ["j", "f", "m", "a", "m", "j", "j", "a", "s", "o", "n", "d"]
 
 const GAP = 20
 
@@ -159,17 +196,30 @@ export function WorkCarousel() {
               aria-label={`${i + 1} av ${PROJECTS.length}: ${p.client}`}
               aria-hidden={i !== index}
               // mr-5 is GAP (20px), so the measured step matches the layout.
-              className="relative mr-5 flex aspect-[4/5] w-[min(78vw,26rem)] shrink-0 flex-col justify-end overflow-hidden rounded-[2rem] p-7 text-white sm:aspect-[5/6]"
-              style={{ background: `linear-gradient(160deg, ${p.from}, ${p.to})` }}
+              className="text-sno relative mr-5 flex min-h-[22rem] w-[min(82vw,24rem)] shrink-0 flex-col rounded-[1.25rem] p-7 sm:min-h-[24rem]"
+              style={{ backgroundColor: p.color }}
             >
-              <div aria-hidden="true" className="absolute inset-x-7 top-7 flex flex-col gap-3 opacity-70">
-                <span className="h-2 w-1/3 rounded-full bg-white/70" />
-                <span className="h-2 w-1/2 rounded-full bg-white/40" />
-                <span className="mt-4 aspect-[16/10] rounded-2xl border border-white/15 bg-white/10" />
+              <div>
+                <ol aria-hidden="true" className="grid grid-cols-12 gap-1">
+                  {MONTH_INITIALS.map((m, month) => (
+                    <li
+                      key={month}
+                      className={cn(
+                        "type-small flex h-9 items-end justify-center rounded-sm pb-1 font-semibold",
+                        p.busy.includes(month) ? "bg-lavsol text-morketid" : "bg-sno/10 text-sno/60"
+                      )}
+                    >
+                      {m}
+                    </li>
+                  ))}
+                </ol>
+                <p className="type-small text-sno/80 mt-2">{p.season}</p>
               </div>
-              <p className="type-caption font-semibold tracking-[0.06em] text-white/70 uppercase">{p.kind}</p>
-              <h3 translate="no" className="type-title mt-1">{p.client}</h3>
-              <p className="mt-2 text-white/80">{p.line}</p>
+              <div className="mt-auto">
+                <h3 translate="no" className="type-title">{p.client}</h3>
+                <p className="type-small text-sno/75 mt-1">{p.place}</p>
+                <p className="mt-4 max-w-[34ch] text-pretty">{p.work}</p>
+              </div>
             </article>
           ))}
         </motion.div>
@@ -220,7 +270,7 @@ function CarouselButton({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="press bg-tile hover:bg-foreground/10 focus-visible:ring-ring inline-flex size-11 items-center justify-center rounded-full outline-none focus-visible:ring-4 disabled:opacity-30 [&_svg]:size-5"
+      className="press bg-foreground/[0.07] hover:bg-foreground/[0.12] focus-visible:ring-ring inline-flex size-11 items-center justify-center rounded-full outline-none focus-visible:ring-4 disabled:opacity-30 [&_svg]:size-5"
     >
       {children}
     </button>

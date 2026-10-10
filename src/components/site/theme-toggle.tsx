@@ -24,7 +24,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label="Bytt mellom lyst og mørkt tema"
-      className="press text-muted-foreground hover:text-foreground hover:bg-tile focus-visible:ring-ring inline-flex size-8 items-center justify-center rounded-full outline-none focus-visible:ring-4"
+      className="press text-foreground/70 hover:text-foreground hover:bg-foreground/10 focus-visible:ring-ring inline-flex size-8 items-center justify-center rounded-full outline-none focus-visible:ring-4"
     >
       {/* Both icons render; CSS picks one, so there is no hydration mismatch. */}
       <Sun aria-hidden="true" className="hidden size-4 dark:block" />

@@ -1,18 +1,19 @@
-import { Reveal } from "@/components/site/reveal"
-import { SectionHeading } from "@/components/site/section-heading"
 import { WorkCarousel } from "@/components/site/work-carousel"
 
 export function Work() {
   return (
-    <section aria-labelledby="arbeid" className="overflow-x-clip py-24 sm:py-32">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <SectionHeading id="arbeid" eyebrow="Arbeid" title="Sveip deg gjennom." align="start">
-          Dra, kast eller bruk piltastene. Kortene følger fingeren, tar med seg farten
-          og legger seg pent på plass.
-        </SectionHeading>
-        <Reveal delay={0.1}>
-          <WorkCarousel />
-        </Reveal>
+    <section aria-labelledby="arbeid" className="overflow-x-clip py-20 sm:py-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-8">
+        <div className="mb-10 flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+          <h2 id="arbeid" className="type-headline max-w-[18ch] text-balance">
+            Noe av det vi har laget
+          </h2>
+          <p className="text-muted-foreground max-w-[40ch]">
+            Det gule viser når på året nettsiden har mest å gjøre. Dra i kortene eller bruk
+            piltastene.
+          </p>
+        </div>
+        <WorkCarousel />
       </div>
     </section>
   )
