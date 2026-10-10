@@ -8,7 +8,11 @@ npm install
 npm run dev     # http://localhost:3000
 npm run build   # produksjonsbygg
 npm run lint
+npm run build:preview   # én selvstendig HTML-fil i dist-preview/
 ```
+
+`build:preview` lager en versjon av siden uten Next.js-server, med CSS og
+JavaScript bygget inn i én fil. Den brukes til forhåndsvisningen på claude.ai.
 
 Designvalgene står i [`DESIGN.md`](DESIGN.md).
 
