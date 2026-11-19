@@ -231,6 +231,46 @@ button.row:active, button.row[aria-current="true"] { background: color-mix(in sr
 .inline { display: flex; gap: 14px; padding: 10px 16px; align-items: center; }
 .inline input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 6px 0; font-size: 17px; }
 
+/* ---------- Toppfelt på Oversikt (etter Framer-designet) ---------- */
+:root { --hero: linear-gradient(165deg, #241552 0%, #5B44C4 48%, #2A9D7A 100%); --hero-glow: rgba(155, 135, 245, 0.55); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --hero: linear-gradient(165deg, #0F0828 0%, #3B2B8E 50%, #136049 100%); --hero-glow: rgba(120, 100, 230, 0.45); } }
+:root[data-theme="dark"] { --hero: linear-gradient(165deg, #0F0828 0%, #3B2B8E 50%, #136049 100%); --hero-glow: rgba(120, 100, 230, 0.45); }
+.view.has-hero { padding-top: 0; }
+.hero { position: relative; overflow: hidden; color: #fff; background: var(--hero);
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding: calc(env(safe-area-inset-top, 0px) + 22px) max(20px, env(safe-area-inset-right, 0px)) 72px max(20px, env(safe-area-inset-left, 0px));
+  border-radius: 0 0 34px 34px; display: flex; flex-direction: column; gap: 18px; }
+@media (min-width: 712px) { .hero { margin-left: 0; margin-right: 0; margin-top: 12px; border-radius: 34px; } }
+.hero::before { content: ""; position: absolute; width: 280px; height: 280px; top: -90px; right: -90px; border-radius: 50%; background: var(--hero-glow); filter: blur(50px); pointer-events: none; }
+.hero::after { content: ""; position: absolute; width: 220px; height: 220px; bottom: -110px; left: -60px; border-radius: 50%; background: rgba(61, 214, 140, 0.35); filter: blur(60px); pointer-events: none; }
+.hero > * { position: relative; z-index: 1; }
+.hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.hero h1 { margin: 0; font-size: 30px; line-height: 36px; font-weight: 700; letter-spacing: 0.2px; }
+.eyebrow { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.72); }
+.hero .big { color: #fff; }
+.hero .big .i { font-size: clamp(48px, 15vw, 60px); line-height: 1.05; }
+.hero .big .d { color: rgba(255, 255, 255, 0.85); }
+.hero-sub { font-size: 15px; line-height: 20px; color: rgba(255, 255, 255, 0.78); letter-spacing: -0.24px; }
+.bars { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; align-items: end; height: 46px; }
+.bars span { display: block; border-radius: 6px; background: rgba(255, 255, 255, 0.28); min-height: 6px; transform-origin: bottom; animation: barUp 0.7s var(--spring) both; animation-delay: calc(var(--i) * 40ms + 120ms); }
+.bars span:last-child { background: rgba(255, 255, 255, 0.95); }
+@keyframes barUp { from { transform: scaleY(0.1); opacity: 0; } }
+.bars-cap { display: flex; justify-content: space-between; font-size: 11px; line-height: 14px; color: rgba(255, 255, 255, 0.6); margin-top: -10px; }
+.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.quick button { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #fff; font-size: 12px; line-height: 15px; font-weight: 500; letter-spacing: 0; text-align: center; }
+.quick .qb { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; }
+.quick .qb svg { width: 22px; height: 22px; }
+.quick button:disabled { opacity: 0.5; }
+.on-dark { --glass-tint: rgba(255, 255, 255, 0.14); --glass-sheen: rgba(255, 255, 255, 0.22); --glass-edge: rgba(255, 255, 255, 0.18); --glass-rim: rgba(255, 255, 255, 0.85); --glass-rim2: rgba(255, 255, 255, 0.18); --glass-shadow: 0 10px 26px rgba(10, 5, 40, 0.28); color: #fff; }
+.float-card { position: relative; z-index: 2; margin-top: -58px; background: var(--cell); border-radius: 26px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; box-shadow: 0 1px 2px rgba(30, 20, 60, 0.06), 0 10px 28px rgba(30, 20, 60, 0.10); }
+.float-card > div { border-radius: 16px; padding: 10px 12px; min-width: 0; }
+.float-card .fp { background: color-mix(in srgb, var(--pos) 14%, var(--cell)); }
+.float-card .fn { background: color-mix(in srgb, var(--neg) 12%, var(--cell)); }
+.float-card span { display: block; font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--label2); }
+.float-card b { display: block; font-family: var(--font-round); font-size: 22px; line-height: 28px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+body.hero-view:not(.past-title) .edge-top { opacity: 0; }
+.edge-top { transition: opacity 0.25s var(--ease); }
+
 /* ---------- Ark (alle kommer fra bunnen) ---------- */
 dialog:modal { position: fixed; }
 dialog { border: 0; padding: 0; color: var(--label); max-width: 100%; max-height: 100%; background: transparent; overflow: visible; }
@@ -354,6 +394,8 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     people: fillSvg('<circle cx="9" cy="7.6" r="3.7"/><path d="M2.4 19.6c0-3.4 3-5.8 6.6-5.8s6.6 2.4 6.6 5.8c0 .6-.4 1-1 1H3.4c-.6 0-1-.4-1-1z"/><circle cx="16.8" cy="8.6" r="2.9" opacity=".6"/><path d="M17.2 14.1c2.8.2 4.6 2.1 4.6 4.8 0 .5-.3.8-.8.8h-3.6c.1-2-.3-3.9-1.6-5.4z" opacity=".6"/>'),
     list: fillSvg('<circle cx="4.5" cy="6" r="1.7"/><circle cx="4.5" cy="12" r="1.7"/><circle cx="4.5" cy="18" r="1.7"/><rect x="8.5" y="5" width="13" height="2" rx="1"/><rect x="8.5" y="11" width="13" height="2" rx="1"/><rect x="8.5" y="17" width="13" height="2" rx="1"/>'),
     plus: svg('<path d="M5 12h14"/><path d="M12 5v14"/>', 2.6),
+    inn: svg('<path d="M17 7 7 17"/><path d="M17 17H7V7"/>', 2.4),
+    ut: svg('<path d="M7 7h10v10"/><path d="M7 17 17 7"/>', 2.4),
     chev: svg('<path d="m9 18 6-6-6-6"/>', 2.8),
     back: svg('<path d="m15 18-6-6 6-6"/>', 2.6),
     x: svg('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', 2.5),
@@ -438,6 +480,16 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     return { b, n, last };
   }
 
+  function trend(n) {
+    const now = Date.now(), out = [];
+    for (let w = n - 1; w >= 0; w--) {
+      const cut = now - w * 7 * 864e5; let sum = 0;
+      for (const e of S.entries) if (e.status !== "void" && new Date(e.loggedAt).getTime() <= cut) sum += effect(e);
+      out.push(sum);
+    }
+    return out;
+  }
+
   /* ---------- Byggeklosser ---------- */
   function rowHTML(e, o = {}) {
     const n = personName(e.personId), void_ = e.status === "void";
@@ -489,17 +541,31 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     let pos = 0, neg = 0;
     for (const v of B.b.values()) { if (v > 0) pos += v; else neg += v; }
     const net = pos + neg;
-    let h = `<h1 class="large" id="largeTitle">Oversikt</h1>${notice()}
-      <section class="card" aria-label="Saldo">
-        <div><div class="cap">${net > 0 ? "Andre skylder deg netto" : net < 0 ? "Du skylder netto" : "Netto"}</div>${big(net, net > 0 ? "pos" : net < 0 ? "neg" : "", "net")}</div>
-        <div class="tiles"><div class="tile" style="--dot:var(--pos)"><span>Skylder meg</span><b>${krShort(pos)}</b></div><div class="tile" style="--dot:var(--neg)"><span>Jeg skylder</span><b>${krShort(neg)}</b></div></div>
-      </section>`;
+    const weeks = trend(8), maxW = Math.max(1, ...weeks.map((w) => Math.abs(w)));
+    const owing = [...B.b.values()].filter((v) => v > 0).length, owed = [...B.b.values()].filter((v) => v < 0).length;
+    const sub = !S.ready ? "Henter gjeldsboken …" : !S.entries.length ? "Ingen poster ennå"
+      : `${owing ? `${owing} ${owing === 1 ? "person" : "personer"} skylder deg` : "Ingen skylder deg"} · ${owed ? `du skylder ${owed} ${owed === 1 ? "person" : "personer"}` : "ingen du skylder"}`;
+    const dis = S.canWrite ? "" : "disabled";
+    let h = `<section class="hero" aria-label="Saldo">
+        <div class="hero-top"><h1 id="largeTitle">Gjeldsbok</h1></div>
+        <div><div class="eyebrow">${net > 0 ? "Netto til gode" : net < 0 ? "Netto skylder du" : "Netto"}</div>${big(net, "", "net")}<div class="hero-sub">${esc(sub)}</div></div>
+        <div class="bars" role="img" aria-label="Saldo de siste 8 ukene">${weeks.map((w, i) => `<span style="--i:${i};height:${Math.max(12, Math.round(Math.abs(w) / maxW * 100))}%"></span>`).join("")}</div>
+        <div class="bars-cap" aria-hidden="true"><span>8 uker siden</span><span>Nå</span></div>
+        <div class="quick">
+          <button type="button" data-quick="debt:in" ${dis}><span class="qb glass on-dark press">${I.inn}</span>Skylder meg</button>
+          <button type="button" data-quick="debt:out" ${dis}><span class="qb glass on-dark press">${I.ut}</span>Jeg skylder</button>
+          <button type="button" data-quick="transfer:in" ${dis}><span class="qb glass on-dark press">${I.inn}</span>Fikk betalt</button>
+          <button type="button" data-quick="transfer:out" ${dis}><span class="qb glass on-dark press">${I.ut}</span>Betalte</button>
+        </div>
+      </section>
+      <div class="float-card"><div class="fp"><span>Skylder meg</span><b class="pos">${krShort(pos)}</b></div><div class="fn"><span>Jeg skylder</span><b class="neg">${krShort(neg)}</b></div></div>
+      ${notice()}`;
     if (blocked()) return h;
     if (!S.ready) return h + skel(3);
     if (!S.entries.length) {
       return h + `<div class="empty"><h3>Ingen poster ennå</h3>
         <p>Velg Skylder når noen skylder deg penger, eller du skylder noen. Velg Overføring når penger faktisk er sendt. Dato og klokkeslett settes automatisk når du lagrer.</p>
-        <div class="btns"><button class="fillbtn prominent" type="button" data-new="debt">Skylder</button><button class="fillbtn" type="button" data-new="transfer">Overføring</button></div></div>`;
+        <p>Bruk knappene i det fargede feltet over, eller plussknappen nederst.</p></div>`;
     }
     const ppl = [...S.people.values()].sort((a, c) => Math.abs(B.b.get(c.id) || 0) - Math.abs(B.b.get(a.id) || 0)).slice(0, 4);
     h += `<div class="head"><h2>Personer</h2><button type="button" data-tab="personer">Vis alle</button></div><div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div>`;
@@ -593,6 +659,8 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
       }
     }
     lastKey = key;
+    const heroView = key === "oversikt";
+    v.classList.toggle("has-hero", heroView); document.body.classList.toggle("hero-view", heroView);
     renderLogList();
     renderChrome();
     renderDetail();
@@ -625,7 +693,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     if (idx !== pillIdx) { pill.classList.add("stretch"); setTimeout(() => pill.classList.remove("stretch"), 220); pillIdx = idx; }
     pill.style.transform = `translateX(${idx * 100}%)`;
     $("navStart").innerHTML = S.personView ? `<button class="capsule-btn glass press" type="button" data-act="back">${I.back}<span>Personer</span></button>` : "";
-    $("navTitle").textContent = S.personView ? personName(S.personView) : { oversikt: "Oversikt", personer: "Personer", logg: "Logg" }[S.tab];
+    $("navTitle").textContent = S.personView ? personName(S.personView) : { oversikt: "Gjeldsbok", personer: "Personer", logg: "Logg" }[S.tab];
     $("plus").disabled = !S.canWrite;
   }
   let io, observed = null;
@@ -634,7 +702,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     if (t === observed) return;
     io?.disconnect(); observed = t;
     if (!t || !("IntersectionObserver" in window)) return;
-    io = new IntersectionObserver(([en]) => $("navTitle").classList.toggle("show", !en.isIntersecting), { rootMargin: "-56px 0px 0px 0px" });
+    io = new IntersectionObserver(([en]) => { $("navTitle").classList.toggle("show", !en.isIntersecting); document.body.classList.toggle("past-title", !en.isIntersecting); }, { rootMargin: "-56px 0px 0px 0px" });
     io.observe(t);
   }
 
@@ -727,14 +795,14 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
   }
 
   /* ---------- Skjema ---------- */
-  function openForm(kind, editId) {
+  function openForm(kind, editId, dir) {
     if (!S.canWrite) return;
     if (editId) {
       const e = S.entries.find((x) => x.id === editId); if (!e) return;
       S.form = { mode: "edit", id: e.id, kind: e.kind, personId: e.personId, newName: "", dir: e.dir, amount: oreToInput(e.amountOre), reason: e.reason, method: e.method || "vipps", loggedAt: e.loggedAt, err: "" };
     } else {
       const pre = S.personView || S.f.person || "";
-      S.form = { mode: "new", kind, personId: pre || (S.people.size ? "" : "__new"), newName: "", dir: "in", amount: "", reason: "", method: "vipps", err: "" };
+      S.form = { mode: "new", kind, personId: pre || (S.people.size ? "" : "__new"), newName: "", dir: dir || "in", amount: "", reason: "", method: "vipps", err: "" };
     }
     renderForm();
     openSheet($("formDlg"));
@@ -866,6 +934,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
   document.addEventListener("click", (ev) => {
     const t = ev.target.closest("button"); if (!t) return;
     if (t.id === "plus") { if (S.canWrite) openSheet($("actDlg")); return; }
+    if (t.dataset.quick) { const [k, d] = t.dataset.quick.split(":"); openForm(k, null, d); return; }
     if (t.dataset.new) { const k = t.dataset.new; if ($("actDlg").open) closeSheet($("actDlg"), () => openForm(k)); else openForm(k); return; }
     if (t.dataset.tab) { if (S.tab === t.dataset.tab && !S.personView) { window.scrollTo({ top: 0, behavior: "smooth" }); return; } S.tab = t.dataset.tab; S.personView = null; S.renaming = false; window.scrollTo({ top: 0 }); render(); return; }
     if (t.dataset.person) { S.personView = t.dataset.person; S.renaming = false; window.scrollTo({ top: 0 }); render(); return; }
