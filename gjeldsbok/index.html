@@ -1,0 +1,775 @@
+<title>Gjeldsbok</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: kassabok i tre kolonner (personer · logg · post) som stables til én kolonne på mobil. */
+:root {
+  --bg: #F2F4EF;
+  --surface: #FFFFFF;
+  --ink: #18211C;
+  --muted: #5D6A62;
+  --rule: #DCE2DA;
+  --plus: #1E6A4C;
+  --plus-soft: #E1EEE6;
+  --minus: #B23A2E;
+  --minus-soft: #F6E3DF;
+  --on-ink: #FFFFFF;
+  --scrim: rgba(17, 22, 19, 0.42);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+  --font-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111613; --surface: #19201C; --ink: #E6ECE8; --muted: #9AA8A0; --rule: #2B3530;
+    --plus: #62C392; --plus-soft: #1B3227; --minus: #F2806F; --minus-soft: #3A221F; --on-ink: #111613;
+    --scrim: rgba(0, 0, 0, 0.6); --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111613; --surface: #19201C; --ink: #E6ECE8; --muted: #9AA8A0; --rule: #2B3530;
+  --plus: #62C392; --plus-soft: #1B3227; --minus: #F2806F; --minus-soft: #3A221F; --on-ink: #111613;
+  --scrim: rgba(0, 0, 0, 0.6); --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { background: var(--bg); }
+body { color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.plus { color: var(--plus); }
+.minus { color: var(--minus); }
+.muted { color: var(--muted); }
+.label { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+h1, h2, h3 { text-wrap: balance; }
+
+.app {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  min-height: 100%;
+}
+.col { min-width: 0; display: flex; flex-direction: column; gap: 16px; padding-block: 28px; }
+.side header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.side h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 30px; line-height: 1.15; letter-spacing: -0.01em; }
+.today { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 20px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.net-label { font-size: 14px; font-weight: 500; color: var(--muted); }
+.net { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: clamp(28px, 7vw, 34px); line-height: 1.15; letter-spacing: -0.02em; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.split div { border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.split .p { background: var(--plus-soft); }
+.split .m { background: var(--minus-soft); }
+.split span { font-size: 13px; color: var(--muted); }
+.split strong { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 16px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; padding: 12px 18px 12px 16px; font-weight: 600; font-size: 15px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); min-height: 46px; }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.btn.primary { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.btn.danger { color: var(--minus); }
+.btn.ghost { background: transparent; border-color: transparent; padding-inline: 10px; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:not(:disabled):hover { filter: brightness(0.97); }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.list { background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; overflow: hidden; }
+.row { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-bottom: 1px solid var(--rule); width: 100%; text-align: left; background: var(--surface); border-inline: 0; border-top: 0; }
+.list > :last-child { border-bottom: 0; }
+button.row:hover { background: color-mix(in srgb, var(--bg) 60%, var(--surface)); }
+.row[aria-current="true"] { background: var(--bg); box-shadow: inset 3px 0 0 var(--ink); }
+.row .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.row .t { font-weight: 600; font-size: 15px; line-height: 20px; overflow-wrap: anywhere; }
+.row .r { font-size: 14px; color: var(--muted); line-height: 20px; overflow-wrap: anywhere; }
+.row .meta { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; font-family: var(--font-mono); font-size: 11px; color: var(--muted); line-height: 16px; }
+.tag { border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; font-size: 10px; }
+.row .amt { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; }
+.row .amt strong { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 15px; line-height: 20px; white-space: nowrap; }
+.row .amt span { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.row.void .t, .row.void .amt strong { text-decoration: line-through; color: var(--muted); }
+.badge { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--rule); color: var(--ink); }
+.badge svg { width: 18px; height: 18px; }
+.badge.p { background: var(--plus-soft); color: var(--plus); }
+.badge.m { background: var(--minus-soft); color: var(--minus); }
+.row.void .badge { background: var(--rule); color: var(--muted); }
+
+.person { align-items: center; padding-right: 10px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--rule); background: var(--bg); display: grid; place-items: center; font-weight: 600; font-size: 14px; flex: none; }
+.person .t { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.person .meta { flex-wrap: nowrap; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.person .amt strong { font-size: 16px; }
+.person .amt span { font-family: var(--font-body); font-size: 12px; }
+.chev { width: 18px; height: 18px; color: var(--muted); flex: none; align-self: center; }
+
+.loghead { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.loghead h2 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 30px; line-height: 1.15; }
+.search { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 0 14px; }
+.search svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
+.search input { border: 0; background: transparent; padding: 12px 0; flex: 1; min-width: 0; font-size: 15px; outline: none; }
+.search:focus-within { outline: 2px solid var(--ink); outline-offset: 1px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip { border-radius: 999px; padding: 8px 14px; border: 1px solid var(--rule); background: var(--surface); font-weight: 500; font-size: 14px; line-height: 18px; }
+.chip[aria-pressed="true"], .chip[aria-checked="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+.chip.add { border-style: dashed; border-color: var(--muted); color: var(--muted); background: transparent; display: inline-flex; gap: 4px; align-items: center; }
+.chip.add svg { width: 16px; height: 16px; }
+.select { position: relative; }
+.select select { appearance: none; -webkit-appearance: none; border-radius: 999px; padding: 8px 34px 8px 14px; border: 1px solid var(--rule); background: var(--surface); font-weight: 500; font-size: 14px; line-height: 18px; max-width: 100%; }
+.select svg { position: absolute; right: 12px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
+.day { display: flex; flex-direction: column; gap: 8px; }
+.day h3 { margin: 0; font-family: var(--font-mono); font-weight: 500; font-size: 12px; color: var(--muted); }
+.days { display: flex; flex-direction: column; gap: 20px; }
+
+.phead { display: flex; flex-direction: column; gap: 4px; }
+.phead .back { align-self: flex-start; margin-left: -10px; color: var(--muted); }
+.phead h2 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 30px; line-height: 1.15; overflow-wrap: anywhere; }
+.phead .big { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 34px; letter-spacing: -0.02em; line-height: 1.2; }
+.phead .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.rename { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.rename input { flex: 1; min-width: 160px; }
+
+.empty { display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 1px dashed var(--muted); border-radius: 16px; }
+.empty h3 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 20px; }
+.empty p { margin: 0; color: var(--muted); max-width: 60ch; }
+.example { position: relative; }
+.example::after { content: "Eksempel"; position: absolute; top: 8px; right: 8px; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; background: var(--ink); color: var(--on-ink); padding: 2px 6px; border-radius: 4px; }
+.example .row { opacity: 0.75; }
+.notice { border-radius: 12px; background: var(--rule); padding: 12px 14px; font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
+.notice svg { width: 18px; height: 18px; flex: none; margin-top: 1px; color: var(--muted); }
+.skeleton { height: 72px; border-radius: 16px; background: linear-gradient(90deg, var(--surface), var(--rule), var(--surface)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* Post-detaljer */
+.detail { display: none; }
+.dpanel { display: flex; flex-direction: column; gap: 18px; }
+.dpanel .top { display: flex; align-items: center; justify-content: space-between; }
+.dpanel h2 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 24px; line-height: 1.2; overflow-wrap: anywhere; }
+.dpanel .big { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 30px; letter-spacing: -0.02em; }
+.dl { display: flex; flex-direction: column; margin: 0; }
+.dl div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--rule); font-size: 14px; }
+.dl dt { color: var(--muted); }
+.dl dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+.timeline { list-style: none; margin: 0; padding: 0; }
+.timeline li { display: grid; grid-template-columns: 9px minmax(0, 1fr); gap: 12px; position: relative; padding-bottom: 16px; }
+.timeline li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--ink); margin-top: 6px; }
+.timeline li:not(:last-child)::after { content: ""; position: absolute; left: 4px; top: 19px; bottom: 2px; width: 1px; background: var(--rule); }
+.timeline li:last-child::before { background: var(--muted); }
+.timeline strong { display: block; font-size: 14px; }
+.timeline .c { font-family: var(--font-mono); font-size: 12px; overflow-wrap: anywhere; }
+.timeline .w { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.confirm { border: 1px solid var(--minus); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+.btnrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.placeholder { color: var(--muted); font-size: 14px; border: 1px dashed var(--rule); border-radius: 16px; padding: 20px; }
+
+/* Ark (skjema og detaljer på mobil) */
+dialog.sheet { border: 0; padding: 0; background: var(--bg); color: var(--ink); width: 100%; max-width: 100%; max-height: 92dvh; margin: auto 0 0; border-radius: 24px 24px 0 0; overflow: auto; }
+dialog.sheet::backdrop { background: var(--scrim); }
+.sheet-in { padding: 20px max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 18px; }
+.sheet-top { display: flex; align-items: center; gap: 12px; }
+.sheet-top h2 { margin: 0; flex: 1; font-family: var(--font-display); font-weight: 600; font-size: 24px; }
+.iconbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--rule); display: grid; place-items: center; flex: none; }
+.iconbtn svg { width: 18px; height: 18px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: var(--rule); border-radius: 12px; }
+.seg button { border: 0; background: transparent; border-radius: 9px; padding: 9px 8px; font-weight: 500; color: var(--muted); font-size: 14px; line-height: 18px; min-width: 0; overflow-wrap: anywhere; }
+.seg button[aria-checked="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: var(--shadow); }
+.fld { display: flex; flex-direction: column; gap: 6px; }
+.fld > span, .fld legend { font-size: 13px; font-weight: 500; color: var(--muted); padding: 0; }
+fieldset.fld { border: 0; margin: 0; padding: 0; min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.input { width: 100%; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; font-size: 16px; }
+.input:focus { outline: 2px solid var(--ink); outline-offset: 1px; }
+.amount { display: flex; align-items: baseline; gap: 8px; background: var(--surface); border: 2px solid var(--ink); border-radius: 16px; padding: 10px 16px; }
+.amount input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 36px; line-height: 1.2; padding: 0; }
+.amount span { font-family: var(--font-mono); font-weight: 500; font-size: 18px; color: var(--muted); }
+.stamp { display: flex; gap: 10px; align-items: flex-start; background: var(--rule); border-radius: 12px; padding: 12px 14px; }
+.stamp svg { width: 18px; height: 18px; color: var(--muted); flex: none; margin-top: 1px; }
+.stamp b { display: block; font-weight: 500; font-size: 13px; }
+.stamp .mono { font-size: 12px; color: var(--muted); }
+.hint { display: flex; gap: 10px; font-size: 13px; color: var(--muted); }
+.hint svg { width: 16px; height: 16px; flex: none; margin-top: 1px; }
+.err { color: var(--minus); font-size: 14px; font-weight: 500; margin: 0; }
+.err:empty { display: none; }
+
+.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--rule); }
+.main { padding-bottom: 96px; }
+.side .actions { display: none; }
+.toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--on-ink); padding: 10px 16px; border-radius: 999px; font-weight: 500; font-size: 14px; z-index: 20; max-width: calc(100% - 32px); }
+
+@media (min-width: 600px) {
+  dialog.sheet { max-width: 480px; margin: auto; border-radius: 24px; max-height: 90dvh; }
+}
+@media (min-width: 900px) {
+  .app { grid-template-columns: 340px minmax(0, 1fr); padding-left: 0; padding-right: 0; }
+  .side { padding-inline: max(24px, env(safe-area-inset-left, 0px)) 24px; border-right: 1px solid var(--rule); position: sticky; top: 0; height: 100dvh; overflow: auto; }
+  .main { padding-inline: 32px max(32px, env(safe-area-inset-right, 0px)); padding-bottom: 40px; }
+  .side .actions { display: grid; }
+  .dock { display: none; }
+  .toast { bottom: 24px; }
+}
+@media (min-width: 1240px) {
+  .app { grid-template-columns: 360px minmax(0, 1fr) 380px; }
+  .main { padding-inline: 32px; }
+  .detail { display: flex; background: var(--surface); border-left: 1px solid var(--rule); padding-inline: 28px max(28px, env(safe-area-inset-right, 0px)); position: sticky; top: 0; height: 100dvh; overflow: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+</style>
+
+<div class="app">
+  <aside class="col side" aria-label="Oversikt">
+    <header>
+      <div>
+        <h1>Gjeldsbok</h1>
+        <div class="today" id="today"></div>
+      </div>
+    </header>
+    <section class="card" aria-label="Saldo totalt">
+      <div>
+        <div class="net-label" id="netLabel">Netto</div>
+        <div class="net" id="net">0,00 kr</div>
+      </div>
+      <div class="split">
+        <div class="p"><span>Skylder meg</span><strong class="plus" id="owedToMe">0,00</strong></div>
+        <div class="m"><span>Jeg skylder</span><strong class="minus" id="iOwe">0,00</strong></div>
+      </div>
+    </section>
+    <div class="actions">
+      <button class="btn primary" type="button" data-new="debt"></button>
+      <button class="btn" type="button" data-new="transfer"></button>
+    </div>
+    <div id="banner"></div>
+    <h2 class="label">Personer</h2>
+    <div id="people"></div>
+  </aside>
+
+  <main class="col main" aria-label="Logg">
+    <div id="personHead"></div>
+    <div class="loghead"><h2 id="logTitle">Logg</h2><span class="mono muted" id="count"></span></div>
+    <label class="search">
+      <span id="searchIcon"></span>
+      <input id="q" type="search" placeholder="Søk i grunn, navn eller betalingsmåte" autocomplete="off">
+    </label>
+    <div class="filters" role="group" aria-label="Filtre">
+      <button class="chip" type="button" data-type="all" aria-pressed="true">Alle</button>
+      <button class="chip" type="button" data-type="debt" aria-pressed="false">Skylder</button>
+      <button class="chip" type="button" data-type="transfer" aria-pressed="false">Overføringer</button>
+      <label class="select"><span class="sr" hidden>Person</span><select id="fPerson" aria-label="Person"><option value="">Alle personer</option></select><span class="caret"></span></label>
+      <label class="select"><select id="fPeriod" aria-label="Periode">
+        <option value="all">Hele perioden</option>
+        <option value="7">Siste 7 dager</option>
+        <option value="30">Siste 30 dager</option>
+        <option value="year">I år</option>
+      </select><span class="caret"></span></label>
+    </div>
+    <div id="entries" class="days"></div>
+  </main>
+
+  <aside class="col detail" id="detailCol" aria-label="Post"></aside>
+</div>
+
+<div class="dock">
+  <button class="btn primary" type="button" data-new="debt"></button>
+  <button class="btn" type="button" data-new="transfer"></button>
+</div>
+
+<dialog class="sheet" id="formDlg" aria-labelledby="formTitle"><form class="sheet-in" id="form" novalidate></form></dialog>
+<dialog class="sheet" id="detailDlg" aria-label="Post"><div class="sheet-in" id="detailSheet"></div></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ---------- Ikoner (Lucide-baner) ---------- */
+  const svg = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  const I = {
+    receipt: svg('<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/>'),
+    inn: svg('<path d="M17 7 7 17"/><path d="M17 17H7V7"/>'),
+    ut: svg('<path d="M7 7h10v10"/><path d="M7 17 17 7"/>'),
+    plus: svg('<path d="M5 12h14"/><path d="M12 5v14"/>'),
+    chev: svg('<path d="m9 18 6-6-6-6"/>'),
+    back: svg('<path d="m15 18-6-6 6-6"/>'),
+    x: svg('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
+    search: svg('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'),
+    clock: svg('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>'),
+    info: svg('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'),
+    down: svg('<path d="m6 9 6 6 6-6"/>'),
+  };
+
+  /* ---------- Formatering ---------- */
+  const TZ = "Europe/Oslo";
+  const nf = new Intl.NumberFormat("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const kr = (ore) => nf.format(Math.abs(ore) / 100);
+  const dtf = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "short", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+  const dayFmt = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "long", day: "numeric", month: "long" });
+  const dayFmtY = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const longToday = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const parts = (d) => { const o = {}; for (const p of dtf.formatToParts(d)) o[p.type] = p.value; return o; };
+  const stamp = (iso) => { const p = parts(new Date(iso)); return `${p.weekday} ${p.day}.${p.month}.${p.year} · ${p.hour}.${p.minute}`; };
+  const dayKey = (iso) => { const p = parts(new Date(iso)); return `${p.year}-${p.month}-${p.day}`; };
+  const shortDate = (iso) => { const p = parts(new Date(iso)); return `${p.day}.${p.month}.`; };
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const initials = (n) => (n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  const firstName = (n) => (n || "personen").trim().split(/\s+/)[0];
+
+  function parseAmount(raw) {
+    let s = String(raw || "").replace(/[\s ]/g, "").replace(/kr/gi, "");
+    s = s.replace(/\.(?=\d{3}(\D|$))/g, "").replace(",", ".");
+    if (!/^\d+(\.\d{1,2})?$/.test(s)) return null;
+    const ore = Math.round(parseFloat(s) * 100);
+    return ore > 0 ? ore : null;
+  }
+  const oreToInput = (ore) => (ore / 100).toFixed(2).replace(".", ",").replace(/,00$/, "");
+
+  const METHODS = { vipps: "Vipps", bank: "Bank", kontant: "Kontant", annet: "Annet" };
+
+  /* ---------- Regnskapsregler ----------
+     Positiv saldo = personen skylder meg.
+     Gjeld inn  (+)  personen skylder meg
+     Gjeld ut   (−)  jeg skylder personen
+     Overføring ut (+)  jeg sendte penger, personen skylder meg mer
+     Overføring inn (−) personen betalte meg, skylder mindre */
+  const effect = (e) => (e.kind === "debt" ? (e.dir === "in" ? 1 : -1) : (e.dir === "out" ? 1 : -1)) * e.amountOre;
+  const title = (e, n) => e.kind === "debt"
+    ? (e.dir === "in" ? `${n} skylder meg` : `Jeg skylder ${n}`)
+    : (e.dir === "in" ? `${n} betalte meg` : `Jeg betalte ${n}`);
+  const amtLabel = (e) => e.kind === "debt" ? (e.dir === "in" ? "til gode" : "skylder") : (e.dir === "in" ? "mottatt" : "sendt");
+  const effectText = (e, n) => e.kind === "debt"
+    ? (e.dir === "in" ? `Gjeld · ${n} skylder deg dette` : `Gjeld · du skylder ${n} dette`)
+    : (e.dir === "in" ? `Overføring inn · teller som betaling fra ${n}` : `Overføring ut · gjør at ${n} skylder deg mer`);
+
+  /* ---------- Tilstand ---------- */
+  const S = {
+    db: null, canWrite: false, ready: false, status: "loading",
+    people: new Map(), entries: [],
+    f: { type: "all", person: "", period: "all", q: "" },
+    sel: null, confirmVoid: false, renaming: false, busy: false,
+    form: null,
+  };
+  const $ = (id) => document.getElementById(id);
+  const wide = window.matchMedia("(min-width: 1240px)");
+
+  const personName = (id) => S.people.get(id)?.name || "Ukjent person";
+
+  function balances() {
+    const b = new Map(); const n = new Map(); const last = new Map();
+    for (const p of S.people.keys()) { b.set(p, 0); n.set(p, 0); }
+    for (const e of S.entries) {
+      n.set(e.personId, (n.get(e.personId) || 0) + 1);
+      if (!last.has(e.personId)) last.set(e.personId, e.loggedAt);
+      if (e.status === "void") continue;
+      b.set(e.personId, (b.get(e.personId) || 0) + effect(e));
+    }
+    return { b, n, last };
+  }
+
+  /* ---------- Gjengivelse ---------- */
+  function render() {
+    renderTotals(); renderPeople(); renderPersonHead(); renderEntries(); renderDetail();
+    const off = !S.canWrite;
+    document.querySelectorAll("[data-new]").forEach((b) => (b.disabled = off));
+  }
+
+  function renderTotals() {
+    const { b } = balances();
+    let pos = 0, neg = 0;
+    for (const v of b.values()) { if (v > 0) pos += v; else neg += v; }
+    const net = pos + neg;
+    $("owedToMe").textContent = kr(pos);
+    $("iOwe").textContent = kr(neg);
+    $("net").textContent = (net < 0 ? "−" : "") + kr(net) + " kr";
+    $("net").className = "net " + (net > 0 ? "plus" : net < 0 ? "minus" : "");
+    $("netLabel").textContent = net > 0 ? "Netto til gode" : net < 0 ? "Netto skylder jeg" : "Netto";
+  }
+
+  function renderPeople() {
+    const el = $("people");
+    if (S.status === "denied" || S.status === "offline") { el.innerHTML = ""; return; }
+    if (!S.ready) { el.innerHTML = '<div class="skeleton"></div>'; return; }
+    const { b, n, last } = balances();
+    const ppl = [...S.people.values()].sort((a, c) => Math.abs(b.get(c.id) || 0) - Math.abs(b.get(a.id) || 0) || a.name.localeCompare(c.name, "nb"));
+    if (!ppl.length) {
+      el.innerHTML = '<p class="muted" style="margin:0;font-size:14px">Personene dukker opp her med saldo når du logger den første posten.</p>';
+    } else {
+      el.innerHTML = '<div class="list">' + ppl.map((p) => {
+        const v = b.get(p.id) || 0, cnt = n.get(p.id) || 0;
+        const cls = v > 0 ? "plus" : v < 0 ? "minus" : "muted";
+        const lab = v > 0 ? "skylder deg" : v < 0 ? "du skylder" : "gjort opp";
+        const sub = `${cnt} ${cnt === 1 ? "post" : "poster"}${last.has(p.id) ? " · " + shortDate(last.get(p.id)) : ""}`;
+        return `<button type="button" class="row person" data-person="${esc(p.id)}" aria-current="${S.f.person === p.id}">
+          <span class="avatar" aria-hidden="true">${esc(initials(p.name))}</span>
+          <span class="mid"><span class="t">${esc(p.name)}</span><span class="meta">${esc(sub)}</span></span>
+          <span class="amt"><strong class="${cls}">${kr(v)}</strong><span>${lab}</span></span>
+          <span class="chev">${I.chev}</span></button>`;
+      }).join("") + "</div>";
+    }
+    const sel = $("fPerson"); const cur = S.f.person;
+    sel.innerHTML = '<option value="">Alle personer</option>' + [...S.people.values()].sort((a, c) => a.name.localeCompare(c.name, "nb")).map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
+    sel.value = S.people.has(cur) ? cur : "";
+  }
+
+  function renderPersonHead() {
+    const el = $("personHead"); const id = S.f.person;
+    if (!id || !S.people.has(id)) { el.innerHTML = ""; $("logTitle").textContent = "Logg"; return; }
+    const p = S.people.get(id); const v = balances().b.get(id) || 0;
+    const cls = v > 0 ? "plus" : v < 0 ? "minus" : "muted";
+    const lab = v > 0 ? `${esc(firstName(p.name))} skylder deg` : v < 0 ? `Du skylder ${esc(firstName(p.name))}` : "Gjort opp";
+    $("logTitle").textContent = "Logg for " + firstName(p.name);
+    el.innerHTML = `<div class="phead">
+      <button type="button" class="btn ghost back" data-act="allpeople">${I.back}Alle personer</button>
+      <h2>${esc(p.name)}</h2>
+      <div class="big ${cls}">${kr(v)} kr</div>
+      <div class="${cls}" style="font-weight:500">${lab}</div>
+      ${S.renaming ? `<div class="rename"><input class="input" id="renameIn" value="${esc(p.name)}" aria-label="Nytt navn" maxlength="60"><button class="btn primary" type="button" data-act="rename-save">Lagre navn</button><button class="btn" type="button" data-act="rename-cancel">Avbryt</button></div>`
+        : `<div class="tools"><button class="btn" type="button" data-act="new-for" data-kind="debt">${I.plus}Skylder</button><button class="btn" type="button" data-act="new-for" data-kind="transfer">${I.plus}Overføring</button>${S.canWrite ? '<button class="btn ghost" type="button" data-act="rename">Endre navn</button>' : ""}</div>`}
+    </div>`;
+  }
+
+  function filtered() {
+    const f = S.f; const q = f.q.trim().toLowerCase();
+    const now = Date.now(); let from = 0;
+    if (f.period === "7") from = now - 7 * 864e5;
+    else if (f.period === "30") from = now - 30 * 864e5;
+    else if (f.period === "year") from = new Date(parts(new Date()).year + "-01-01T00:00:00").getTime();
+    return S.entries.filter((e) => {
+      if (f.type !== "all" && e.kind !== f.type) return false;
+      if (f.person && e.personId !== f.person) return false;
+      if (from && new Date(e.loggedAt).getTime() < from) return false;
+      if (q) {
+        const hay = [e.reason, personName(e.personId), METHODS[e.method] || "", title(e, personName(e.personId))].join(" ").toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }
+
+  function rowHTML(e, opts = {}) {
+    const n = personName(e.personId);
+    const void_ = e.status === "void";
+    const tone = e.kind === "debt" ? (e.dir === "in" ? "p" : "m") : "";
+    const amtCls = e.kind === "debt" ? (e.dir === "in" ? "plus" : "minus") : "";
+    const sign = e.kind === "debt" ? (e.dir === "in" ? "+" : "−") : "";
+    const reason = e.reason + (e.kind === "transfer" && e.method ? " · " + (METHODS[e.method] || e.method) : "");
+    const edited = (e.history || []).some((h) => h.action === "edited");
+    const tag = opts.static ? "div" : "button";
+    return `<${tag} ${opts.static ? "" : 'type="button"'} class="row${void_ ? " void" : ""}" data-entry="${esc(e.id)}" aria-current="${S.sel === e.id}">
+      <span class="badge ${tone}">${e.kind === "debt" ? I.receipt : e.dir === "in" ? I.inn : I.ut}</span>
+      <span class="mid"><span class="t">${esc(title(e, n))}</span><span class="r">${esc(reason)}</span>
+        <span class="meta"><span>${stamp(e.loggedAt)}</span>${edited ? '<span class="tag">redigert</span>' : ""}${void_ ? '<span class="tag">annullert</span>' : ""}</span></span>
+      <span class="amt"><strong class="${amtCls}">${sign}${kr(e.amountOre)}</strong><span>${amtLabel(e)}</span></span></${tag}>`;
+  }
+
+  function renderEntries() {
+    const el = $("entries");
+    if (S.status === "denied" || S.status === "offline") { el.innerHTML = ""; $("count").textContent = ""; return; }
+    if (!S.ready) { el.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>'; $("count").textContent = ""; return; }
+    if (!S.entries.length) {
+      $("count").textContent = "";
+      const example = { id: "x", kind: "debt", dir: "in", personId: "_", amountOre: 45000, reason: "Pizza fredag", loggedAt: new Date().toISOString(), status: "active" };
+      const keep = S.people; S.people = new Map([["_", { id: "_", name: "Ola" }]]);
+      const ex = rowHTML(example, { static: true }); S.people = keep;
+      el.innerHTML = `<div class="empty"><h3>Ingen poster ennå</h3>
+        <p>Trykk <b>Skylder</b> når noen skylder deg penger, eller du skylder noen. Trykk <b>Overføring</b> når penger faktisk er sendt, for eksempel på Vipps. Dato og klokkeslett settes automatisk når du lagrer.</p>
+        <div class="list example">${ex}</div></div>`;
+      return;
+    }
+    const list = filtered();
+    $("count").textContent = list.length === S.entries.length ? `${list.length} ${list.length === 1 ? "post" : "poster"}` : `${list.length} av ${S.entries.length} poster`;
+    if (!list.length) { el.innerHTML = '<div class="placeholder">Ingen poster passer filteret. Prøv et annet søk eller en lengre periode.</div>'; return; }
+    const thisYear = parts(new Date()).year; const groups = [];
+    for (const e of list) {
+      const k = dayKey(e.loggedAt);
+      if (!groups.length || groups[groups.length - 1].k !== k) groups.push({ k, d: e.loggedAt, items: [] });
+      groups[groups.length - 1].items.push(e);
+    }
+    el.innerHTML = groups.map((g) => {
+      const d = new Date(g.d); const label = cap((parts(d).year === thisYear ? dayFmt : dayFmtY).format(d));
+      return `<section class="day"><h3>${esc(label)}</h3><div class="list">${g.items.map((e) => rowHTML(e)).join("")}</div></section>`;
+    }).join("");
+  }
+
+  const FIELD_LABEL = { amountOre: "Sum", reason: "Grunn", personId: "Person", kind: "Type", dir: "Retning", method: "Betalt med" };
+  function fmtField(f, v) {
+    if (v == null || v === "") return "–";
+    if (f === "amountOre") return kr(v) + " kr";
+    if (f === "personId") return personName(v);
+    if (f === "kind") return v === "debt" ? "Skylder" : "Overføring";
+    if (f === "dir") return v === "in" ? "inn" : "ut";
+    if (f === "method") return METHODS[v] || v;
+    return String(v);
+  }
+
+  function detailHTML(e, inSheet) {
+    const n = personName(e.personId); const void_ = e.status === "void";
+    const sign = e.kind === "debt" ? (e.dir === "in" ? "+" : "−") : "";
+    const cls = void_ ? "muted" : e.kind === "debt" ? (e.dir === "in" ? "plus" : "minus") : "";
+    const hist = [...(e.history || [])].reverse().map((h) => {
+      let head = "", body = "";
+      if (h.action === "created") { head = "Opprettet"; body = `${kr(h.snapshot?.amountOre ?? e.amountOre)} kr · ${esc(h.snapshot?.reason ?? "")}`; }
+      else if (h.action === "edited") { head = "Endret"; body = Object.entries(h.changes || {}).map(([f, [a, b]]) => `${FIELD_LABEL[f] || f}: ${esc(fmtField(f, a))} → ${esc(fmtField(f, b))}`).join("<br>"); }
+      else if (h.action === "voided") { head = "Annullert"; body = "Teller ikke lenger i saldoen"; }
+      else if (h.action === "restored") { head = "Gjenopprettet"; body = "Teller igjen i saldoen"; }
+      return `<li><div><strong>${head}</strong><div class="c">${body}</div><div class="w">${stamp(h.at)}</div></div></li>`;
+    }).join("");
+    const actions = !S.canWrite ? "" : S.confirmVoid
+      ? `<div class="confirm"><span>Annullere denne posten? Den blir stående i loggen, men teller ikke i saldoen. Du kan gjenopprette den senere.</span>
+         <div class="btnrow"><button class="btn danger" type="button" data-act="void-yes" ${S.busy ? "disabled" : ""}>Ja, annuller</button><button class="btn" type="button" data-act="void-no">Behold</button></div></div>`
+      : `<div class="btnrow"><button class="btn" type="button" data-act="edit" ${void_ || S.busy ? "disabled" : ""}>Rediger</button>
+         ${void_ ? `<button class="btn" type="button" data-act="restore" ${S.busy ? "disabled" : ""}>Gjenopprett</button>` : `<button class="btn danger" type="button" data-act="void" ${S.busy ? "disabled" : ""}>Annuller post</button>`}</div>`;
+    return `<div class="dpanel">
+      <div class="top"><p class="label">Post${void_ ? " · annullert" : ""}</p><button class="iconbtn" type="button" data-act="close-detail" aria-label="Lukk">${I.x}</button></div>
+      <div><h2>${esc(title(e, n))}</h2><div class="big ${cls}" ${void_ ? 'style="text-decoration:line-through"' : ""}>${sign}${kr(e.amountOre)} kr</div><div class="muted" style="font-size:14px">${esc(effectText(e, firstName(n)))}</div></div>
+      <dl class="dl">
+        <div><dt>Person</dt><dd>${esc(n)}</dd></div>
+        <div><dt>Grunn</dt><dd>${esc(e.reason)}</dd></div>
+        ${e.kind === "transfer" ? `<div><dt>Betalt med</dt><dd>${esc(METHODS[e.method] || "–")}</dd></div>` : ""}
+        <div><dt>Loggført</dt><dd class="mono">${stamp(e.loggedAt)}</dd></div>
+      </dl>
+      ${actions}
+      <p class="label">Historikk</p>
+      <ol class="timeline">${hist}</ol>
+      <p class="muted" style="margin:0;font-size:13px">Ingenting slettes. Endringer og annulleringer lagres med tidspunkt, så loggen viser alltid hva som skjedde.</p>
+    </div>`;
+  }
+
+  function renderDetail() {
+    const e = S.entries.find((x) => x.id === S.sel);
+    const col = $("detailCol"), dlg = $("detailDlg");
+    if (wide.matches) {
+      if (dlg.open) dlg.close();
+      col.innerHTML = e ? detailHTML(e) : '<p class="label">Post</p><div class="placeholder">Velg en post i loggen for å se detaljer, redigere den eller se endringshistorikken.</div>';
+    } else {
+      col.innerHTML = "";
+      if (e) { $("detailSheet").innerHTML = detailHTML(e, true); if (!dlg.open) dlg.showModal(); }
+      else if (dlg.open) dlg.close();
+    }
+  }
+
+  /* ---------- Skjema ---------- */
+  function openForm(kind, editId) {
+    if (!S.canWrite) return;
+    if (editId) {
+      const e = S.entries.find((x) => x.id === editId); if (!e) return;
+      S.form = { mode: "edit", id: e.id, kind: e.kind, personId: e.personId, newName: "", dir: e.dir, amount: oreToInput(e.amountOre), reason: e.reason, method: e.method || "vipps", loggedAt: e.loggedAt, err: "" };
+    } else {
+      const ppl = [...S.people.keys()];
+      S.form = { mode: "new", kind, personId: S.f.person || (ppl.length ? "" : "__new"), newName: "", dir: "in", amount: "", reason: "", method: "vipps", err: "" };
+    }
+    renderForm();
+    if ($("detailDlg").open) $("detailDlg").close();
+    $("formDlg").showModal();
+    setTimeout(() => { const t = S.form.personId ? $("amt") : null; (t || $("form").querySelector("button,input"))?.focus(); }, 30);
+  }
+
+  function readFormInputs() {
+    if (!S.form) return;
+    const a = $("amt"), r = $("reason"), nn = $("newName");
+    if (a) S.form.amount = a.value; if (r) S.form.reason = r.value; if (nn) S.form.newName = nn.value;
+  }
+
+  function renderForm() {
+    const F = S.form; const isT = F.kind === "transfer";
+    const pName = F.personId === "__new" ? (F.newName.trim() || "personen") : F.personId ? firstName(personName(F.personId)) : "personen";
+    const ppl = [...S.people.values()].sort((a, c) => a.name.localeCompare(c.name, "nb"));
+    const now = new Date().toISOString();
+    $("form").innerHTML = `
+      <div class="sheet-top"><h2 id="formTitle">${F.mode === "edit" ? "Rediger post" : isT ? "Ny overføring" : "Ny gjeld"}</h2><button class="iconbtn" type="button" data-act="close-form" aria-label="Lukk">${I.x}</button></div>
+      <div class="seg" role="radiogroup" aria-label="Type">
+        <button type="button" role="radio" aria-checked="${!isT}" data-f="kind" data-v="debt">Skylder</button>
+        <button type="button" role="radio" aria-checked="${isT}" data-f="kind" data-v="transfer">Overføring</button>
+      </div>
+      <fieldset class="fld"><legend>Hvem</legend>
+        <div class="chips" role="radiogroup" aria-label="Person">
+          ${ppl.map((p) => `<button type="button" class="chip" role="radio" aria-checked="${F.personId === p.id}" data-f="personId" data-v="${esc(p.id)}">${esc(p.name)}</button>`).join("")}
+          <button type="button" class="chip add" role="radio" aria-checked="${F.personId === "__new"}" data-f="personId" data-v="__new">${I.plus}Ny person</button>
+        </div>
+        ${F.personId === "__new" ? `<input class="input" id="newName" placeholder="Navn, for eksempel Ola Hansen" maxlength="60" autocomplete="off" value="${esc(F.newName)}">` : ""}
+      </fieldset>
+      <fieldset class="fld"><legend>Retning</legend>
+        <div class="seg" role="radiogroup" aria-label="Retning">
+          <button type="button" role="radio" aria-checked="${F.dir === "in"}" data-f="dir" data-v="in">${esc(isT ? `${pName} betalte meg` : `${pName} skylder meg`)}</button>
+          <button type="button" role="radio" aria-checked="${F.dir === "out"}" data-f="dir" data-v="out">${esc(isT ? `Jeg betalte ${pName}` : `Jeg skylder ${pName}`)}</button>
+        </div>
+      </fieldset>
+      <label class="fld"><span>Beløp</span>
+        <div class="amount"><input id="amt" inputmode="decimal" autocomplete="off" placeholder="0" value="${esc(F.amount)}" aria-label="Beløp i kroner"><span>kr</span></div>
+      </label>
+      <label class="fld"><span>Grunn</span><input class="input" id="reason" maxlength="140" autocomplete="off" placeholder="${isT ? "For eksempel: tilbakebetaling for konsertbillett" : "For eksempel: pizza fredag"}" value="${esc(F.reason)}"></label>
+      ${isT ? `<fieldset class="fld"><legend>Betalt med</legend><div class="chips" role="radiogroup" aria-label="Betalt med">
+        ${Object.entries(METHODS).map(([k, v]) => `<button type="button" class="chip" role="radio" aria-checked="${F.method === k}" data-f="method" data-v="${k}">${v}</button>`).join("")}</div></fieldset>` : ""}
+      <div class="stamp">${I.clock}<div>${F.mode === "edit"
+        ? `<b>Opprinnelig loggført</b><span class="mono">${stamp(F.loggedAt)}</span><div class="muted" style="font-size:12px;margin-top:4px">Endringen lagres i historikken med dato og klokkeslett.</div>`
+        : `<b>Dato og klokkeslett settes når du lagrer</b><span class="mono" id="clock">${stamp(now)}</span>`}</div></div>
+      ${isT && F.mode === "new" ? `<div class="hint">${I.info}<span>Lånte du bort penger med Vipps? Logg det bare som en overføring ut. Da skylder personen deg beløpet, og du trenger ikke føre gjeld i tillegg.</span></div>` : ""}
+      <p class="err" id="formErr" role="alert">${esc(F.err)}</p>
+      <button class="btn primary" type="submit" ${S.busy ? "disabled" : ""}>${F.mode === "edit" ? "Lagre endring" : isT ? "Loggfør overføring" : "Loggfør gjeld"}</button>`;
+  }
+
+  async function submitForm() {
+    readFormInputs();
+    const F = S.form; const db = S.db; if (!F || !db || S.busy) return;
+    const amountOre = parseAmount(F.amount); const reason = F.reason.trim(); const newName = F.newName.trim();
+    let err = "";
+    if (!F.personId) err = "Velg hvem posten gjelder.";
+    else if (F.personId === "__new" && !newName) err = "Skriv navnet på den nye personen.";
+    else if (amountOre == null) err = "Skriv et beløp større enn 0, for eksempel 450 eller 1 250,50.";
+    else if (!reason) err = "Skriv en grunn, så du husker hva posten gjaldt.";
+    if (err) { F.err = err; renderForm(); return; }
+    S.busy = true; renderForm();
+    try {
+      let personId = F.personId;
+      if (personId === "__new") {
+        const existing = [...S.people.values()].find((p) => p.name.toLowerCase() === newName.toLowerCase());
+        if (existing) personId = existing.id;
+        else { const ref = db.collection("people").doc(); await ref.set({ name: newName, createdAt: new Date().toISOString() }); personId = ref.id; }
+      }
+      const data = { kind: F.kind, dir: F.dir, personId, amountOre, reason, method: F.kind === "transfer" ? F.method : null };
+      const now = new Date().toISOString();
+      if (F.mode === "new") {
+        const ref = db.collection("entries").doc();
+        await ref.set({ ...data, loggedAt: now, status: "active", history: [{ at: now, action: "created", snapshot: { amountOre, reason } }] });
+        if (wide.matches) S.sel = ref.id;
+        toast(F.kind === "debt" ? "Gjeld loggført" : "Overføring loggført");
+      } else {
+        const cur = S.entries.find((x) => x.id === F.id);
+        const changes = {};
+        for (const k of Object.keys(data)) if ((cur[k] ?? null) !== (data[k] ?? null)) changes[k] = [cur[k] ?? null, data[k] ?? null];
+        if (Object.keys(changes).length) {
+          await db.doc("entries/" + F.id).update({ ...data, history: [...(cur.history || []), { at: now, action: "edited", changes }] });
+          toast("Endring lagret");
+        }
+      }
+      S.busy = false; S.form = null; $("formDlg").close(); render();
+    } catch (e) {
+      S.busy = false;
+      F.err = e?.code === "quota_exceeded" ? "Gjeldsboken er full. Kontakt den som satte den opp." : "Kunne ikke lagre. Sjekk nettet og prøv igjen.";
+      renderForm();
+    }
+  }
+
+  async function setStatusOf(id, status, action) {
+    const e = S.entries.find((x) => x.id === id); if (!e || S.busy) return;
+    S.busy = true; renderDetail();
+    try {
+      const now = new Date().toISOString();
+      await S.db.doc("entries/" + id).update({ status, history: [...(e.history || []), { at: now, action }] });
+      toast(action === "voided" ? "Posten er annullert" : "Posten er gjenopprettet");
+    } catch { toast("Kunne ikke lagre. Prøv igjen."); }
+    S.busy = false; S.confirmVoid = false; render();
+  }
+
+  async function renamePerson() {
+    const id = S.f.person; const name = $("renameIn")?.value.trim();
+    if (!id || !name || S.busy) return;
+    S.busy = true;
+    try { await S.db.doc("people/" + id).update({ name }); toast("Navnet er endret"); S.renaming = false; }
+    catch { toast("Kunne ikke lagre navnet."); }
+    S.busy = false; render();
+  }
+
+  let toastT;
+  function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2600); }
+
+  function banner(kind) {
+    const msgs = {
+      slow: "Får ikke kontakt med lagringen ennå. Det du ser kan være utdatert.",
+      denied: "Denne gjeldsboken er privat. Bare eieren kan se og føre poster.",
+      offline: "Lagringen er ikke tilgjengelig her. Åpne gjeldsboken på claude.ai mens du er logget inn.",
+      error: "Mistet kontakten med lagringen. Last inn siden på nytt.",
+    };
+    $("banner").innerHTML = msgs[kind] ? `<div class="notice">${I.info}<span>${msgs[kind]}</span></div>` : "";
+  }
+
+  /* ---------- Hendelser ---------- */
+  document.addEventListener("click", (ev) => {
+    const t = ev.target.closest("button"); if (!t) return;
+    if (t.dataset.new) { openForm(t.dataset.new); return; }
+    if (t.dataset.type) { S.f.type = t.dataset.type; document.querySelectorAll("[data-type]").forEach((b) => b.setAttribute("aria-pressed", b === t)); renderEntries(); return; }
+    if (t.dataset.person) {
+      const id = t.dataset.person; S.f.person = S.f.person === id ? "" : id; S.renaming = false; render();
+      if (S.f.person && !window.matchMedia("(min-width: 900px)").matches) $("personHead").scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (t.dataset.entry) { S.sel = t.dataset.entry; S.confirmVoid = false; renderEntries(); renderDetail(); return; }
+    if (t.dataset.f && S.form) {
+      readFormInputs(); S.form[t.dataset.f] = t.dataset.v; S.form.err = ""; renderForm();
+      if (t.dataset.f === "personId" && t.dataset.v === "__new") $("newName")?.focus();
+      return;
+    }
+    switch (t.dataset.act) {
+      case "close-form": $("formDlg").close(); break;
+      case "close-detail": S.sel = null; S.confirmVoid = false; renderEntries(); renderDetail(); break;
+      case "edit": openForm(null, S.sel); break;
+      case "void": S.confirmVoid = true; renderDetail(); break;
+      case "void-no": S.confirmVoid = false; renderDetail(); break;
+      case "void-yes": setStatusOf(S.sel, "void", "voided"); break;
+      case "restore": setStatusOf(S.sel, "active", "restored"); break;
+      case "allpeople": S.f.person = ""; S.renaming = false; render(); break;
+      case "new-for": openForm(t.dataset.kind); break;
+      case "rename": S.renaming = true; renderPersonHead(); $("renameIn")?.focus(); break;
+      case "rename-cancel": S.renaming = false; renderPersonHead(); break;
+      case "rename-save": renamePerson(); break;
+    }
+  });
+  $("form").addEventListener("submit", (ev) => { ev.preventDefault(); submitForm(); });
+  $("form").addEventListener("input", (ev) => {
+    if (ev.target.id === "newName" && S.form) { S.form.newName = ev.target.value; const segs = $("form").querySelectorAll('[data-f="dir"]'); const n = ev.target.value.trim() || "personen"; const isT = S.form.kind === "transfer"; if (segs.length === 2) { segs[0].textContent = isT ? `${firstName(n)} betalte meg` : `${firstName(n)} skylder meg`; segs[1].textContent = isT ? `Jeg betalte ${firstName(n)}` : `Jeg skylder ${firstName(n)}`; } }
+  });
+  $("formDlg").addEventListener("close", () => { if (!S.busy) S.form = null; });
+  $("formDlg").addEventListener("click", (ev) => { if (ev.target === $("formDlg")) $("formDlg").close(); });
+  $("detailDlg").addEventListener("click", (ev) => { if (ev.target === $("detailDlg")) $("detailDlg").close(); });
+  $("detailDlg").addEventListener("close", () => { if (!wide.matches && S.sel) { S.sel = null; S.confirmVoid = false; renderEntries(); } });
+  $("q").addEventListener("input", (ev) => { S.f.q = ev.target.value; renderEntries(); });
+  $("fPerson").addEventListener("change", (ev) => { S.f.person = ev.target.value; S.renaming = false; render(); });
+  $("fPeriod").addEventListener("change", (ev) => { S.f.period = ev.target.value; renderEntries(); });
+  wide.addEventListener("change", renderDetail);
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && ev.target.id === "renameIn") renamePerson(); });
+
+  /* ---------- Statisk oppsett ---------- */
+  $("searchIcon").outerHTML = I.search;
+  document.querySelectorAll(".caret").forEach((c) => (c.outerHTML = I.down));
+  document.querySelectorAll('[data-new="debt"]').forEach((b) => (b.innerHTML = I.plus + "Skylder"));
+  document.querySelectorAll('[data-new="transfer"]').forEach((b) => (b.innerHTML = I.plus + "Overføring"));
+  const tick = () => {
+    $("today").textContent = longToday.format(new Date());
+    const c = document.getElementById("clock"); if (c) c.textContent = stamp(new Date().toISOString());
+  };
+  tick(); setInterval(tick, 15000);
+  render();
+
+  /* ---------- Lagring ---------- */
+  (async () => {
+    if (!window.claude || typeof window.claude.use !== "function") { S.status = "offline"; banner("offline"); render(); return; }
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db) { S.status = "offline"; banner("offline"); render(); return; }
+    const owner = user ? await user.isOwner() : null;
+    if (owner === false) { S.status = "denied"; banner("denied"); render(); return; }
+    S.db = db; S.canWrite = true;
+    let gotP = false, gotE = false, confirmed = { p: false, e: false };
+    const timer = setTimeout(() => { if (!(confirmed.p && confirmed.e)) banner("slow"); }, 10000);
+    const settle = () => {
+      if (gotP && gotE) { S.ready = true; S.status = "ok"; }
+      if (confirmed.p && confirmed.e) { clearTimeout(timer); banner(""); }
+      render();
+    };
+    const onErr = (e) => { clearTimeout(timer); S.ready = true; if (e?.code === "revoked") { S.canWrite = false; banner("denied"); } else banner("error"); render(); };
+    db.collection("people").onSnapshot((s) => {
+      const m = new Map(); for (const d of s.docs) m.set(d.id, { id: d.id, ...d.data() });
+      S.people = m; gotP = true; if (!s.metadata.fromCache) confirmed.p = true; settle();
+    }, onErr);
+    db.collection("entries").orderBy("loggedAt", "desc").onSnapshot((s) => {
+      S.entries = s.docs.map((d) => ({ id: d.id, ...d.data() }));
+      gotE = true; if (!s.metadata.fromCache) confirmed.e = true;
+      if (S.sel && !S.entries.some((x) => x.id === S.sel)) S.sel = null;
+      settle();
+    }, onErr);
+  })();
+})();
+</script>
