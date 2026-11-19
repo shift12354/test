@@ -6,6 +6,10 @@ dataene ligger i Artifactens database, slik at samme logg vises på mobil og PC.
 
 - Design i Figma: https://www.figma.com/design/Qj17TNPI6KFpSWHC0JxgDz
 - Kode: `index.html` (én fil, ingen byggesteg)
+- Stil: iOS 26 med Liquid Glass (Figma-siden «iOS 26 · Liquid Glass»). Glass brukes bare i
+  navigasjonslaget (fanelinje, knapper, ark), etter skillene `apple-liquid-glass`,
+  `apple-typography` og `apple-design-system` i `.claude/skills/`
+  (fra rshankras/claude-code-apple-skills, MIT).
 
 ## To typer poster
 

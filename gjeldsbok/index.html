@@ -1,320 +1,343 @@
 <title>Gjeldsbok</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#F2F2F7">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap">
 <style>
-/* Layout: kassabok i tre kolonner (personer · logg · post) som stables til én kolonne på mobil. */
+/* Layout: iOS 26-app i én kolonne. Liquid Glass bare i navigasjonslaget (fanelinje, knapper, ark), innsatte grupperte lister for innholdet. */
 :root {
-  --bg: #F2F4EF;
-  --surface: #FFFFFF;
-  --ink: #18211C;
-  --muted: #5D6A62;
-  --rule: #DCE2DA;
-  --plus: #1E6A4C;
-  --plus-soft: #E1EEE6;
-  --minus: #B23A2E;
-  --minus-soft: #F6E3DF;
-  --on-ink: #FFFFFF;
-  --scrim: rgba(17, 22, 19, 0.42);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
-  --font-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --bg: #F2F2F7;
+  --cell: #FFFFFF;
+  --label: #000000;
+  --label2: #6E6E73;
+  --label3: #8E8E93;
+  --sep: #C6C6C8;
+  --fill: rgba(120, 120, 128, 0.16);
+  --fill2: rgba(120, 120, 128, 0.08);
+  --blue: #007AFF;
+  --green: #34C759;
+  --green-text: #248A3D;
+  --red: #FF3B30;
+  --red-text: #D70015;
+  --gray: #8E8E93;
+  --white: #FFFFFF;
+  --glass: rgba(255, 255, 255, 0.52);
+  --glass-strong: rgba(250, 250, 252, 0.72);
+  --glass-edge: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --scrim: rgba(0, 0, 0, 0.2);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", "Nunito", -apple-system, system-ui, sans-serif;
+  --spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111613; --surface: #19201C; --ink: #E6ECE8; --muted: #9AA8A0; --rule: #2B3530;
-    --plus: #62C392; --plus-soft: #1B3227; --minus: #F2806F; --minus-soft: #3A221F; --on-ink: #111613;
-    --scrim: rgba(0, 0, 0, 0.6); --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --bg: #000000; --cell: #1C1C1E; --label: #FFFFFF; --label2: #98989F; --label3: #6E6E73; --sep: #38383A;
+    --fill: rgba(120, 120, 128, 0.32); --fill2: rgba(120, 120, 128, 0.18);
+    --blue: #0A84FF; --green: #30D158; --green-text: #30D158; --red: #FF453A; --red-text: #FF6961; --gray: #636366;
+    --glass: rgba(44, 44, 48, 0.5); --glass-strong: rgba(36, 36, 40, 0.78); --glass-edge: rgba(255, 255, 255, 0.16);
+    --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4); --scrim: rgba(0, 0, 0, 0.45);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111613; --surface: #19201C; --ink: #E6ECE8; --muted: #9AA8A0; --rule: #2B3530;
-  --plus: #62C392; --plus-soft: #1B3227; --minus: #F2806F; --minus-soft: #3A221F; --on-ink: #111613;
-  --scrim: rgba(0, 0, 0, 0.6); --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --bg: #000000; --cell: #1C1C1E; --label: #FFFFFF; --label2: #98989F; --label3: #6E6E73; --sep: #38383A;
+  --fill: rgba(120, 120, 128, 0.32); --fill2: rgba(120, 120, 128, 0.18);
+  --blue: #0A84FF; --green: #30D158; --green-text: #30D158; --red: #FF453A; --red-text: #FF6961; --gray: #636366;
+  --glass: rgba(44, 44, 48, 0.5); --glass-strong: rgba(36, 36, 40, 0.78); --glass-edge: rgba(255, 255, 255, 0.16);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4); --scrim: rgba(0, 0, 0, 0.45);
   color-scheme: dark;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { background: var(--bg); }
-body { color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
-button, input, select { font: inherit; color: inherit; }
-button { cursor: pointer; }
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.plus { color: var(--plus); }
-.minus { color: var(--minus); }
-.muted { color: var(--muted); }
-.label { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-h1, h2, h3 { text-wrap: balance; }
+body { color: var(--label); font-family: var(--font); font-size: 17px; line-height: 22px; letter-spacing: -0.41px; -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; letter-spacing: inherit; }
+button { cursor: pointer; border: 0; background: none; padding: 0; }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--blue) 60%, transparent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.green { color: var(--green-text); }
+.red { color: var(--red-text); }
+.blue { color: var(--blue); }
+.sec { color: var(--label2); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+/* ---------- Liquid Glass ---------- */
+.glass {
+  position: relative;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(190%) brightness(1.04);
+  backdrop-filter: blur(16px) saturate(190%) brightness(1.04);
+  box-shadow: var(--glass-shadow), inset 0 0 0 0.5px var(--glass-edge), inset 0 1px 0 var(--glass-edge);
+  isolation: isolate;
+}
+.glass::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: -1;
+  background:
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.45), transparent 55%),
+    radial-gradient(80% 60% at 90% 110%, rgba(255, 255, 255, 0.18), transparent 60%);
+  mix-blend-mode: soft-light;
+}
+.glass.tinted { background: var(--blue); color: var(--white); box-shadow: 0 8px 20px color-mix(in srgb, var(--blue) 35%, transparent), inset 0 0 0 0.5px rgba(255, 255, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.press { transition: transform 0.35s var(--spring), filter 0.2s; }
+.press:active { transform: scale(0.94); filter: brightness(1.08); }
+@media (prefers-reduced-transparency: reduce) {
+  .glass { background: var(--glass-strong); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .glass::before { display: none; }
+}
+@media (prefers-contrast: more) {
+  .glass { background: var(--cell); box-shadow: inset 0 0 0 1.5px var(--label); }
+}
+
+.circle { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.circle svg { width: 22px; height: 22px; }
+.circle:disabled { opacity: 0.5; }
+.capsule-btn { height: 48px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; padding: 0 16px 0 10px; font-weight: 500; }
+.capsule-btn svg { width: 22px; height: 22px; }
+
+/* ---------- Ramme ---------- */
 .app {
-  display: grid; grid-template-columns: minmax(0, 1fr); gap: 0;
+  max-width: 680px; margin: 0 auto;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 0;
-  min-height: 100%;
 }
-.col { min-width: 0; display: flex; flex-direction: column; gap: 16px; padding-block: 28px; }
-.side header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
-.side h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 30px; line-height: 1.15; letter-spacing: -0.01em; }
-.today { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-top: 4px; }
+.view { padding-top: 64px; padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; animation: viewIn 0.35s var(--ease); outline: none; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(6px); } }
+.large { margin: 4px 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: 0.37px; overflow-wrap: anywhere; text-wrap: balance; }
 
-.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 20px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
-.net-label { font-size: 14px; font-weight: 500; color: var(--muted); }
-.net { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: clamp(28px, 7vw, 34px); line-height: 1.15; letter-spacing: -0.02em; }
-.split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.split div { border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.split .p { background: var(--plus-soft); }
-.split .m { background: var(--minus-soft); }
-.split span { font-size: 13px; color: var(--muted); }
-.split strong { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 16px; }
+.edge-top { position: fixed; z-index: 8; top: 0; left: 0; right: 0; height: calc(env(safe-area-inset-top, 0px) + 64px); pointer-events: none; background: linear-gradient(var(--bg) 35%, color-mix(in srgb, var(--bg) 0%, transparent)); }
+.edge-bottom { position: fixed; z-index: 8; bottom: 0; left: 0; right: 0; height: calc(env(safe-area-inset-bottom, 0px) + 120px); pointer-events: none; background: linear-gradient(color-mix(in srgb, var(--bg) 0%, transparent), color-mix(in srgb, var(--bg) 85%, transparent)); }
+.navbar { position: fixed; z-index: 9; top: env(safe-area-inset-top, 0px); left: 0; right: 0; height: 64px; pointer-events: none; }
+.navbar-in { max-width: 680px; margin: 0 auto; height: 100%; display: flex; align-items: center; gap: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.navbar-in > * { pointer-events: auto; }
+.navtitle { flex: 1; text-align: center; font-weight: 600; opacity: 0; transform: translateY(4px); transition: opacity 0.2s, transform 0.25s var(--ease); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none !important; }
+.navtitle.show { opacity: 1; transform: none; }
+.navslot { width: 48px; display: flex; flex: none; }
+.navslot.wide { width: auto; min-width: 48px; }
+.navslot.end { justify-content: flex-end; }
 
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; padding: 12px 18px 12px 16px; font-weight: 600; font-size: 15px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); min-height: 46px; }
-.btn svg { width: 18px; height: 18px; flex: none; }
-.btn.primary { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
-.btn.danger { color: var(--minus); }
-.btn.ghost { background: transparent; border-color: transparent; padding-inline: 10px; }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn:not(:disabled):hover { filter: brightness(0.97); }
-.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* ---------- Fanelinje ---------- */
+.dock { position: fixed; z-index: 10; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); pointer-events: none; }
+.dock-in { max-width: 680px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.dock-in > * { pointer-events: auto; }
+.tabbar { display: grid; grid-template-columns: repeat(3, 84px); padding: 4px; border-radius: 999px; }
+.tab { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 0 6px; border-radius: 999px; font-size: 10px; line-height: 12px; font-weight: 500; letter-spacing: 0; color: var(--label); transition: color 0.2s; }
+.tab svg { width: 24px; height: 24px; }
+.tab[aria-current="page"] { color: var(--blue); }
+.pill { position: absolute; z-index: 0; top: 4px; left: 4px; width: 84px; bottom: 4px; border-radius: 999px; background: var(--fill); transition: transform 0.45s var(--spring); }
+.plusbtn { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; }
+.plusbtn svg { width: 26px; height: 26px; transition: transform 0.35s var(--spring); }
+.plusbtn[aria-expanded="true"] svg { transform: rotate(45deg); }
+.plusbtn:disabled { opacity: 0.5; }
+.menu { position: fixed; z-index: 11; right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 92px); width: min(290px, calc(100% - 40px)); border-radius: 26px; padding: 6px; display: flex; flex-direction: column; transform-origin: calc(100% - 31px) calc(100% + 46px); animation: morph 0.42s var(--spring); }
+@media (min-width: 720px) { .menu { right: calc(50% - 320px); } }
+@keyframes morph { from { opacity: 0; transform: scale(0.25); filter: blur(6px); } }
+.menu button { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 20px; text-align: left; }
+.menu button:hover, .menu button:focus-visible { background: var(--fill2); }
+.menu .sym { width: 30px; height: 30px; border-radius: 8px; }
+.menu b { display: block; font-weight: 500; }
+.menu small { display: block; font-size: 13px; line-height: 18px; color: var(--label2); letter-spacing: -0.08px; }
 
-.list { background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; overflow: hidden; }
-.row { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-bottom: 1px solid var(--rule); width: 100%; text-align: left; background: var(--surface); border-inline: 0; border-top: 0; }
-.list > :last-child { border-bottom: 0; }
-button.row:hover { background: color-mix(in srgb, var(--bg) 60%, var(--surface)); }
-.row[aria-current="true"] { background: var(--bg); box-shadow: inset 3px 0 0 var(--ink); }
-.row .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.row .t { font-weight: 600; font-size: 15px; line-height: 20px; overflow-wrap: anywhere; }
-.row .r { font-size: 14px; color: var(--muted); line-height: 20px; overflow-wrap: anywhere; }
-.row .meta { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; font-family: var(--font-mono); font-size: 11px; color: var(--muted); line-height: 16px; }
-.tag { border: 1px solid var(--rule); border-radius: 4px; padding: 0 5px; font-size: 10px; }
-.row .amt { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: none; }
-.row .amt strong { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 15px; line-height: 20px; white-space: nowrap; }
-.row .amt span { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
-.row.void .t, .row.void .amt strong { text-decoration: line-through; color: var(--muted); }
-.badge { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--rule); color: var(--ink); }
-.badge svg { width: 18px; height: 18px; }
-.badge.p { background: var(--plus-soft); color: var(--plus); }
-.badge.m { background: var(--minus-soft); color: var(--minus); }
-.row.void .badge { background: var(--rule); color: var(--muted); }
+/* ---------- Innhold ---------- */
+.card { background: var(--cell); border-radius: 26px; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
+.cap { font-size: 15px; line-height: 20px; font-weight: 500; color: var(--label2); letter-spacing: -0.24px; }
+.big { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 4px; font-family: var(--font-round); font-weight: 700; letter-spacing: -0.5px; }
+.big .i { font-size: clamp(40px, 13vw, 52px); line-height: 1.12; font-variant-numeric: tabular-nums; }
+.big .d { font-size: 24px; font-weight: 600; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { background: var(--bg); border-radius: 16px; padding: 10px 14px; min-width: 0; }
+.tile span { display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: var(--label2); letter-spacing: -0.08px; }
+.tile span::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--dot); flex: none; }
+.tile b { display: block; font-family: var(--font-round); font-size: 20px; line-height: 26px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.head { display: flex; align-items: baseline; gap: 12px; padding: 10px 4px 0; }
+.head h2 { flex: 1; margin: 0; font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: 0.35px; }
+.head button, .linkbtn { color: var(--blue); }
+.dayhead { padding: 10px 4px 0; margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; color: var(--label2); letter-spacing: -0.24px; }
+.footer { padding: 0 16px; margin: 0; font-size: 13px; line-height: 18px; color: var(--label2); letter-spacing: -0.08px; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
 
-.person { align-items: center; padding-right: 10px; }
-.avatar { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--rule); background: var(--bg); display: grid; place-items: center; font-weight: 600; font-size: 14px; flex: none; }
-.person .t { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.person .meta { flex-wrap: nowrap; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-.person .amt strong { font-size: 16px; }
-.person .amt span { font-family: var(--font-body); font-size: 12px; }
-.chev { width: 18px; height: 18px; color: var(--muted); flex: none; align-self: center; }
+.group { background: var(--cell); border-radius: 26px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; padding-left: 16px; width: 100%; text-align: left; background: var(--cell); transition: background 0.15s; }
+button.row:active, button.row[aria-current="true"] { background: color-mix(in srgb, var(--label) 7%, var(--cell)); }
+.cell { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 11px 16px 11px 0; border-bottom: 0.5px solid var(--sep); min-height: 60px; }
+.group > :last-child .cell { border-bottom: 0; }
+.txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.t { overflow-wrap: anywhere; }
+.sub { font-size: 15px; line-height: 20px; color: var(--label2); letter-spacing: -0.24px; overflow-wrap: anywhere; }
+.meta { font-size: 13px; line-height: 18px; color: var(--label3); letter-spacing: -0.08px; }
+.amt { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex: none; }
+.amt b { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.amt small { font-size: 13px; line-height: 18px; color: var(--label3); letter-spacing: -0.08px; }
+.void .t, .void .amt b { text-decoration: line-through; color: var(--label2); }
+.sym { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--white); flex: none; }
+.sym svg { width: 18px; height: 18px; stroke-width: 2.2; }
+.s-green { background: var(--green); } .s-red { background: var(--red); } .s-blue { background: var(--blue); } .s-gray { background: var(--gray); }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #fff; font-family: var(--font-round); font-weight: 700; font-size: 16px; letter-spacing: 0; background: linear-gradient(180deg, #A9ADB9, #858A96); }
+.chev { width: 16px; height: 16px; color: var(--label3); flex: none; display: grid; }
+.chev svg { width: 16px; height: 16px; }
+.person .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.loghead { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-.loghead h2 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 30px; line-height: 1.15; }
-.search { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 0 14px; }
-.search svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
-.search input { border: 0; background: transparent; padding: 12px 0; flex: 1; min-width: 0; font-size: 15px; outline: none; }
-.search:focus-within { outline: 2px solid var(--ink); outline-offset: 1px; }
-.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.chip { border-radius: 999px; padding: 8px 14px; border: 1px solid var(--rule); background: var(--surface); font-weight: 500; font-size: 14px; line-height: 18px; }
-.chip[aria-pressed="true"], .chip[aria-checked="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
-.chip.add { border-style: dashed; border-color: var(--muted); color: var(--muted); background: transparent; display: inline-flex; gap: 4px; align-items: center; }
-.chip.add svg { width: 16px; height: 16px; }
-.select { position: relative; }
-.select select { appearance: none; -webkit-appearance: none; border-radius: 999px; padding: 8px 34px 8px 14px; border: 1px solid var(--rule); background: var(--surface); font-weight: 500; font-size: 14px; line-height: 18px; max-width: 100%; }
-.select svg { position: absolute; right: 12px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
-.day { display: flex; flex-direction: column; gap: 8px; }
-.day h3 { margin: 0; font-family: var(--font-mono); font-weight: 500; font-size: 12px; color: var(--muted); }
-.days { display: flex; flex-direction: column; gap: 20px; }
+.searchf { display: flex; align-items: center; gap: 6px; background: var(--fill); border-radius: 999px; padding: 0 12px; }
+.searchf svg { width: 18px; height: 18px; color: var(--label2); flex: none; }
+.searchf input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; padding: 9px 0; font-size: 17px; }
+.searchf:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 40%, transparent); }
+.seg { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 2px; border-radius: 999px; background: var(--fill); }
+.seg button { position: relative; z-index: 1; padding: 7px 6px; border-radius: 999px; font-size: 14px; line-height: 18px; font-weight: 500; letter-spacing: -0.15px; min-width: 0; overflow-wrap: anywhere; }
+.seg button[aria-checked="true"] { font-weight: 600; }
+.seg .thumb { position: absolute; z-index: 0; top: 2px; bottom: 2px; left: 2px; border-radius: 999px; background: var(--cell); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04); transition: transform 0.4s var(--spring); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.pick { position: relative; display: inline-flex; align-items: center; background: var(--cell); border-radius: 999px; color: var(--blue); font-weight: 500; font-size: 15px; letter-spacing: -0.24px; max-width: 100%; }
+.pick select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: inherit; padding: 7px 30px 7px 14px; border-radius: 999px; max-width: 100%; font-size: 15px; font-weight: 500; }
+.pick svg { position: absolute; right: 10px; width: 14px; height: 14px; pointer-events: none; }
+.btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fillbtn { display: inline-flex; justify-content: center; align-items: center; gap: 6px; min-height: 50px; padding: 0 16px; border-radius: 999px; background: var(--fill); font-weight: 600; color: var(--blue); }
+.fillbtn svg { width: 20px; height: 20px; }
+.fillbtn.danger { color: var(--red-text); }
+.fillbtn.prominent { background: var(--blue); color: var(--white); }
+.fillbtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.empty { background: var(--cell); border-radius: 26px; padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; }
+.empty h3 { margin: 0; font-size: 20px; line-height: 25px; font-weight: 600; letter-spacing: 0.38px; }
+.empty p { margin: 0; font-size: 15px; line-height: 20px; color: var(--label2); letter-spacing: -0.24px; }
+.notice { display: flex; gap: 10px; align-items: flex-start; background: var(--cell); border-radius: 20px; padding: 14px 16px; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; }
+.notice svg { width: 20px; height: 20px; color: var(--blue); flex: none; }
+.skel { height: 64px; border-radius: 26px; background: var(--cell); position: relative; overflow: hidden; }
+.skel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--fill2), transparent); animation: sh 1.3s infinite; }
+@keyframes sh { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.inline { display: flex; gap: 12px; padding: 10px 16px; align-items: center; }
+.inline input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 6px 0; font-size: 17px; }
 
-.phead { display: flex; flex-direction: column; gap: 4px; }
-.phead .back { align-self: flex-start; margin-left: -10px; color: var(--muted); }
-.phead h2 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 30px; line-height: 1.15; overflow-wrap: anywhere; }
-.phead .big { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 34px; letter-spacing: -0.02em; line-height: 1.2; }
-.phead .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-.rename { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-.rename input { flex: 1; min-width: 160px; }
-
-.empty { display: flex; flex-direction: column; gap: 12px; padding: 20px; border: 1px dashed var(--muted); border-radius: 16px; }
-.empty h3 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 20px; }
-.empty p { margin: 0; color: var(--muted); max-width: 60ch; }
-.example { position: relative; }
-.example::after { content: "Eksempel"; position: absolute; top: 8px; right: 8px; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; background: var(--ink); color: var(--on-ink); padding: 2px 6px; border-radius: 4px; }
-.example .row { opacity: 0.75; }
-.notice { border-radius: 12px; background: var(--rule); padding: 12px 14px; font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
-.notice svg { width: 18px; height: 18px; flex: none; margin-top: 1px; color: var(--muted); }
-.skeleton { height: 72px; border-radius: 16px; background: linear-gradient(90deg, var(--surface), var(--rule), var(--surface)); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
-@keyframes shimmer { to { background-position: -200% 0; } }
-
-/* Post-detaljer */
-.detail { display: none; }
-.dpanel { display: flex; flex-direction: column; gap: 18px; }
-.dpanel .top { display: flex; align-items: center; justify-content: space-between; }
-.dpanel h2 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 24px; line-height: 1.2; overflow-wrap: anywhere; }
-.dpanel .big { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 30px; letter-spacing: -0.02em; }
-.dl { display: flex; flex-direction: column; margin: 0; }
-.dl div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--rule); font-size: 14px; }
-.dl dt { color: var(--muted); }
-.dl dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
-.timeline { list-style: none; margin: 0; padding: 0; }
-.timeline li { display: grid; grid-template-columns: 9px minmax(0, 1fr); gap: 12px; position: relative; padding-bottom: 16px; }
-.timeline li::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--ink); margin-top: 6px; }
-.timeline li:not(:last-child)::after { content: ""; position: absolute; left: 4px; top: 19px; bottom: 2px; width: 1px; background: var(--rule); }
-.timeline li:last-child::before { background: var(--muted); }
-.timeline strong { display: block; font-size: 14px; }
-.timeline .c { font-family: var(--font-mono); font-size: 12px; overflow-wrap: anywhere; }
-.timeline .w { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
-.confirm { border: 1px solid var(--minus); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
-.btnrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.placeholder { color: var(--muted); font-size: 14px; border: 1px dashed var(--rule); border-radius: 16px; padding: 20px; }
-
-/* Ark (skjema og detaljer på mobil) */
-dialog.sheet { border: 0; padding: 0; background: var(--bg); color: var(--ink); width: 100%; max-width: 100%; max-height: 92dvh; margin: auto 0 0; border-radius: 24px 24px 0 0; overflow: auto; }
-dialog.sheet::backdrop { background: var(--scrim); }
-.sheet-in { padding: 20px max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 18px; }
-.sheet-top { display: flex; align-items: center; gap: 12px; }
-.sheet-top h2 { margin: 0; flex: 1; font-family: var(--font-display); font-weight: 600; font-size: 24px; }
-.iconbtn { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--rule); display: grid; place-items: center; flex: none; }
-.iconbtn svg { width: 18px; height: 18px; }
-.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; background: var(--rule); border-radius: 12px; }
-.seg button { border: 0; background: transparent; border-radius: 9px; padding: 9px 8px; font-weight: 500; color: var(--muted); font-size: 14px; line-height: 18px; min-width: 0; overflow-wrap: anywhere; }
-.seg button[aria-checked="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: var(--shadow); }
-.fld { display: flex; flex-direction: column; gap: 6px; }
-.fld > span, .fld legend { font-size: 13px; font-weight: 500; color: var(--muted); padding: 0; }
-fieldset.fld { border: 0; margin: 0; padding: 0; min-width: 0; }
+/* ---------- Ark ---------- */
+dialog { border: 0; padding: 0; color: var(--label); max-width: 100%; max-height: 100%; }
+dialog::backdrop { background: var(--scrim); animation: fade 0.3s; }
+@keyframes fade { from { opacity: 0; } }
+dialog.full { width: 100%; height: calc(100dvh - env(safe-area-inset-top, 0px) - 12px); margin: auto 0 0; border-radius: 38px 38px 0 0; background: var(--bg); overflow: auto; overscroll-behavior: contain; animation: rise 0.45s var(--ease); }
+dialog.float { width: calc(100% - 16px); max-width: 520px; margin: auto auto calc(8px + env(safe-area-inset-bottom, 0px)); border-radius: 44px; max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 24px); overflow: auto; overscroll-behavior: contain; animation: rise 0.5s var(--spring); }
+@keyframes rise { from { transform: translateY(40%); opacity: 0.4; } }
+@media (min-width: 720px) { dialog.full { max-width: 560px; height: min(860px, calc(100dvh - 48px)); margin: auto; border-radius: 38px; } }
+.sheet { padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 14px; }
+.float .sheet { padding: 8px 16px 24px; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--label3); opacity: 0.5; align-self: center; }
+.sheetbar { display: flex; align-items: center; gap: 12px; }
+.sheetbar h2 { flex: 1; margin: 0; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600; }
+.lbl { padding: 6px 16px 0; margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; color: var(--label2); letter-spacing: -0.24px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.input { width: 100%; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; font-size: 16px; }
-.input:focus { outline: 2px solid var(--ink); outline-offset: 1px; }
-.amount { display: flex; align-items: baseline; gap: 8px; background: var(--surface); border: 2px solid var(--ink); border-radius: 16px; padding: 10px 16px; }
-.amount input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; font-size: 36px; line-height: 1.2; padding: 0; }
-.amount span { font-family: var(--font-mono); font-weight: 500; font-size: 18px; color: var(--muted); }
-.stamp { display: flex; gap: 10px; align-items: flex-start; background: var(--rule); border-radius: 12px; padding: 12px 14px; }
-.stamp svg { width: 18px; height: 18px; color: var(--muted); flex: none; margin-top: 1px; }
-.stamp b { display: block; font-weight: 500; font-size: 13px; }
-.stamp .mono { font-size: 12px; color: var(--muted); }
-.hint { display: flex; gap: 10px; font-size: 13px; color: var(--muted); }
-.hint svg { width: 16px; height: 16px; flex: none; margin-top: 1px; }
-.err { color: var(--minus); font-size: 14px; font-weight: 500; margin: 0; }
+.chip { padding: 8px 16px; border-radius: 999px; background: var(--cell); font-size: 16px; line-height: 20px; letter-spacing: -0.31px; max-width: 100%; overflow-wrap: anywhere; }
+.chip[aria-checked="true"] { background: var(--blue); color: var(--white); font-weight: 600; }
+.chip.add { background: var(--fill); color: var(--blue); display: inline-flex; align-items: center; gap: 4px; padding-left: 12px; }
+.chip.add svg { width: 16px; height: 16px; }
+.amountcard { background: var(--cell); border-radius: 26px; padding: 14px 16px 16px; display: flex; flex-direction: column; align-items: center; }
+.amountcard label { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--label2); }
+.amountrow { display: flex; align-items: baseline; justify-content: center; gap: 6px; max-width: 100%; }
+.amountrow input { font-family: var(--font-round); font-weight: 700; font-size: 56px; line-height: 64px; letter-spacing: -0.5px; border: 0; outline: none; background: transparent; text-align: center; width: 2.5ch; min-width: 2ch; max-width: 100%; padding: 0; caret-color: var(--blue); font-variant-numeric: tabular-nums; }
+.amountrow span { font-family: var(--font-round); font-weight: 600; font-size: 24px; color: var(--label2); }
+.formrow { display: flex; align-items: center; gap: 12px; padding: 0 16px; min-height: 48px; border-bottom: 0.5px solid var(--sep); }
+.formrow:last-child { border-bottom: 0; }
+.formrow > span:first-child { flex: none; }
+.formrow input, .formrow select { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; text-align: right; padding: 13px 0; color: var(--label2); font-size: 17px; appearance: none; -webkit-appearance: none; }
+.formrow select { text-align-last: right; }
+.formrow input:focus { color: var(--label); }
+.formrow svg { width: 14px; height: 14px; color: var(--label2); flex: none; }
+.err { margin: 0; padding: 0 16px; color: var(--red-text); font-size: 15px; line-height: 20px; font-weight: 500; }
 .err:empty { display: none; }
+.dhead { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.dhead .big { justify-content: center; }
+.dhead .big .i { font-size: 44px; }
+.dhead .big .d { font-size: 20px; }
+.kv .formrow { min-height: 44px; }
+.kv .formrow > span:last-child { flex: 1; text-align: right; color: var(--label2); overflow-wrap: anywhere; padding: 11px 0; }
+.hist .row { align-items: flex-start; }
+.hist .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--blue); margin-top: 17px; flex: none; }
+.hist .row:last-child .dot { background: var(--gray); }
+.hist .cell { flex-direction: column; align-items: stretch; gap: 1px; min-height: 0; }
+.hist b { font-weight: 600; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; }
+.hist .c { font-size: 15px; line-height: 20px; letter-spacing: -0.24px; overflow-wrap: anywhere; }
+.confirm { background: var(--cell); border-radius: 26px; padding: 16px; display: flex; flex-direction: column; gap: 12px; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; }
 
-.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--rule); }
-.main { padding-bottom: 96px; }
-.side .actions { display: none; }
-.toast { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--on-ink); padding: 10px 16px; border-radius: 999px; font-weight: 500; font-size: 14px; z-index: 20; max-width: calc(100% - 32px); }
+.toast { position: fixed; z-index: 30; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 10px); transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 12px 18px 12px 14px; border-radius: 999px; font-weight: 600; font-size: 15px; animation: drop 0.5s var(--spring); max-width: calc(100% - 32px); }
+.toast svg { width: 20px; height: 20px; color: var(--green); flex: none; }
+@keyframes drop { from { transform: translate(-50%, -140%); } }
 
-@media (min-width: 600px) {
-  dialog.sheet { max-width: 480px; margin: auto; border-radius: 24px; max-height: 90dvh; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
-@media (min-width: 900px) {
-  .app { grid-template-columns: 340px minmax(0, 1fr); padding-left: 0; padding-right: 0; }
-  .side { padding-inline: max(24px, env(safe-area-inset-left, 0px)) 24px; border-right: 1px solid var(--rule); position: sticky; top: 0; height: 100dvh; overflow: auto; }
-  .main { padding-inline: 32px max(32px, env(safe-area-inset-right, 0px)); padding-bottom: 40px; }
-  .side .actions { display: grid; }
-  .dock { display: none; }
-  .toast { bottom: 24px; }
-}
-@media (min-width: 1240px) {
-  .app { grid-template-columns: 360px minmax(0, 1fr) 380px; }
-  .main { padding-inline: 32px; }
-  .detail { display: flex; background: var(--surface); border-left: 1px solid var(--rule); padding-inline: 28px max(28px, env(safe-area-inset-right, 0px)); position: sticky; top: 0; height: 100dvh; overflow: auto; }
-}
-@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
 </style>
 
-<div class="app">
-  <aside class="col side" aria-label="Oversikt">
-    <header>
-      <div>
-        <h1>Gjeldsbok</h1>
-        <div class="today" id="today"></div>
-      </div>
-    </header>
-    <section class="card" aria-label="Saldo totalt">
-      <div>
-        <div class="net-label" id="netLabel">Netto</div>
-        <div class="net" id="net">0,00 kr</div>
-      </div>
-      <div class="split">
-        <div class="p"><span>Skylder meg</span><strong class="plus" id="owedToMe">0,00</strong></div>
-        <div class="m"><span>Jeg skylder</span><strong class="minus" id="iOwe">0,00</strong></div>
-      </div>
-    </section>
-    <div class="actions">
-      <button class="btn primary" type="button" data-new="debt"></button>
-      <button class="btn" type="button" data-new="transfer"></button>
-    </div>
-    <div id="banner"></div>
-    <h2 class="label">Personer</h2>
-    <div id="people"></div>
-  </aside>
+<div class="edge-top" aria-hidden="true"></div>
+<header class="navbar"><div class="navbar-in">
+  <div class="navslot wide" id="navStart"></div>
+  <div class="navtitle" id="navTitle" aria-hidden="true"></div>
+  <div class="navslot end" id="navEnd"></div>
+</div></header>
 
-  <main class="col main" aria-label="Logg">
-    <div id="personHead"></div>
-    <div class="loghead"><h2 id="logTitle">Logg</h2><span class="mono muted" id="count"></span></div>
-    <label class="search">
-      <span id="searchIcon"></span>
-      <input id="q" type="search" placeholder="Søk i grunn, navn eller betalingsmåte" autocomplete="off">
-    </label>
-    <div class="filters" role="group" aria-label="Filtre">
-      <button class="chip" type="button" data-type="all" aria-pressed="true">Alle</button>
-      <button class="chip" type="button" data-type="debt" aria-pressed="false">Skylder</button>
-      <button class="chip" type="button" data-type="transfer" aria-pressed="false">Overføringer</button>
-      <label class="select"><span class="sr" hidden>Person</span><select id="fPerson" aria-label="Person"><option value="">Alle personer</option></select><span class="caret"></span></label>
-      <label class="select"><select id="fPeriod" aria-label="Periode">
-        <option value="all">Hele perioden</option>
-        <option value="7">Siste 7 dager</option>
-        <option value="30">Siste 30 dager</option>
-        <option value="year">I år</option>
-      </select><span class="caret"></span></label>
-    </div>
-    <div id="entries" class="days"></div>
-  </main>
+<div class="app"><main id="view" class="view" tabindex="-1"></main></div>
 
-  <aside class="col detail" id="detailCol" aria-label="Post"></aside>
-</div>
+<div class="edge-bottom" aria-hidden="true"></div>
+<div class="dock"><div class="dock-in">
+  <nav class="tabbar glass" aria-label="Faner">
+    <span class="pill" id="pill" aria-hidden="true"></span>
+    <button class="tab press" type="button" data-tab="oversikt"></button>
+    <button class="tab press" type="button" data-tab="personer"></button>
+    <button class="tab press" type="button" data-tab="logg"></button>
+  </nav>
+  <button class="plusbtn glass press" type="button" id="plus" aria-label="Ny post" aria-expanded="false" aria-controls="menu"></button>
+</div></div>
+<div class="menu glass" id="menu" role="menu" hidden></div>
 
-<div class="dock">
-  <button class="btn primary" type="button" data-new="debt"></button>
-  <button class="btn" type="button" data-new="transfer"></button>
-</div>
-
-<dialog class="sheet" id="formDlg" aria-labelledby="formTitle"><form class="sheet-in" id="form" novalidate></form></dialog>
-<dialog class="sheet" id="detailDlg" aria-label="Post"><div class="sheet-in" id="detailSheet"></div></dialog>
-<div class="toast" id="toast" role="status" hidden></div>
+<dialog class="full" id="formDlg" aria-labelledby="formTitle"><form class="sheet" id="form" novalidate></form></dialog>
+<dialog class="float glass" id="detailDlg" aria-label="Post"><div class="sheet" id="detailSheet"></div></dialog>
+<div id="toastHost"></div>
 
 <script>
 (() => {
   "use strict";
 
-  /* ---------- Ikoner (Lucide-baner) ---------- */
-  const svg = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+  /* ---------- Ikoner ---------- */
+  const svg = (p, w = 2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
   const I = {
+    house: svg('<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'),
+    users: svg('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+    list: svg('<path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/>'),
+    plus: svg('<path d="M5 12h14"/><path d="M12 5v14"/>', 2.4),
     receipt: svg('<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/>'),
     inn: svg('<path d="M17 7 7 17"/><path d="M17 17H7V7"/>'),
     ut: svg('<path d="M7 7h10v10"/><path d="M7 17 17 7"/>'),
-    plus: svg('<path d="M5 12h14"/><path d="M12 5v14"/>'),
-    chev: svg('<path d="m9 18 6-6-6-6"/>'),
-    back: svg('<path d="m15 18-6-6 6-6"/>'),
-    x: svg('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
-    search: svg('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'),
-    clock: svg('<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>'),
+    swap: svg('<path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/>'),
+    chev: svg('<path d="m9 18 6-6-6-6"/>', 2.4),
+    back: svg('<path d="m15 18-6-6 6-6"/>', 2.4),
+    x: svg('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', 2.2),
+    check: svg('<path d="M20 6 9 17l-5-5"/>', 2.6),
+    search: svg('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>', 2.2),
+    updown: svg('<path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>', 2.4),
     info: svg('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'),
-    down: svg('<path d="m6 9 6 6 6-6"/>'),
+    done: svg('<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>', 2.2),
   };
 
   /* ---------- Formatering ---------- */
   const TZ = "Europe/Oslo";
   const nf = new Intl.NumberFormat("nb-NO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const nf0 = new Intl.NumberFormat("nb-NO", { maximumFractionDigits: 0 });
   const kr = (ore) => nf.format(Math.abs(ore) / 100);
+  const krShort = (ore) => (Math.abs(ore) % 100 === 0 ? nf0.format(Math.abs(ore) / 100) : nf.format(Math.abs(ore) / 100)) + " kr";
+  const splitKr = (ore) => { const s = kr(ore); const i = s.lastIndexOf(","); return [s.slice(0, i), s.slice(i) + " kr"]; };
   const dtf = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "short", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
   const dayFmt = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "long", day: "numeric", month: "long" });
   const dayFmtY = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const longToday = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const parts = (d) => { const o = {}; for (const p of dtf.formatToParts(d)) o[p.type] = p.value; return o; };
   const stamp = (iso) => { const p = parts(new Date(iso)); return `${p.weekday} ${p.day}.${p.month}.${p.year} · ${p.hour}.${p.minute}`; };
-  const dayKey = (iso) => { const p = parts(new Date(iso)); return `${p.year}-${p.month}-${p.day}`; };
+  const clock = (iso) => { const p = parts(new Date(iso)); return `${p.hour}.${p.minute}`; };
+  const dayKey = (d) => { const p = parts(d); return `${p.year}-${p.month}-${p.day}`; };
   const shortDate = (iso) => { const p = parts(new Date(iso)); return `${p.day}.${p.month}.`; };
-  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const relDay = (iso) => {
+    const d = new Date(iso), k = dayKey(d), now = new Date();
+    if (k === dayKey(now)) return "I dag";
+    if (k === dayKey(new Date(now.getTime() - 864e5))) return "I går";
+    const s = (parts(d).year === parts(now).year ? dayFmt : dayFmtY).format(d);
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+  const shortStamp = (iso) => { const r = relDay(iso); return (r === "I dag" || r === "I går") ? `${r} · ${clock(iso)}` : stamp(iso); };
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const initials = (n) => (n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
   const firstName = (n) => (n || "personen").trim().split(/\s+/)[0];
@@ -327,15 +350,11 @@ fieldset.fld { border: 0; margin: 0; padding: 0; min-width: 0; }
     return ore > 0 ? ore : null;
   }
   const oreToInput = (ore) => (ore / 100).toFixed(2).replace(".", ",").replace(/,00$/, "");
-
   const METHODS = { vipps: "Vipps", bank: "Bank", kontant: "Kontant", annet: "Annet" };
 
   /* ---------- Regnskapsregler ----------
      Positiv saldo = personen skylder meg.
-     Gjeld inn  (+)  personen skylder meg
-     Gjeld ut   (−)  jeg skylder personen
-     Overføring ut (+)  jeg sendte penger, personen skylder meg mer
-     Overføring inn (−) personen betalte meg, skylder mindre */
+     Gjeld inn (+) · Gjeld ut (−) · Overføring ut (+) · Overføring inn (−) */
   const effect = (e) => (e.kind === "debt" ? (e.dir === "in" ? 1 : -1) : (e.dir === "out" ? 1 : -1)) * e.amountOre;
   const title = (e, n) => e.kind === "debt"
     ? (e.dir === "in" ? `${n} skylder meg` : `Jeg skylder ${n}`)
@@ -343,98 +362,137 @@ fieldset.fld { border: 0; margin: 0; padding: 0; min-width: 0; }
   const amtLabel = (e) => e.kind === "debt" ? (e.dir === "in" ? "til gode" : "skylder") : (e.dir === "in" ? "mottatt" : "sendt");
   const effectText = (e, n) => e.kind === "debt"
     ? (e.dir === "in" ? `Gjeld · ${n} skylder deg dette` : `Gjeld · du skylder ${n} dette`)
-    : (e.dir === "in" ? `Overføring inn · teller som betaling fra ${n}` : `Overføring ut · gjør at ${n} skylder deg mer`);
+    : (e.dir === "in" ? `Overføring inn · teller som betaling fra ${n}` : `Overføring ut · ${n} skylder deg mer`);
 
   /* ---------- Tilstand ---------- */
   const S = {
-    db: null, canWrite: false, ready: false, status: "loading",
+    db: null, canWrite: false, ready: false, status: "loading", banner: "",
     people: new Map(), entries: [],
+    tab: "oversikt", personView: null,
     f: { type: "all", person: "", period: "all", q: "" },
-    sel: null, confirmVoid: false, renaming: false, busy: false,
-    form: null,
+    sel: null, confirmVoid: false, renaming: false, busy: false, form: null,
   };
   const $ = (id) => document.getElementById(id);
-  const wide = window.matchMedia("(min-width: 1240px)");
-
   const personName = (id) => S.people.get(id)?.name || "Ukjent person";
+  const sortedPeople = () => [...S.people.values()].sort((a, c) => a.name.localeCompare(c.name, "nb"));
 
   function balances() {
-    const b = new Map(); const n = new Map(); const last = new Map();
+    const b = new Map(), n = new Map(), last = new Map();
     for (const p of S.people.keys()) { b.set(p, 0); n.set(p, 0); }
     for (const e of S.entries) {
       n.set(e.personId, (n.get(e.personId) || 0) + 1);
       if (!last.has(e.personId)) last.set(e.personId, e.loggedAt);
-      if (e.status === "void") continue;
-      b.set(e.personId, (b.get(e.personId) || 0) + effect(e));
+      if (e.status !== "void") b.set(e.personId, (b.get(e.personId) || 0) + effect(e));
     }
     return { b, n, last };
   }
 
-  /* ---------- Gjengivelse ---------- */
-  function render() {
-    renderTotals(); renderPeople(); renderPersonHead(); renderEntries(); renderDetail();
-    const off = !S.canWrite;
-    document.querySelectorAll("[data-new]").forEach((b) => (b.disabled = off));
+  /* ---------- Byggeklosser ---------- */
+  function symFor(e) {
+    if (e.status === "void") return ["s-gray", e.kind === "debt" ? I.receipt : e.dir === "in" ? I.inn : I.ut];
+    if (e.kind === "debt") return [e.dir === "in" ? "s-green" : "s-red", I.receipt];
+    return ["s-blue", e.dir === "in" ? I.inn : I.ut];
   }
-
-  function renderTotals() {
-    const { b } = balances();
-    let pos = 0, neg = 0;
-    for (const v of b.values()) { if (v > 0) pos += v; else neg += v; }
-    const net = pos + neg;
-    $("owedToMe").textContent = kr(pos);
-    $("iOwe").textContent = kr(neg);
-    $("net").textContent = (net < 0 ? "−" : "") + kr(net) + " kr";
-    $("net").className = "net " + (net > 0 ? "plus" : net < 0 ? "minus" : "");
-    $("netLabel").textContent = net > 0 ? "Netto til gode" : net < 0 ? "Netto skylder jeg" : "Netto";
+  function rowHTML(e, o = {}) {
+    const n = personName(e.personId), void_ = e.status === "void";
+    const [sc, ic] = symFor(e);
+    const cls = e.kind === "debt" ? (e.dir === "in" ? "green" : "red") : "";
+    const sign = e.kind === "debt" ? (e.dir === "in" ? "+" : "−") : "";
+    const reason = e.reason + (e.kind === "transfer" && e.method ? " · " + (METHODS[e.method] || e.method) : "");
+    const edited = (e.history || []).some((h) => h.action === "edited");
+    const when = (o.timeOnly ? clock(e.loggedAt) : shortStamp(e.loggedAt)) + (edited ? " · Redigert" : "") + (void_ ? " · Annullert" : "");
+    return `<button type="button" class="row${void_ ? " void" : ""}" data-entry="${esc(e.id)}" aria-current="${S.sel === e.id}">
+      <span class="sym ${sc}">${ic}</span>
+      <span class="cell"><span class="txt"><span class="t">${esc(title(e, n))}</span><span class="sub">${esc(reason)}</span><span class="meta">${esc(when)}</span></span>
+      <span class="amt"><b class="${void_ ? "" : cls}">${sign}${kr(e.amountOre)} kr</b><small>${amtLabel(e)}</small></span></span></button>`;
   }
-
-  function renderPeople() {
-    const el = $("people");
-    if (S.status === "denied" || S.status === "offline") { el.innerHTML = ""; return; }
-    if (!S.ready) { el.innerHTML = '<div class="skeleton"></div>'; return; }
-    const { b, n, last } = balances();
-    const ppl = [...S.people.values()].sort((a, c) => Math.abs(b.get(c.id) || 0) - Math.abs(b.get(a.id) || 0) || a.name.localeCompare(c.name, "nb"));
-    if (!ppl.length) {
-      el.innerHTML = '<p class="muted" style="margin:0;font-size:14px">Personene dukker opp her med saldo når du logger den første posten.</p>';
-    } else {
-      el.innerHTML = '<div class="list">' + ppl.map((p) => {
-        const v = b.get(p.id) || 0, cnt = n.get(p.id) || 0;
-        const cls = v > 0 ? "plus" : v < 0 ? "minus" : "muted";
-        const lab = v > 0 ? "skylder deg" : v < 0 ? "du skylder" : "gjort opp";
-        const sub = `${cnt} ${cnt === 1 ? "post" : "poster"}${last.has(p.id) ? " · " + shortDate(last.get(p.id)) : ""}`;
-        return `<button type="button" class="row person" data-person="${esc(p.id)}" aria-current="${S.f.person === p.id}">
-          <span class="avatar" aria-hidden="true">${esc(initials(p.name))}</span>
-          <span class="mid"><span class="t">${esc(p.name)}</span><span class="meta">${esc(sub)}</span></span>
-          <span class="amt"><strong class="${cls}">${kr(v)}</strong><span>${lab}</span></span>
-          <span class="chev">${I.chev}</span></button>`;
-      }).join("") + "</div>";
+  function personRow(p, B) {
+    const v = B.b.get(p.id) || 0, cnt = B.n.get(p.id) || 0;
+    const cls = v > 0 ? "green" : v < 0 ? "red" : "sec";
+    const lab = v > 0 ? "skylder deg" : v < 0 ? "du skylder" : "gjort opp";
+    const sub = `${cnt} ${cnt === 1 ? "post" : "poster"}${B.last.has(p.id) ? " · " + shortDate(B.last.get(p.id)) : ""}`;
+    return `<button type="button" class="row person" data-person="${esc(p.id)}">
+      <span class="avatar" aria-hidden="true">${esc(initials(p.name))}</span>
+      <span class="cell"><span class="txt"><span class="t">${esc(p.name)}</span><span class="meta">${esc(sub)}</span></span>
+      <span class="amt"><b class="${cls}">${krShort(v)}</b><small>${lab}</small></span><span class="chev">${I.chev}</span></span></button>`;
+  }
+  const big = (ore, cls) => { const [i, d] = splitKr(ore); return `<div class="big ${cls}"><span class="i">${ore < 0 ? "−" : ""}${i}</span><span class="d">${d}</span></div>`; };
+  const skel = (n) => Array.from({ length: n }, () => '<div class="skel"></div>').join("");
+  function dayGroups(list) {
+    const groups = [];
+    for (const e of list) {
+      const k = dayKey(new Date(e.loggedAt));
+      if (!groups.length || groups[groups.length - 1].k !== k) groups.push({ k, d: e.loggedAt, items: [] });
+      groups[groups.length - 1].items.push(e);
     }
-    const sel = $("fPerson"); const cur = S.f.person;
-    sel.innerHTML = '<option value="">Alle personer</option>' + [...S.people.values()].sort((a, c) => a.name.localeCompare(c.name, "nb")).map((p) => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
-    sel.value = S.people.has(cur) ? cur : "";
+    return groups.map((g) => `<h3 class="dayhead">${esc(relDay(g.d))}</h3><div class="group">${g.items.map((e) => rowHTML(e, { timeOnly: true })).join("")}</div>`).join("");
+  }
+  function notice() {
+    const m = {
+      slow: "Får ikke kontakt med lagringen ennå. Det du ser kan være utdatert.",
+      denied: "Denne gjeldsboken er privat. Bare eieren kan se og føre poster.",
+      offline: "Lagringen er ikke tilgjengelig her. Åpne gjeldsboken på claude.ai mens du er logget inn.",
+      error: "Mistet kontakten med lagringen. Last inn siden på nytt.",
+    }[S.banner];
+    return m ? `<div class="notice">${I.info}<span>${m}</span></div>` : "";
+  }
+  const blocked = () => S.status === "denied" || S.status === "offline";
+
+  /* ---------- Visninger ---------- */
+  function vOversikt() {
+    const B = balances();
+    let pos = 0, neg = 0;
+    for (const v of B.b.values()) { if (v > 0) pos += v; else neg += v; }
+    const net = pos + neg;
+    let h = `<h1 class="large" id="largeTitle">Oversikt</h1>${notice()}
+      <section class="card" aria-label="Saldo">
+        <div><div class="cap">${net > 0 ? "Netto til gode" : net < 0 ? "Netto skylder jeg" : "Netto"}</div>${big(net, net > 0 ? "green" : net < 0 ? "red" : "")}</div>
+        <div class="tiles"><div class="tile" style="--dot:var(--green)"><span>Skylder meg</span><b>${krShort(pos)}</b></div><div class="tile" style="--dot:var(--red)"><span>Jeg skylder</span><b>${krShort(neg)}</b></div></div>
+      </section>`;
+    if (blocked()) return h;
+    if (!S.ready) return h + skel(3);
+    if (!S.entries.length) {
+      return h + `<div class="empty"><h3>Ingen poster ennå</h3>
+        <p>Velg <b>Skylder</b> når noen skylder deg penger, eller du skylder noen. Velg <b>Overføring</b> når penger faktisk er sendt, for eksempel med Vipps. Dato og klokkeslett settes automatisk når du lagrer.</p>
+        <div class="btns"><button class="fillbtn prominent press" type="button" data-new="debt">${I.receipt}Skylder</button><button class="fillbtn press" type="button" data-new="transfer">${I.swap}Overføring</button></div></div>`;
+    }
+    const ppl = [...S.people.values()].sort((a, c) => Math.abs(B.b.get(c.id) || 0) - Math.abs(B.b.get(a.id) || 0)).slice(0, 4);
+    h += `<div class="head"><h2>Personer</h2><button type="button" data-tab="personer">Vis alle</button></div><div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div>`;
+    h += `<div class="head"><h2>Sist loggført</h2><button type="button" data-tab="logg">Logg</button></div><div class="group">${S.entries.slice(0, 5).map((e) => rowHTML(e)).join("")}</div>`;
+    return h;
   }
 
-  function renderPersonHead() {
-    const el = $("personHead"); const id = S.f.person;
-    if (!id || !S.people.has(id)) { el.innerHTML = ""; $("logTitle").textContent = "Logg"; return; }
-    const p = S.people.get(id); const v = balances().b.get(id) || 0;
-    const cls = v > 0 ? "plus" : v < 0 ? "minus" : "muted";
+  function vPersoner() {
+    const B = balances();
+    const h = `<h1 class="large" id="largeTitle">Personer</h1>${notice()}`;
+    if (blocked()) return h;
+    if (!S.ready) return h + skel(2);
+    const ppl = sortedPeople();
+    if (!ppl.length) return h + `<div class="empty"><h3>Ingen personer ennå</h3><p>Personene dukker opp her med saldo når du logger den første posten.</p></div>`;
+    return h + `<div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div><p class="footer">Grønt betyr at personen skylder deg. Rødt betyr at du skylder personen.</p>`;
+  }
+
+  function vPerson() {
+    const p = S.people.get(S.personView);
+    if (!p) { S.personView = null; return vPersoner(); }
+    const v = balances().b.get(p.id) || 0;
+    const cls = v > 0 ? "green" : v < 0 ? "red" : "";
     const lab = v > 0 ? `${esc(firstName(p.name))} skylder deg` : v < 0 ? `Du skylder ${esc(firstName(p.name))}` : "Gjort opp";
-    $("logTitle").textContent = "Logg for " + firstName(p.name);
-    el.innerHTML = `<div class="phead">
-      <button type="button" class="btn ghost back" data-act="allpeople">${I.back}Alle personer</button>
-      <h2>${esc(p.name)}</h2>
-      <div class="big ${cls}">${kr(v)} kr</div>
-      <div class="${cls}" style="font-weight:500">${lab}</div>
-      ${S.renaming ? `<div class="rename"><input class="input" id="renameIn" value="${esc(p.name)}" aria-label="Nytt navn" maxlength="60"><button class="btn primary" type="button" data-act="rename-save">Lagre navn</button><button class="btn" type="button" data-act="rename-cancel">Avbryt</button></div>`
-        : `<div class="tools"><button class="btn" type="button" data-act="new-for" data-kind="debt">${I.plus}Skylder</button><button class="btn" type="button" data-act="new-for" data-kind="transfer">${I.plus}Overføring</button>${S.canWrite ? '<button class="btn ghost" type="button" data-act="rename">Endre navn</button>' : ""}</div>`}
-    </div>`;
+    const list = S.entries.filter((e) => e.personId === p.id);
+    return `<h1 class="large" id="largeTitle">${esc(p.name)}</h1>
+      <section class="card"><div><div class="cap">${lab}</div>${big(Math.abs(v), cls)}</div>
+        ${S.canWrite ? `<div class="btns"><button class="fillbtn press" type="button" data-new="debt">${I.receipt}Skylder</button><button class="fillbtn press" type="button" data-new="transfer">${I.swap}Overføring</button></div>` : ""}
+      </section>
+      ${S.canWrite ? `<div class="group">${S.renaming
+        ? `<div class="inline"><input id="renameIn" value="${esc(p.name)}" aria-label="Nytt navn" maxlength="60" autocomplete="off"><button class="linkbtn" type="button" data-act="rename-cancel">Avbryt</button><button class="linkbtn" type="button" data-act="rename-save" style="font-weight:600">Lagre</button></div>`
+        : `<button class="row" type="button" data-act="rename"><span class="cell" style="min-height:48px"><span class="txt"><span class="t blue">Endre navn</span></span></span></button>`}</div>` : ""}
+      <div class="head"><h2>Logg</h2></div>
+      ${list.length ? dayGroups(list) : '<p class="footer">Ingen poster for denne personen.</p>'}`;
   }
 
   function filtered() {
-    const f = S.f; const q = f.q.trim().toLowerCase();
-    const now = Date.now(); let from = 0;
+    const f = S.f, q = f.q.trim().toLowerCase(), now = Date.now();
+    let from = 0;
     if (f.period === "7") from = now - 7 * 864e5;
     else if (f.period === "30") from = now - 30 * 864e5;
     else if (f.period === "year") from = new Date(parts(new Date()).year + "-01-01T00:00:00").getTime();
@@ -449,52 +507,73 @@ fieldset.fld { border: 0; margin: 0; padding: 0; min-width: 0; }
       return true;
     });
   }
-
-  function rowHTML(e, opts = {}) {
-    const n = personName(e.personId);
-    const void_ = e.status === "void";
-    const tone = e.kind === "debt" ? (e.dir === "in" ? "p" : "m") : "";
-    const amtCls = e.kind === "debt" ? (e.dir === "in" ? "plus" : "minus") : "";
-    const sign = e.kind === "debt" ? (e.dir === "in" ? "+" : "−") : "";
-    const reason = e.reason + (e.kind === "transfer" && e.method ? " · " + (METHODS[e.method] || e.method) : "");
-    const edited = (e.history || []).some((h) => h.action === "edited");
-    const tag = opts.static ? "div" : "button";
-    return `<${tag} ${opts.static ? "" : 'type="button"'} class="row${void_ ? " void" : ""}" data-entry="${esc(e.id)}" aria-current="${S.sel === e.id}">
-      <span class="badge ${tone}">${e.kind === "debt" ? I.receipt : e.dir === "in" ? I.inn : I.ut}</span>
-      <span class="mid"><span class="t">${esc(title(e, n))}</span><span class="r">${esc(reason)}</span>
-        <span class="meta"><span>${stamp(e.loggedAt)}</span>${edited ? '<span class="tag">redigert</span>' : ""}${void_ ? '<span class="tag">annullert</span>' : ""}</span></span>
-      <span class="amt"><strong class="${amtCls}">${sign}${kr(e.amountOre)}</strong><span>${amtLabel(e)}</span></span></${tag}>`;
+  function segHTML(name, opts, val) {
+    const idx = Math.max(0, opts.findIndex(([v]) => v === val));
+    return `<div class="seg" role="radiogroup" aria-label="${esc(name === "type" ? "Type" : name === "kind" ? "Type post" : "Retning")}">
+      <span class="thumb" style="width:calc((100% - 4px) / ${opts.length});transform:translateX(${idx * 100}%)"></span>
+      ${opts.map(([v, l]) => `<button type="button" role="radio" aria-checked="${v === val}" data-seg="${esc(name)}" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div>`;
   }
-
-  function renderEntries() {
-    const el = $("entries");
-    if (S.status === "denied" || S.status === "offline") { el.innerHTML = ""; $("count").textContent = ""; return; }
-    if (!S.ready) { el.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>'; $("count").textContent = ""; return; }
-    if (!S.entries.length) {
-      $("count").textContent = "";
-      const example = { id: "x", kind: "debt", dir: "in", personId: "_", amountOre: 45000, reason: "Pizza fredag", loggedAt: new Date().toISOString(), status: "active" };
-      const keep = S.people; S.people = new Map([["_", { id: "_", name: "Ola" }]]);
-      const ex = rowHTML(example, { static: true }); S.people = keep;
-      el.innerHTML = `<div class="empty"><h3>Ingen poster ennå</h3>
-        <p>Trykk <b>Skylder</b> når noen skylder deg penger, eller du skylder noen. Trykk <b>Overføring</b> når penger faktisk er sendt, for eksempel på Vipps. Dato og klokkeslett settes automatisk når du lagrer.</p>
-        <div class="list example">${ex}</div></div>`;
-      return;
-    }
+  const personOptions = () => `<option value="">Alle personer</option>${sortedPeople().map((p) => `<option value="${esc(p.id)}" ${S.f.person === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}`;
+  function vLogg() {
+    const h = `<h1 class="large" id="largeTitle">Logg</h1>${notice()}`;
+    if (blocked()) return h;
+    return h + `<label class="searchf">${I.search}<span class="sr">Søk</span><input id="q" type="search" placeholder="Søk i grunn eller navn" autocomplete="off" value="${esc(S.f.q)}"></label>
+      ${segHTML("type", [["all", "Alle"], ["debt", "Skylder"], ["transfer", "Overføringer"]], S.f.type)}
+      <div class="filters">
+        <label class="pick"><span class="sr">Person</span><select id="fPerson">${personOptions()}</select>${I.updown}</label>
+        <label class="pick"><span class="sr">Periode</span><select id="fPeriod">${[["all", "Hele perioden"], ["7", "Siste 7 dager"], ["30", "Siste 30 dager"], ["year", "I år"]].map(([v, l]) => `<option value="${v}" ${S.f.period === v ? "selected" : ""}>${l}</option>`).join("")}</select>${I.updown}</label>
+      </div><div id="logList" class="stack"></div>`;
+  }
+  function renderLogList() {
+    const el = $("logList"); if (!el) return;
+    if (!S.ready) { el.innerHTML = skel(3); return; }
+    if (!S.entries.length) { el.innerHTML = `<div class="empty"><h3>Loggen er tom</h3><p>Trykk på plussknappen nederst for å føre den første posten.</p></div>`; return; }
     const list = filtered();
-    $("count").textContent = list.length === S.entries.length ? `${list.length} ${list.length === 1 ? "post" : "poster"}` : `${list.length} av ${S.entries.length} poster`;
-    if (!list.length) { el.innerHTML = '<div class="placeholder">Ingen poster passer filteret. Prøv et annet søk eller en lengre periode.</div>'; return; }
-    const thisYear = parts(new Date()).year; const groups = [];
-    for (const e of list) {
-      const k = dayKey(e.loggedAt);
-      if (!groups.length || groups[groups.length - 1].k !== k) groups.push({ k, d: e.loggedAt, items: [] });
-      groups[groups.length - 1].items.push(e);
-    }
-    el.innerHTML = groups.map((g) => {
-      const d = new Date(g.d); const label = cap((parts(d).year === thisYear ? dayFmt : dayFmtY).format(d));
-      return `<section class="day"><h3>${esc(label)}</h3><div class="list">${g.items.map((e) => rowHTML(e)).join("")}</div></section>`;
-    }).join("");
+    if (!list.length) { el.innerHTML = '<div class="empty"><h3>Ingen treff</h3><p>Ingen poster passer filteret. Prøv et annet søk eller en lengre periode.</p></div>'; return; }
+    el.innerHTML = dayGroups(list) + `<p class="footer">${list.length === S.entries.length ? `${list.length} ${list.length === 1 ? "post" : "poster"}` : `Viser ${list.length} av ${S.entries.length} poster`}. Ingenting slettes. Annullerte poster står igjen, men teller ikke i saldoen.</p>`;
   }
 
+  /* ---------- Gjengivelse ---------- */
+  let lastKey = "";
+  function render() {
+    const key = S.personView ? "person:" + S.personView : S.tab;
+    const v = $("view");
+    if (key === "logg" && lastKey === "logg" && $("logList")) {
+      // Logg-fanen er allerede vist: oppdater bare listen, så søkefeltet beholder fokus.
+      const fp = $("fPerson"); if (fp) { fp.innerHTML = personOptions(); fp.value = S.f.person; }
+      const nb = v.querySelector(".notice"), n = notice();
+      if (nb) nb.remove();
+      if (n) $("largeTitle").insertAdjacentHTML("afterend", n);
+    } else {
+      v.innerHTML = S.personView ? vPerson() : S.tab === "personer" ? vPersoner() : S.tab === "logg" ? vLogg() : vOversikt();
+      if (key !== lastKey) { v.style.animation = "none"; void v.offsetWidth; v.style.animation = ""; }
+    }
+    lastKey = key;
+    renderLogList();
+    renderChrome();
+    renderDetail();
+    observeTitle();
+  }
+  function renderChrome() {
+    const tabs = ["oversikt", "personer", "logg"];
+    document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-current", b.dataset.tab === S.tab ? "page" : "false"));
+    $("pill").style.transform = `translateX(${tabs.indexOf(S.tab) * 100}%)`;
+    $("navStart").innerHTML = S.personView ? `<button class="capsule-btn glass press" type="button" data-act="back">${I.back}<span>Personer</span></button>` : "";
+    $("navEnd").innerHTML = S.tab === "logg" && !S.personView && !blocked() ? `<button class="circle glass press" type="button" data-act="focus-search" aria-label="Søk">${I.search}</button>` : "";
+    $("navTitle").textContent = S.personView ? personName(S.personView) : { oversikt: "Oversikt", personer: "Personer", logg: "Logg" }[S.tab];
+    $("plus").disabled = !S.canWrite;
+  }
+  let io, observed = null;
+  function observeTitle() {
+    const t = $("largeTitle");
+    if (t === observed) return;
+    io?.disconnect(); observed = t;
+    if (!t || !("IntersectionObserver" in window)) return;
+    io = new IntersectionObserver(([en]) => $("navTitle").classList.toggle("show", !en.isIntersecting), { rootMargin: "-60px 0px 0px 0px" });
+    io.observe(t);
+  }
+
+  /* ---------- Post-ark ---------- */
   const FIELD_LABEL = { amountOre: "Sum", reason: "Grunn", personId: "Person", kind: "Type", dir: "Retning", method: "Betalt med" };
   function fmtField(f, v) {
     if (v == null || v === "") return "–";
@@ -505,117 +584,105 @@ fieldset.fld { border: 0; margin: 0; padding: 0; min-width: 0; }
     if (f === "method") return METHODS[v] || v;
     return String(v);
   }
-
-  function detailHTML(e, inSheet) {
-    const n = personName(e.personId); const void_ = e.status === "void";
-    const sign = e.kind === "debt" ? (e.dir === "in" ? "+" : "−") : "";
-    const cls = void_ ? "muted" : e.kind === "debt" ? (e.dir === "in" ? "plus" : "minus") : "";
+  function detailHTML(e) {
+    const n = personName(e.personId), void_ = e.status === "void";
+    const cls = void_ ? "sec" : e.kind === "debt" ? (e.dir === "in" ? "green" : "red") : "";
     const hist = [...(e.history || [])].reverse().map((h) => {
       let head = "", body = "";
       if (h.action === "created") { head = "Opprettet"; body = `${kr(h.snapshot?.amountOre ?? e.amountOre)} kr · ${esc(h.snapshot?.reason ?? "")}`; }
       else if (h.action === "edited") { head = "Endret"; body = Object.entries(h.changes || {}).map(([f, [a, b]]) => `${FIELD_LABEL[f] || f}: ${esc(fmtField(f, a))} → ${esc(fmtField(f, b))}`).join("<br>"); }
       else if (h.action === "voided") { head = "Annullert"; body = "Teller ikke lenger i saldoen"; }
       else if (h.action === "restored") { head = "Gjenopprettet"; body = "Teller igjen i saldoen"; }
-      return `<li><div><strong>${head}</strong><div class="c">${body}</div><div class="w">${stamp(h.at)}</div></div></li>`;
+      return `<div class="row"><span class="dot"></span><span class="cell"><b>${head}</b><span class="c">${body}</span><span class="meta">${stamp(h.at)}</span></span></div>`;
     }).join("");
     const actions = !S.canWrite ? "" : S.confirmVoid
       ? `<div class="confirm"><span>Annullere denne posten? Den blir stående i loggen, men teller ikke i saldoen. Du kan gjenopprette den senere.</span>
-         <div class="btnrow"><button class="btn danger" type="button" data-act="void-yes" ${S.busy ? "disabled" : ""}>Ja, annuller</button><button class="btn" type="button" data-act="void-no">Behold</button></div></div>`
-      : `<div class="btnrow"><button class="btn" type="button" data-act="edit" ${void_ || S.busy ? "disabled" : ""}>Rediger</button>
-         ${void_ ? `<button class="btn" type="button" data-act="restore" ${S.busy ? "disabled" : ""}>Gjenopprett</button>` : `<button class="btn danger" type="button" data-act="void" ${S.busy ? "disabled" : ""}>Annuller post</button>`}</div>`;
-    return `<div class="dpanel">
-      <div class="top"><p class="label">Post${void_ ? " · annullert" : ""}</p><button class="iconbtn" type="button" data-act="close-detail" aria-label="Lukk">${I.x}</button></div>
-      <div><h2>${esc(title(e, n))}</h2><div class="big ${cls}" ${void_ ? 'style="text-decoration:line-through"' : ""}>${sign}${kr(e.amountOre)} kr</div><div class="muted" style="font-size:14px">${esc(effectText(e, firstName(n)))}</div></div>
-      <dl class="dl">
-        <div><dt>Person</dt><dd>${esc(n)}</dd></div>
-        <div><dt>Grunn</dt><dd>${esc(e.reason)}</dd></div>
-        ${e.kind === "transfer" ? `<div><dt>Betalt med</dt><dd>${esc(METHODS[e.method] || "–")}</dd></div>` : ""}
-        <div><dt>Loggført</dt><dd class="mono">${stamp(e.loggedAt)}</dd></div>
-      </dl>
+         <div class="btns"><button class="fillbtn press" type="button" data-act="void-no">Behold</button><button class="fillbtn danger press" type="button" data-act="void-yes" ${S.busy ? "disabled" : ""}>Annuller post</button></div></div>`
+      : `<div class="btns"><button class="fillbtn press" type="button" data-act="edit" ${void_ || S.busy ? "disabled" : ""}>Rediger</button>
+         ${void_ ? `<button class="fillbtn press" type="button" data-act="restore" ${S.busy ? "disabled" : ""}>Gjenopprett</button>` : `<button class="fillbtn danger press" type="button" data-act="void" ${S.busy ? "disabled" : ""}>Annuller post</button>`}</div>`;
+    return `<span class="grab" aria-hidden="true"></span>
+      <div class="sheetbar"><button class="circle glass press" type="button" data-act="close-detail" aria-label="Lukk">${I.x}</button><h2>Post${void_ ? " · annullert" : ""}</h2><span class="navslot"></span></div>
+      <div class="dhead"><span class="cap">${esc(title(e, n))}</span><div ${void_ ? 'style="text-decoration:line-through"' : ""}>${big(e.amountOre, cls)}</div><span class="sub">${esc(effectText(e, firstName(n)))}</span></div>
+      <div class="group kv">
+        <div class="formrow"><span>Person</span><span>${esc(n)}</span></div>
+        <div class="formrow"><span>Grunn</span><span>${esc(e.reason)}</span></div>
+        ${e.kind === "transfer" ? `<div class="formrow"><span>Betalt med</span><span>${esc(METHODS[e.method] || "–")}</span></div>` : ""}
+        <div class="formrow"><span>Loggført</span><span class="num">${stamp(e.loggedAt)}</span></div>
+      </div>
       ${actions}
-      <p class="label">Historikk</p>
-      <ol class="timeline">${hist}</ol>
-      <p class="muted" style="margin:0;font-size:13px">Ingenting slettes. Endringer og annulleringer lagres med tidspunkt, så loggen viser alltid hva som skjedde.</p>
-    </div>`;
+      <div class="head"><h2 style="font-size:20px">Historikk</h2></div>
+      <div class="group hist">${hist}</div>`;
   }
-
   function renderDetail() {
-    const e = S.entries.find((x) => x.id === S.sel);
-    const col = $("detailCol"), dlg = $("detailDlg");
-    if (wide.matches) {
-      if (dlg.open) dlg.close();
-      col.innerHTML = e ? detailHTML(e) : '<p class="label">Post</p><div class="placeholder">Velg en post i loggen for å se detaljer, redigere den eller se endringshistorikken.</div>';
-    } else {
-      col.innerHTML = "";
-      if (e) { $("detailSheet").innerHTML = detailHTML(e, true); if (!dlg.open) dlg.showModal(); }
-      else if (dlg.open) dlg.close();
-    }
+    const dlg = $("detailDlg"), e = S.entries.find((x) => x.id === S.sel);
+    if (e) { $("detailSheet").innerHTML = detailHTML(e); if (!dlg.open) { dlg.showModal(); dlg.scrollTop = 0; dlg.querySelector('[data-act="close-detail"]')?.focus({ preventScroll: true }); } }
+    else if (dlg.open) dlg.close();
   }
 
   /* ---------- Skjema ---------- */
   function openForm(kind, editId) {
     if (!S.canWrite) return;
+    closeMenu();
     if (editId) {
       const e = S.entries.find((x) => x.id === editId); if (!e) return;
       S.form = { mode: "edit", id: e.id, kind: e.kind, personId: e.personId, newName: "", dir: e.dir, amount: oreToInput(e.amountOre), reason: e.reason, method: e.method || "vipps", loggedAt: e.loggedAt, err: "" };
+      S.sel = null; S.confirmVoid = false; $("detailDlg").close();
     } else {
-      const ppl = [...S.people.keys()];
-      S.form = { mode: "new", kind, personId: S.f.person || (ppl.length ? "" : "__new"), newName: "", dir: "in", amount: "", reason: "", method: "vipps", err: "" };
+      const pre = S.personView || S.f.person || "";
+      S.form = { mode: "new", kind, personId: pre || (S.people.size ? "" : "__new"), newName: "", dir: "in", amount: "", reason: "", method: "vipps", err: "" };
     }
     renderForm();
-    if ($("detailDlg").open) $("detailDlg").close();
     $("formDlg").showModal();
-    setTimeout(() => { const t = S.form.personId ? $("amt") : null; (t || $("form").querySelector("button,input"))?.focus(); }, 30);
+    setTimeout(() => { (S.form?.personId && S.form.personId !== "__new" ? $("amt") : ($("newName") || $("form").querySelector('[data-f="personId"]')))?.focus(); }, 60);
   }
-
-  function readFormInputs() {
+  function readForm() {
     if (!S.form) return;
-    const a = $("amt"), r = $("reason"), nn = $("newName");
-    if (a) S.form.amount = a.value; if (r) S.form.reason = r.value; if (nn) S.form.newName = nn.value;
+    const a = $("amt"), r = $("reason"), nn = $("newName"), m = $("method");
+    if (a) S.form.amount = a.value;
+    if (r) S.form.reason = r.value;
+    if (nn) S.form.newName = nn.value;
+    if (m) S.form.method = m.value;
   }
-
+  function sizeAmount() { const a = $("amt"); if (a) a.style.width = Math.max(2, (a.value || a.placeholder).length + 0.5) + "ch"; }
+  function dirLabels() {
+    const F = S.form, isT = F.kind === "transfer";
+    const n = F.personId === "__new" ? firstName(F.newName.trim() || "personen") : F.personId ? firstName(personName(F.personId)) : "personen";
+    return isT ? [`${n} betalte meg`, `Jeg betalte ${n}`] : [`${n} skylder meg`, `Jeg skylder ${n}`];
+  }
   function renderForm() {
-    const F = S.form; const isT = F.kind === "transfer";
-    const pName = F.personId === "__new" ? (F.newName.trim() || "personen") : F.personId ? firstName(personName(F.personId)) : "personen";
-    const ppl = [...S.people.values()].sort((a, c) => a.name.localeCompare(c.name, "nb"));
-    const now = new Date().toISOString();
+    const F = S.form, isT = F.kind === "transfer";
+    const [dIn, dOut] = dirLabels();
     $("form").innerHTML = `
-      <div class="sheet-top"><h2 id="formTitle">${F.mode === "edit" ? "Rediger post" : isT ? "Ny overføring" : "Ny gjeld"}</h2><button class="iconbtn" type="button" data-act="close-form" aria-label="Lukk">${I.x}</button></div>
-      <div class="seg" role="radiogroup" aria-label="Type">
-        <button type="button" role="radio" aria-checked="${!isT}" data-f="kind" data-v="debt">Skylder</button>
-        <button type="button" role="radio" aria-checked="${isT}" data-f="kind" data-v="transfer">Overføring</button>
+      <span class="grab" aria-hidden="true"></span>
+      <div class="sheetbar">
+        <button class="circle glass press" type="button" data-act="close-form" aria-label="Avbryt">${I.x}</button>
+        <h2 id="formTitle">${F.mode === "edit" ? "Rediger post" : isT ? "Ny overføring" : "Ny gjeld"}</h2>
+        <button class="circle glass tinted press" type="submit" aria-label="${F.mode === "edit" ? "Lagre endring" : "Loggfør"}" ${S.busy ? "disabled" : ""}>${I.check}</button>
       </div>
-      <fieldset class="fld"><legend>Hvem</legend>
-        <div class="chips" role="radiogroup" aria-label="Person">
-          ${ppl.map((p) => `<button type="button" class="chip" role="radio" aria-checked="${F.personId === p.id}" data-f="personId" data-v="${esc(p.id)}">${esc(p.name)}</button>`).join("")}
-          <button type="button" class="chip add" role="radio" aria-checked="${F.personId === "__new"}" data-f="personId" data-v="__new">${I.plus}Ny person</button>
-        </div>
-        ${F.personId === "__new" ? `<input class="input" id="newName" placeholder="Navn, for eksempel Ola Hansen" maxlength="60" autocomplete="off" value="${esc(F.newName)}">` : ""}
-      </fieldset>
-      <fieldset class="fld"><legend>Retning</legend>
-        <div class="seg" role="radiogroup" aria-label="Retning">
-          <button type="button" role="radio" aria-checked="${F.dir === "in"}" data-f="dir" data-v="in">${esc(isT ? `${pName} betalte meg` : `${pName} skylder meg`)}</button>
-          <button type="button" role="radio" aria-checked="${F.dir === "out"}" data-f="dir" data-v="out">${esc(isT ? `Jeg betalte ${pName}` : `Jeg skylder ${pName}`)}</button>
-        </div>
-      </fieldset>
-      <label class="fld"><span>Beløp</span>
-        <div class="amount"><input id="amt" inputmode="decimal" autocomplete="off" placeholder="0" value="${esc(F.amount)}" aria-label="Beløp i kroner"><span>kr</span></div>
-      </label>
-      <label class="fld"><span>Grunn</span><input class="input" id="reason" maxlength="140" autocomplete="off" placeholder="${isT ? "For eksempel: tilbakebetaling for konsertbillett" : "For eksempel: pizza fredag"}" value="${esc(F.reason)}"></label>
-      ${isT ? `<fieldset class="fld"><legend>Betalt med</legend><div class="chips" role="radiogroup" aria-label="Betalt med">
-        ${Object.entries(METHODS).map(([k, v]) => `<button type="button" class="chip" role="radio" aria-checked="${F.method === k}" data-f="method" data-v="${k}">${v}</button>`).join("")}</div></fieldset>` : ""}
-      <div class="stamp">${I.clock}<div>${F.mode === "edit"
-        ? `<b>Opprinnelig loggført</b><span class="mono">${stamp(F.loggedAt)}</span><div class="muted" style="font-size:12px;margin-top:4px">Endringen lagres i historikken med dato og klokkeslett.</div>`
-        : `<b>Dato og klokkeslett settes når du lagrer</b><span class="mono" id="clock">${stamp(now)}</span>`}</div></div>
-      ${isT && F.mode === "new" ? `<div class="hint">${I.info}<span>Lånte du bort penger med Vipps? Logg det bare som en overføring ut. Da skylder personen deg beløpet, og du trenger ikke føre gjeld i tillegg.</span></div>` : ""}
-      <p class="err" id="formErr" role="alert">${esc(F.err)}</p>
-      <button class="btn primary" type="submit" ${S.busy ? "disabled" : ""}>${F.mode === "edit" ? "Lagre endring" : isT ? "Loggfør overføring" : "Loggfør gjeld"}</button>`;
+      ${segHTML("kind", [["debt", "Skylder"], ["transfer", "Overføring"]], F.kind)}
+      <p class="lbl" id="whoLbl">Hvem</p>
+      <div class="chips" role="radiogroup" aria-labelledby="whoLbl">
+        ${sortedPeople().map((p) => `<button type="button" class="chip press" role="radio" aria-checked="${F.personId === p.id}" data-f="personId" data-v="${esc(p.id)}">${esc(p.name)}</button>`).join("")}
+        <button type="button" class="chip add press" role="radio" aria-checked="${F.personId === "__new"}" data-f="personId" data-v="__new">${I.plus}Ny person</button>
+      </div>
+      ${F.personId === "__new" ? `<div class="group"><label class="formrow"><span>Navn</span><input id="newName" placeholder="For eksempel Ola Hansen" maxlength="60" autocomplete="off" value="${esc(F.newName)}"></label></div>` : ""}
+      ${segHTML("dir", [["in", dIn], ["out", dOut]], F.dir)}
+      <div class="amountcard"><label for="amt">Beløp</label><div class="amountrow"><input id="amt" inputmode="decimal" autocomplete="off" placeholder="0" value="${esc(F.amount)}"><span>kr</span></div></div>
+      <div class="group">
+        <label class="formrow"><span>Grunn</span><input id="reason" maxlength="140" autocomplete="off" placeholder="${isT ? "Tilbakebetaling" : "Pizza fredag"}" value="${esc(F.reason)}"></label>
+        ${isT ? `<label class="formrow"><span>Betalt med</span><select id="method">${Object.entries(METHODS).map(([k, v]) => `<option value="${k}" ${F.method === k ? "selected" : ""}>${v}</option>`).join("")}</select>${I.updown}</label>` : ""}
+      </div>
+      <p class="err" role="alert">${esc(F.err)}</p>
+      <p class="footer">${F.mode === "edit"
+        ? `Opprinnelig loggført ${stamp(F.loggedAt)}. Endringen lagres i historikken med dato og klokkeslett.`
+        : `Dato og klokkeslett settes automatisk når du lagrer: <span id="clock" class="num">${stamp(new Date().toISOString())}</span>.${isT ? " Lånte du bort penger med Vipps, holder det å føre én overføring ut. Da skylder personen deg beløpet." : ""}`}</p>
+      <button class="fillbtn prominent press" type="submit" ${S.busy ? "disabled" : ""}>${F.mode === "edit" ? "Lagre endring" : isT ? "Loggfør overføring" : "Loggfør gjeld"}</button>`;
+    sizeAmount();
   }
-
   async function submitForm() {
-    readFormInputs();
-    const F = S.form; const db = S.db; if (!F || !db || S.busy) return;
-    const amountOre = parseAmount(F.amount); const reason = F.reason.trim(); const newName = F.newName.trim();
+    readForm();
+    const F = S.form, db = S.db; if (!F || !db || S.busy) return;
+    const amountOre = parseAmount(F.amount), reason = F.reason.trim(), newName = F.newName.trim();
     let err = "";
     if (!F.personId) err = "Velg hvem posten gjelder.";
     else if (F.personId === "__new" && !newName) err = "Skriv navnet på den nye personen.";
@@ -626,20 +693,17 @@ fieldset.fld { border: 0; margin: 0; padding: 0; min-width: 0; }
     try {
       let personId = F.personId;
       if (personId === "__new") {
-        const existing = [...S.people.values()].find((p) => p.name.toLowerCase() === newName.toLowerCase());
-        if (existing) personId = existing.id;
+        const ex = [...S.people.values()].find((p) => p.name.toLowerCase() === newName.toLowerCase());
+        if (ex) personId = ex.id;
         else { const ref = db.collection("people").doc(); await ref.set({ name: newName, createdAt: new Date().toISOString() }); personId = ref.id; }
       }
       const data = { kind: F.kind, dir: F.dir, personId, amountOre, reason, method: F.kind === "transfer" ? F.method : null };
       const now = new Date().toISOString();
       if (F.mode === "new") {
-        const ref = db.collection("entries").doc();
-        await ref.set({ ...data, loggedAt: now, status: "active", history: [{ at: now, action: "created", snapshot: { amountOre, reason } }] });
-        if (wide.matches) S.sel = ref.id;
+        await db.collection("entries").doc().set({ ...data, loggedAt: now, status: "active", history: [{ at: now, action: "created", snapshot: { amountOre, reason } }] });
         toast(F.kind === "debt" ? "Gjeld loggført" : "Overføring loggført");
       } else {
-        const cur = S.entries.find((x) => x.id === F.id);
-        const changes = {};
+        const cur = S.entries.find((x) => x.id === F.id), changes = {};
         for (const k of Object.keys(data)) if ((cur[k] ?? null) !== (data[k] ?? null)) changes[k] = [cur[k] ?? null, data[k] ?? null];
         if (Object.keys(changes).length) {
           await db.doc("entries/" + F.id).update({ ...data, history: [...(cur.history || []), { at: now, action: "edited", changes }] });
@@ -649,11 +713,10 @@ fieldset.fld { border: 0; margin: 0; padding: 0; min-width: 0; }
       S.busy = false; S.form = null; $("formDlg").close(); render();
     } catch (e) {
       S.busy = false;
-      F.err = e?.code === "quota_exceeded" ? "Gjeldsboken er full. Kontakt den som satte den opp." : "Kunne ikke lagre. Sjekk nettet og prøv igjen.";
+      F.err = e?.code === "quota_exceeded" ? "Gjeldsboken er full." : "Kunne ikke lagre. Sjekk nettet og prøv igjen.";
       renderForm();
     }
   }
-
   async function setStatusOf(id, status, action) {
     const e = S.entries.find((x) => x.id === id); if (!e || S.busy) return;
     S.busy = true; renderDetail();
@@ -661,112 +724,128 @@ fieldset.fld { border: 0; margin: 0; padding: 0; min-width: 0; }
       const now = new Date().toISOString();
       await S.db.doc("entries/" + id).update({ status, history: [...(e.history || []), { at: now, action }] });
       toast(action === "voided" ? "Posten er annullert" : "Posten er gjenopprettet");
-    } catch { toast("Kunne ikke lagre. Prøv igjen."); }
+    } catch { toast("Kunne ikke lagre. Prøv igjen.", true); }
     S.busy = false; S.confirmVoid = false; render();
   }
-
   async function renamePerson() {
-    const id = S.f.person; const name = $("renameIn")?.value.trim();
+    const id = S.personView, name = $("renameIn")?.value.trim();
     if (!id || !name || S.busy) return;
     S.busy = true;
     try { await S.db.doc("people/" + id).update({ name }); toast("Navnet er endret"); S.renaming = false; }
-    catch { toast("Kunne ikke lagre navnet."); }
+    catch { toast("Kunne ikke lagre navnet.", true); }
     S.busy = false; render();
   }
 
   let toastT;
-  function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2600); }
-
-  function banner(kind) {
-    const msgs = {
-      slow: "Får ikke kontakt med lagringen ennå. Det du ser kan være utdatert.",
-      denied: "Denne gjeldsboken er privat. Bare eieren kan se og føre poster.",
-      offline: "Lagringen er ikke tilgjengelig her. Åpne gjeldsboken på claude.ai mens du er logget inn.",
-      error: "Mistet kontakten med lagringen. Last inn siden på nytt.",
-    };
-    $("banner").innerHTML = msgs[kind] ? `<div class="notice">${I.info}<span>${msgs[kind]}</span></div>` : "";
+  function toast(msg, bad) {
+    $("toastHost").innerHTML = `<div class="toast glass" role="status">${bad ? I.info : I.done}<span>${esc(msg)}</span></div>`;
+    clearTimeout(toastT); toastT = setTimeout(() => ($("toastHost").innerHTML = ""), 2400);
   }
+
+  /* ---------- Pluss-meny ---------- */
+  function openMenu() {
+    if (!S.canWrite) return;
+    const m = $("menu");
+    m.innerHTML = `<button type="button" role="menuitem" data-new="debt"><span class="sym s-green">${I.receipt}</span><span><b>Skylder</b><small>Noen skylder meg, eller jeg skylder</small></span></button>
+      <button type="button" role="menuitem" data-new="transfer"><span class="sym s-blue">${I.swap}</span><span><b>Overføring</b><small>Penger som faktisk er sendt</small></span></button>`;
+    m.hidden = false; $("plus").setAttribute("aria-expanded", "true");
+    m.querySelector("button").focus();
+  }
+  function closeMenu() { $("menu").hidden = true; $("plus").setAttribute("aria-expanded", "false"); }
 
   /* ---------- Hendelser ---------- */
   document.addEventListener("click", (ev) => {
-    const t = ev.target.closest("button"); if (!t) return;
+    const t = ev.target.closest("button");
+    if (!$("menu").hidden && !ev.target.closest("#menu") && t?.id !== "plus") closeMenu();
+    if (!t) return;
+    if (t.id === "plus") { $("menu").hidden ? openMenu() : closeMenu(); return; }
     if (t.dataset.new) { openForm(t.dataset.new); return; }
-    if (t.dataset.type) { S.f.type = t.dataset.type; document.querySelectorAll("[data-type]").forEach((b) => b.setAttribute("aria-pressed", b === t)); renderEntries(); return; }
-    if (t.dataset.person) {
-      const id = t.dataset.person; S.f.person = S.f.person === id ? "" : id; S.renaming = false; render();
-      if (S.f.person && !window.matchMedia("(min-width: 900px)").matches) $("personHead").scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
+    if (t.dataset.tab) { S.tab = t.dataset.tab; S.personView = null; S.renaming = false; window.scrollTo({ top: 0 }); render(); return; }
+    if (t.dataset.person) { S.personView = t.dataset.person; S.renaming = false; window.scrollTo({ top: 0 }); render(); return; }
+    if (t.dataset.entry) { S.sel = t.dataset.entry; S.confirmVoid = false; renderDetail(); return; }
+    if (t.dataset.seg) {
+      const name = t.dataset.seg, v = t.dataset.v;
+      if (name === "type") {
+        S.f.type = v; const seg = t.parentElement, bs = [...seg.querySelectorAll("button")];
+        bs.forEach((b) => b.setAttribute("aria-checked", b === t));
+        seg.querySelector(".thumb").style.transform = `translateX(${bs.indexOf(t) * 100}%)`;
+        renderLogList(); return;
+      }
+      if (S.form) { readForm(); S.form[name] = v; S.form.err = ""; renderForm(); return; }
     }
-    if (t.dataset.entry) { S.sel = t.dataset.entry; S.confirmVoid = false; renderEntries(); renderDetail(); return; }
     if (t.dataset.f && S.form) {
-      readFormInputs(); S.form[t.dataset.f] = t.dataset.v; S.form.err = ""; renderForm();
-      if (t.dataset.f === "personId" && t.dataset.v === "__new") $("newName")?.focus();
+      readForm(); S.form[t.dataset.f] = t.dataset.v; S.form.err = ""; renderForm();
+      if (t.dataset.v === "__new") $("newName")?.focus();
       return;
     }
     switch (t.dataset.act) {
       case "close-form": $("formDlg").close(); break;
-      case "close-detail": S.sel = null; S.confirmVoid = false; renderEntries(); renderDetail(); break;
+      case "close-detail": S.sel = null; S.confirmVoid = false; renderDetail(); break;
       case "edit": openForm(null, S.sel); break;
       case "void": S.confirmVoid = true; renderDetail(); break;
       case "void-no": S.confirmVoid = false; renderDetail(); break;
       case "void-yes": setStatusOf(S.sel, "void", "voided"); break;
       case "restore": setStatusOf(S.sel, "active", "restored"); break;
-      case "allpeople": S.f.person = ""; S.renaming = false; render(); break;
-      case "new-for": openForm(t.dataset.kind); break;
-      case "rename": S.renaming = true; renderPersonHead(); $("renameIn")?.focus(); break;
-      case "rename-cancel": S.renaming = false; renderPersonHead(); break;
+      case "back": S.personView = null; S.renaming = false; render(); break;
+      case "rename": S.renaming = true; render(); $("renameIn")?.focus(); break;
+      case "rename-cancel": S.renaming = false; render(); break;
       case "rename-save": renamePerson(); break;
+      case "focus-search": window.scrollTo({ top: 0, behavior: "smooth" }); $("q")?.focus(); break;
     }
   });
-  $("form").addEventListener("submit", (ev) => { ev.preventDefault(); submitForm(); });
-  $("form").addEventListener("input", (ev) => {
-    if (ev.target.id === "newName" && S.form) { S.form.newName = ev.target.value; const segs = $("form").querySelectorAll('[data-f="dir"]'); const n = ev.target.value.trim() || "personen"; const isT = S.form.kind === "transfer"; if (segs.length === 2) { segs[0].textContent = isT ? `${firstName(n)} betalte meg` : `${firstName(n)} skylder meg`; segs[1].textContent = isT ? `Jeg betalte ${firstName(n)}` : `Jeg skylder ${firstName(n)}`; } }
+  document.addEventListener("input", (ev) => {
+    const id = ev.target.id;
+    if (id === "q") { S.f.q = ev.target.value; renderLogList(); }
+    else if (id === "amt") sizeAmount();
+    else if (id === "newName" && S.form) {
+      S.form.newName = ev.target.value;
+      const b = $("form").querySelectorAll('[data-seg="dir"]'), [a, c] = dirLabels();
+      if (b.length === 2) { b[0].textContent = a; b[1].textContent = c; }
+    }
   });
+  document.addEventListener("change", (ev) => {
+    if (ev.target.id === "fPerson") { S.f.person = ev.target.value; renderLogList(); }
+    if (ev.target.id === "fPeriod") { S.f.period = ev.target.value; renderLogList(); }
+  });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" && !$("menu").hidden) { closeMenu(); $("plus").focus(); }
+    if (ev.key === "Enter" && ev.target.id === "renameIn") renamePerson();
+  });
+  $("form").addEventListener("submit", (ev) => { ev.preventDefault(); submitForm(); });
   $("formDlg").addEventListener("close", () => { if (!S.busy) S.form = null; });
-  $("formDlg").addEventListener("click", (ev) => { if (ev.target === $("formDlg")) $("formDlg").close(); });
-  $("detailDlg").addEventListener("click", (ev) => { if (ev.target === $("detailDlg")) $("detailDlg").close(); });
-  $("detailDlg").addEventListener("close", () => { if (!wide.matches && S.sel) { S.sel = null; S.confirmVoid = false; renderEntries(); } });
-  $("q").addEventListener("input", (ev) => { S.f.q = ev.target.value; renderEntries(); });
-  $("fPerson").addEventListener("change", (ev) => { S.f.person = ev.target.value; S.renaming = false; render(); });
-  $("fPeriod").addEventListener("change", (ev) => { S.f.period = ev.target.value; renderEntries(); });
-  wide.addEventListener("change", renderDetail);
-  document.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && ev.target.id === "renameIn") renamePerson(); });
+  for (const d of ["formDlg", "detailDlg"]) $(d).addEventListener("click", (ev) => { if (ev.target === $(d)) $(d).close(); });
+  $("detailDlg").addEventListener("close", () => { if (S.sel) { S.sel = null; S.confirmVoid = false; } });
 
-  /* ---------- Statisk oppsett ---------- */
-  $("searchIcon").outerHTML = I.search;
-  document.querySelectorAll(".caret").forEach((c) => (c.outerHTML = I.down));
-  document.querySelectorAll('[data-new="debt"]').forEach((b) => (b.innerHTML = I.plus + "Skylder"));
-  document.querySelectorAll('[data-new="transfer"]').forEach((b) => (b.innerHTML = I.plus + "Overføring"));
-  const tick = () => {
-    $("today").textContent = longToday.format(new Date());
-    const c = document.getElementById("clock"); if (c) c.textContent = stamp(new Date().toISOString());
-  };
-  tick(); setInterval(tick, 15000);
+  /* ---------- Oppstart ---------- */
+  const TAB_LABEL = { oversikt: "Oversikt", personer: "Personer", logg: "Logg" };
+  const TAB_ICON = { oversikt: I.house, personer: I.users, logg: I.list };
+  document.querySelectorAll(".tab").forEach((b) => { b.innerHTML = TAB_ICON[b.dataset.tab] + `<span>${TAB_LABEL[b.dataset.tab]}</span>`; });
+  $("plus").innerHTML = I.plus;
+  setInterval(() => { const c = $("clock"); if (c) c.textContent = stamp(new Date().toISOString()); }, 15000);
   render();
 
-  /* ---------- Lagring ---------- */
   (async () => {
-    if (!window.claude || typeof window.claude.use !== "function") { S.status = "offline"; banner("offline"); render(); return; }
+    if (!window.claude || typeof window.claude.use !== "function") { S.status = "offline"; S.banner = "offline"; render(); return; }
     const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
-    if (!db) { S.status = "offline"; banner("offline"); render(); return; }
+    if (!db) { S.status = "offline"; S.banner = "offline"; render(); return; }
     const owner = user ? await user.isOwner() : null;
-    if (owner === false) { S.status = "denied"; banner("denied"); render(); return; }
-    S.db = db; S.canWrite = true;
-    let gotP = false, gotE = false, confirmed = { p: false, e: false };
-    const timer = setTimeout(() => { if (!(confirmed.p && confirmed.e)) banner("slow"); }, 10000);
+    if (owner === false) { S.status = "denied"; S.banner = "denied"; render(); return; }
+    S.db = db; S.canWrite = true; render();
+    let gotP = false, gotE = false; const ok = { p: false, e: false };
+    const timer = setTimeout(() => { if (!(ok.p && ok.e)) { S.banner = "slow"; render(); } }, 10000);
     const settle = () => {
       if (gotP && gotE) { S.ready = true; S.status = "ok"; }
-      if (confirmed.p && confirmed.e) { clearTimeout(timer); banner(""); }
+      if (ok.p && ok.e) { clearTimeout(timer); if (S.banner === "slow") S.banner = ""; }
       render();
     };
-    const onErr = (e) => { clearTimeout(timer); S.ready = true; if (e?.code === "revoked") { S.canWrite = false; banner("denied"); } else banner("error"); render(); };
+    const onErr = (e) => { clearTimeout(timer); S.ready = true; if (e?.code === "revoked") { S.canWrite = false; S.banner = "denied"; } else S.banner = "error"; render(); };
     db.collection("people").onSnapshot((s) => {
       const m = new Map(); for (const d of s.docs) m.set(d.id, { id: d.id, ...d.data() });
-      S.people = m; gotP = true; if (!s.metadata.fromCache) confirmed.p = true; settle();
+      S.people = m; gotP = true; if (!s.metadata.fromCache) ok.p = true; settle();
     }, onErr);
     db.collection("entries").orderBy("loggedAt", "desc").onSnapshot((s) => {
       S.entries = s.docs.map((d) => ({ id: d.id, ...d.data() }));
-      gotE = true; if (!s.metadata.fromCache) confirmed.e = true;
+      gotE = true; if (!s.metadata.fromCache) ok.e = true;
       if (S.sel && !S.entries.some((x) => x.id === S.sel)) S.sel = null;
       settle();
     }, onErr);
