@@ -138,6 +138,11 @@ body.scrolled .navtitle { opacity: 1; }
 .plusbtn:disabled { opacity: 0.45; }
 
 /* ---------- Innhold ---------- */
+.totals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.totals > div { background: var(--flate); border-radius: 22px; padding: 14px 16px 16px; min-width: 0; }
+.totals span { display: block; font-size: 15px; line-height: 20px; font-weight: 500; color: var(--grafitt); letter-spacing: -0.24px; }
+.totals b { display: block; font-family: var(--font-round); font-size: clamp(26px, 8vw, 34px); line-height: 1.15; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.3px; overflow-wrap: anywhere; }
+.none { padding: 0 4px; margin: 0; font-size: 15px; line-height: 20px; color: var(--grafitt); letter-spacing: -0.24px; }
 .ledger { padding: 4px 4px 10px; margin: 0; font-size: clamp(26px, 7.4vw, 32px); line-height: 1.18; font-weight: 600; letter-spacing: -0.6px; text-wrap: balance; max-width: 22ch; }
 .ledger .n { font-weight: 700; }
 .ledger .soft { color: var(--grafitt); }
@@ -294,8 +299,8 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
 <dialog class="actions" id="actDlg" aria-label="Ny post"><div class="wrap">
   <div class="actgroup glass frost">
     <div class="drag" data-drag><span class="grab" aria-hidden="true"></span></div>
-    <button type="button" data-new="debt"><b>Skylder</b><small>Noen skylder meg penger, eller jeg skylder noen</small></button>
-    <button type="button" data-new="transfer"><b>Overføring</b><small>Penger som er sendt, for eksempel med Vipps</small></button>
+    <button type="button" data-new="debt"><b>Skylder</b></button>
+    <button type="button" data-new="transfer"><b>Overføring</b></button>
   </div>
   <button class="actcancel glass frost press" type="button" data-act="close-act">Avbryt</button>
 </div></dialog>
@@ -348,7 +353,6 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const initials = (n) => (n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
   const firstName = (n) => (n || "personen").trim().split(/\s+/)[0];
-  const listNames = (arr) => arr.length <= 1 ? (arr[0] || "") : arr.slice(0, -1).join(", ") + " og " + arr[arr.length - 1];
 
   function parseAmount(raw) {
     let s = String(raw || "").replace(/[\s ]/g, "").replace(/kr/gi, "");
@@ -367,10 +371,6 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
   const title = (e, n) => e.kind === "debt"
     ? (e.dir === "in" ? `${n} skylder meg` : `Jeg skylder ${n}`)
     : (e.dir === "in" ? `${n} betalte meg` : `Jeg betalte ${n}`);
-  const amtLabel = (e) => e.kind === "debt" ? (e.dir === "in" ? "til gode" : "skylder") : (e.dir === "in" ? "mottatt" : "sendt");
-  const effectText = (e, n) => e.kind === "debt"
-    ? (e.dir === "in" ? `${n} skylder deg dette.` : `Du skylder ${n} dette.`)
-    : (e.dir === "in" ? `${n} betalte deg. Det trekkes fra det ${n} skylder.` : `Du sendte penger til ${n}, så ${n} skylder deg mer.`);
 
   /* ---------- Tilstand ---------- */
   const TABS = ["oversikt", "personer", "logg"];
@@ -405,24 +405,22 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
     const sign = e.kind === "debt" ? (e.dir === "in" ? "+" : "−") : "";
     const edited = (e.history || []).some((h) => h.action === "edited");
     const bits = [timeOnly ? clock(e.loggedAt) : when(e.loggedAt)];
-    if (e.kind === "transfer" && e.method) bits.push(METHODS[e.method] || e.method);
     if (edited) bits.push("redigert");
     if (void_) bits.push("annullert");
     const meta = bits.join(", ");
     return `<button type="button" class="row${void_ ? " void" : ""}" data-entry="${esc(e.id)}" aria-current="${S.sel === e.id}">
       ${avatar(n)}
       <span class="cell"><span class="txt"><span class="t">${esc(title(e, n))}</span><span class="sub">${esc(e.reason)}</span><span class="meta">${esc(meta.charAt(0).toUpperCase() + meta.slice(1))}</span></span>
-      <span class="amt"><b class="${void_ ? "" : cls}">${sign}${kr(e.amountOre)} kr</b><small>${amtLabel(e)}</small></span></span></button>`;
+      <span class="amt"><b class="${void_ ? "" : cls}">${sign}${kr(e.amountOre)} kr</b></span></span></button>`;
   }
-  function personRow(p, B) {
-    const v = B.b.get(p.id) || 0, cnt = B.n.get(p.id) || 0;
+  function personRow(p, B, compact) {
+    const v = B.b.get(p.id) || 0;
     const cls = v > 0 ? "pos" : v < 0 ? "neg" : "sec";
     const lab = v > 0 ? "skylder deg" : v < 0 ? "du skylder" : "gjort opp";
-    const sub = `${cnt} ${cnt === 1 ? "post" : "poster"}${B.last.has(p.id) ? ", sist " + shortDate(B.last.get(p.id)) : ""}`;
     return `<button type="button" class="row person" data-person="${esc(p.id)}">
       ${avatar(p.name)}
-      <span class="cell"><span class="txt"><span class="t">${esc(p.name)}</span><span class="meta">${esc(sub)}</span></span>
-      <span class="amt"><b class="${cls}">${krShort(v)}</b><small>${lab}</small></span><span class="chev">${I.chev}</span></span></button>`;
+      <span class="cell" style="min-height:56px"><span class="txt"><span class="t">${esc(p.name)}</span></span>
+      <span class="amt"><b class="${cls}">${krShort(v)}</b>${compact ? "" : `<small>${lab}</small>`}</span><span class="chev">${I.chev}</span></span></button>`;
   }
   const skel = (n) => Array.from({ length: n }, () => '<div class="skel"></div>').join("");
   function dayGroups(list) {
@@ -445,32 +443,19 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
   }
 
   /* ---------- Paneler ---------- */
-  function ledgerSentence(B) {
-    const owe = [], owed = []; let pos = 0, neg = 0;
-    for (const p of S.people.values()) { const v = B.b.get(p.id) || 0; if (v > 0) { owe.push([p, v]); pos += v; } else if (v < 0) { owed.push([p, v]); neg += v; } }
-    owe.sort((a, b) => b[1] - a[1]); owed.sort((a, b) => a[1] - b[1]);
-    const names = (arr) => { const ns = arr.map(([p]) => esc(p.name)); return ns.length > 3 ? listNames([...ns.slice(0, 2), `${ns.length - 2} til`]) : listNames(ns); };
-    if (!owe.length && !owed.length) return `Ingen skylder deg noe, <span class="soft">og du skylder ingen.</span>`;
-    let s = "";
-    if (owe.length) s += `${names(owe)} skylder deg <span class="n">${krShort(pos)}</span>.`;
-    if (owed.length) s += `${s ? " " : ""}${owe.length ? '<span class="soft">' : ""}Du skylder ${names(owed)} <span class="n">${krShort(neg)}</span>.${owe.length ? "</span>" : ""}`;
-    else s += ` <span class="soft">Du skylder ingen.</span>`;
-    return s;
-  }
   function renderOversikt() {
     const el = $("pane-oversikt");
     const B = balances();
     let h = `<h1 class="large" data-title="Oversikt">Oversikt</h1>${notice()}`;
     if (blocked()) { el.innerHTML = h; return; }
-    if (!S.ready) { el.innerHTML = h + skel(3); return; }
-    h += `<p class="ledger">${ledgerSentence(B)}</p>`;
-    if (!S.entries.length) {
-      h += `<div class="empty"><h3>Ingen poster ennå</h3><p>Trykk på pluss nederst og velg Skylder eller Overføring. Dato og klokkeslett settes når du lagrer.</p></div>`;
-      el.innerHTML = h; return;
-    }
-    const ppl = [...S.people.values()].filter((p) => (B.b.get(p.id) || 0) !== 0).sort((a, c) => Math.abs(B.b.get(c.id) || 0) - Math.abs(B.b.get(a.id) || 0)).slice(0, 4);
-    if (ppl.length) h += `<div class="head"><h2>Utestående</h2><button type="button" data-tab="personer">Alle personer</button></div><div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div>`;
-    h += `<div class="head"><h2>Sist ført</h2><button type="button" data-tab="logg">Hele loggen</button></div><div class="group">${S.entries.slice(0, 5).map((e) => rowHTML(e)).join("")}</div>`;
+    if (!S.ready) { el.innerHTML = h + skel(2); return; }
+    const owe = [], owed = []; let pos = 0, neg = 0;
+    for (const p of S.people.values()) { const v = B.b.get(p.id) || 0; if (v > 0) { owe.push(p); pos += v; } else if (v < 0) { owed.push(p); neg += v; } }
+    owe.sort((a, c) => B.b.get(c.id) - B.b.get(a.id)); owed.sort((a, c) => B.b.get(a.id) - B.b.get(c.id));
+    h += `<div class="totals"><div><span>Skylder meg</span><b class="pos">${krShort(pos)}</b></div><div><span>Jeg skylder</span><b class="neg">${krShort(neg)}</b></div></div>`;
+    if (!S.entries.length) { el.innerHTML = h + `<p class="none">Trykk på pluss for å føre den første posten.</p>`; return; }
+    const sect = (t, arr, none) => `<div class="head"><h2>${t}</h2></div>` + (arr.length ? `<div class="group">${arr.map((p) => personRow(p, B, true)).join("")}</div>` : `<p class="none">${none}</p>`);
+    h += sect("Skylder meg", owe, "Ingen skylder deg noe.") + sect("Jeg skylder", owed, "Du skylder ingen.");
     el.innerHTML = h;
   }
   function renderPersoner() {
@@ -479,8 +464,8 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
     if (blocked()) { el.innerHTML = h; return; }
     if (!S.ready) { el.innerHTML = h + skel(2); return; }
     const ppl = sortedPeople();
-    h += ppl.length ? `<div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div><p class="footer">Grønt betyr at personen skylder deg. Rødt betyr at du skylder personen.</p>`
-      : `<div class="empty"><h3>Ingen personer ennå</h3><p>En person legges til første gang du fører en post på dem.</p></div>`;
+    h += ppl.length ? `<div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div>`
+      : `<p class="none">Ingen personer ennå.</p>`;
     el.innerHTML = h;
   }
   function renderPerson() {
@@ -540,10 +525,10 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
     const el = $("logList");
     if (blocked()) { el.innerHTML = ""; return; }
     if (!S.ready) { el.innerHTML = skel(3); return; }
-    if (!S.entries.length) { el.innerHTML = `<div class="empty"><h3>Loggen er tom</h3><p>Trykk på pluss nederst for å føre den første posten.</p></div>`; return; }
+    if (!S.entries.length) { el.innerHTML = `<p class="none">Ingen poster ennå.</p>`; return; }
     const list = filtered();
-    if (!list.length) { el.innerHTML = '<div class="empty"><h3>Ingen treff</h3><p>Ingen poster passer filteret. Prøv et annet søk eller en lengre periode.</p></div>'; return; }
-    el.innerHTML = dayGroups(list) + `<p class="footer">${list.length === S.entries.length ? `${list.length} ${list.length === 1 ? "post" : "poster"}.` : `Viser ${list.length} av ${S.entries.length} poster.`} Ingenting slettes. Annullerte poster står igjen, men teller ikke i saldoen.</p>`;
+    if (!list.length) { el.innerHTML = '<p class="none">Ingen treff.</p>'; return; }
+    el.innerHTML = dayGroups(list);
   }
 
   /* ---------- Gjengivelse ---------- */
@@ -707,13 +692,13 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
       return `<div class="row"><span class="dot"></span><span class="cell"><b>${head}</b><span class="c">${body}</span><span class="meta">${stamp(h.at)}</span></span></div>`;
     }).join("");
     const actions = !S.canWrite ? "" : S.confirmVoid
-      ? `<div class="confirm kv"><span>Annullere denne posten? Den blir stående i loggen, men teller ikke i saldoen. Du kan gjenopprette den senere.</span>
+      ? `<div class="confirm kv"><span>Annullere posten? Den teller ikke lenger i saldoen.</span>
          <div class="btns"><button class="fillbtn" type="button" data-act="void-no">Behold</button><button class="fillbtn danger" type="button" data-act="void-yes" ${S.busy ? "disabled" : ""}>Annuller post</button></div></div>`
       : `<div class="btns"><button class="fillbtn" type="button" data-act="edit" ${void_ || S.busy ? "disabled" : ""}>Rediger</button>
          ${void_ ? `<button class="fillbtn" type="button" data-act="restore" ${S.busy ? "disabled" : ""}>Gjenopprett</button>` : `<button class="fillbtn danger" type="button" data-act="void" ${S.busy ? "disabled" : ""}>Annuller post</button>`}</div>`;
     return `<div class="drag" data-drag><span class="grab" aria-hidden="true"></span>
       <div class="sheetbar"><button class="circle glass press" type="button" data-act="close-detail" aria-label="Lukk">${I.x}</button><h2>${void_ ? "Annullert post" : "Post"}</h2><span class="navslot"></span></div></div>
-      <div class="dhead">${avatar(n, "xl")}<span class="who">${esc(title(e, n))}</span><span class="sum ${cls}" ${void_ ? 'style="text-decoration:line-through"' : ""}>${sign}${kr(e.amountOre)} kr</span><span class="sub">${esc(effectText(e, firstName(n)))}</span></div>
+      <div class="dhead">${avatar(n, "xl")}<span class="who">${esc(title(e, n))}</span><span class="sum ${cls}" ${void_ ? 'style="text-decoration:line-through"' : ""}>${sign}${kr(e.amountOre)} kr</span></div>
       <div class="group kv">
         <div class="formrow"><span>Grunn</span><span>${esc(e.reason)}</span></div>
         ${e.kind === "transfer" ? `<div class="formrow"><span>Betalt med</span><span>${esc(METHODS[e.method] || "Ikke oppgitt")}</span></div>` : ""}
@@ -774,7 +759,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
         <button class="circle glass ink press" type="submit" aria-label="${F.mode === "edit" ? "Lagre endring" : "Lagre"}" ${S.busy ? "disabled" : ""}>${I.check}</button>
       </div></div>
       ${segHTML("kind", [["debt", "Skylder"], ["transfer", "Overføring"]], F.kind)}
-      <p class="lbl" id="whoLbl">Hvem</p>
+      <p class="sr" id="whoLbl">Hvem</p>
       <div class="chips" role="radiogroup" aria-labelledby="whoLbl">
         ${sortedPeople().map((p) => `<button type="button" class="chip" role="radio" aria-checked="${F.personId === p.id}" data-f="personId" data-v="${esc(p.id)}">${esc(p.name)}</button>`).join("")}
         <button type="button" class="chip add" role="radio" aria-checked="${F.personId === "__new"}" data-f="personId" data-v="__new">Ny person</button>
@@ -787,9 +772,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto c
         ${isT ? `<label class="formrow"><span>Betalt med</span><select id="method">${Object.entries(METHODS).map(([k, v]) => `<option value="${k}" ${F.method === k ? "selected" : ""}>${v}</option>`).join("")}</select>${I.updown}</label>` : ""}
       </div>
       <p class="err" role="alert">${esc(F.err)}</p>
-      <p class="footer">${F.mode === "edit"
-        ? `Posten er datert ${stamp(F.loggedAt)}. Endringen lagres i historikken med dato og klokkeslett.`
-        : `Dato og klokkeslett settes når du lagrer: <span id="clock">${stamp(new Date().toISOString())}</span>.${isT ? " Lånte du bort penger med Vipps, holder det å føre én overføring ut. Da skylder personen deg beløpet." : ""}`}</p>
+      <p class="footer">${F.mode === "edit" ? stamp(F.loggedAt) : `<span id="clock">${stamp(new Date().toISOString())}</span>`}</p>
       <button class="fillbtn ink" type="submit" ${S.busy ? "disabled" : ""}>${F.mode === "edit" ? "Lagre endring" : isT ? "Lagre overføring" : "Lagre gjeld"}</button>`;
     $("form").scrollTop = sc;
     sizeAmount();
