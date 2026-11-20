@@ -7,10 +7,9 @@ dataene ligger i Artifactens database, slik at samme logg vises på mobil og PC.
 - Design i Figma: https://www.figma.com/design/Qj17TNPI6KFpSWHC0JxgDz
 - Design i Framer: https://framer.com/projects/lCaZo5KidDVRkzbKua5e (siden «Gjeldsbok · iPhone»)
 - Kode: `index.html` (én fil, ingen byggesteg)
-- Stil: Apple-inspirert med Liquid Glass og egne farger («Lyng»-lilla aksent), Figma-siden «Glass · eget design». Glass brukes bare i
-  navigasjonslaget (fanelinje, knapper, ark), etter skillene `apple-liquid-glass`,
-  `apple-typography` og `apple-design-system` i `.claude/skills/`
-  (fra rshankras/claude-code-apple-skills, MIT).
+- Stil: Apple-inspirert etter skillen `frontend-design`. Rolige farger (Kritt, Flate, Blekk, Grafitt);
+  grønt og rødt bare på beløp. Liquid Glass bare i navigasjonslaget: fanelinje med dragbar linse,
+  plussknapp, ark og varsler. Figma-siden «Glass · Kritt og blekk».
 
 ## To typer poster
 

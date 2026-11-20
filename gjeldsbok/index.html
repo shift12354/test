@@ -1,371 +1,292 @@
 <title>Gjeldsbok</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="theme-color" content="#F5F4F8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0B0A0F" media="(prefers-color-scheme: dark)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<meta name="theme-color" content="#F4F5F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <style>
-/* Layout: iOS-inspirert app i én kolonne. Glass bare i navigasjonslaget (fanelinje, knapper, ark), grupperte lister for innholdet. Alt som dukker opp, kommer fra bunnen. */
+/* Layout: iOS-app i én venstrejustert kolonne. Toppen er en setning om hvem som skylder hva.
+   Liquid Glass bare i navigasjonslaget: fanelinje med dragbar linse, plussknapp, ark og varsler.
+   Farger: Kritt, Flate, Blekk, Grafitt + Til gode/Skylder kun på beløp. */
 @property --glow { syntax: "<number>"; inherits: true; initial-value: 0; }
 :root {
-  --bg: #F5F4F8;
-  --cell: #FFFFFF;
-  --label: #16141C;
-  --label2: #6B6875;
-  --label3: #8E8A99;
-  --sep: #DAD7E0;
-  --fill: rgba(120, 112, 140, 0.14);
-  --fill2: rgba(120, 112, 140, 0.08);
-  --accent: #6E56CF;
-  --accent-text: #5B45BC;
-  --on-accent: #FFFFFF;
-  --pos: #2FB57E;
-  --pos-text: #18805A;
-  --neg: #E5484D;
-  --neg-text: #C9343A;
-  --glass-tint: rgba(255, 255, 255, 0.36);
-  --sheet-tint: rgba(250, 249, 253, 0.74);
-  --glass-solid: rgba(250, 249, 253, 0.92);
-  --glass-rim: rgba(255, 255, 255, 0.95);
-  --glass-rim2: rgba(255, 255, 255, 0.22);
-  --glass-sheen: rgba(255, 255, 255, 0.22);
-  --glass-edge: rgba(255, 255, 255, 0.16);
-  --glass-shadow: 0 12px 32px rgba(40, 30, 80, 0.14), 0 2px 6px rgba(40, 30, 80, 0.08);
-  --scrim: rgba(20, 16, 30, 0.25);
-  --amb1: rgba(110, 86, 207, 0.20);
-  --amb2: rgba(47, 181, 126, 0.12);
-  --amb3: rgba(229, 72, 77, 0.07);
-  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
-  --font-round: ui-rounded, "SF Pro Rounded", "Nunito", -apple-system, system-ui, sans-serif;
-  --spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+  --kritt: #F4F5F7;
+  --flate: #FFFFFF;
+  --blekk: #000000;
+  --grafitt: #6B6E76;
+  --dempet: #8D9098;
+  --linje: #D9DBE0;
+  --fyll: rgba(118, 120, 128, 0.14);
+  --fyll2: rgba(118, 120, 128, 0.08);
+  --til-gode: #1A7F4B;
+  --skylder: #C4312B;
+  --paa-blekk: #FFFFFF;
+  --glass-tint: rgba(255, 255, 255, 0.56);
+  --glass-solid: rgba(250, 250, 252, 0.94);
+  --glass-rim: rgba(255, 255, 255, 1);
+  --glass-rim2: rgba(255, 255, 255, 0.25);
+  --glass-sheen: rgba(255, 255, 255, 0.35);
+  --glass-edge: rgba(255, 255, 255, 0.22);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --lens: rgba(118, 120, 128, 0.16);
+  --lens-lift: rgba(255, 255, 255, 0.5);
+  --scrim: rgba(0, 0, 0, 0.22);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-round: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
+  --spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --sheet: cubic-bezier(0.32, 0.72, 0, 1);
   --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0B0A0F; --cell: #1A1820; --label: #F4F2F8; --label2: #A09CAB; --label3: #6F6B7A; --sep: #2E2B36;
-    --fill: rgba(140, 130, 170, 0.24); --fill2: rgba(140, 130, 170, 0.12);
-    --accent: #9B87F5; --accent-text: #B3A4FA; --on-accent: #0B0A0F;
-    --pos: #3DD68C; --pos-text: #3DD68C; --neg: #FF6369; --neg-text: #FF7A7F;
-    --glass-tint: rgba(40, 36, 54, 0.42); --sheet-tint: rgba(28, 26, 36, 0.78); --glass-solid: rgba(30, 28, 38, 0.94); --glass-rim: rgba(255, 255, 255, 0.38); --glass-rim2: rgba(255, 255, 255, 0.05);
-    --glass-sheen: rgba(255, 255, 255, 0.07); --glass-edge: rgba(255, 255, 255, 0.07);
-    --glass-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4); --scrim: rgba(0, 0, 0, 0.5);
-    --amb1: rgba(155, 135, 245, 0.20); --amb2: rgba(61, 214, 140, 0.09); --amb3: rgba(255, 99, 105, 0.06);
+    --kritt: #000000; --flate: #1C1C1E; --blekk: #FFFFFF; --grafitt: #9A9DA5; --dempet: #6E7179; --linje: #38383A;
+    --fyll: rgba(118, 120, 128, 0.32); --fyll2: rgba(118, 120, 128, 0.18);
+    --til-gode: #3DCB7F; --skylder: #FF6B5E; --paa-blekk: #000000;
+    --glass-tint: rgba(36, 36, 40, 0.55); --glass-solid: rgba(28, 28, 30, 0.95); --glass-rim: rgba(255, 255, 255, 0.4); --glass-rim2: rgba(255, 255, 255, 0.05);
+    --glass-sheen: rgba(255, 255, 255, 0.08); --glass-edge: rgba(255, 255, 255, 0.07);
+    --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5);
+    --lens: rgba(255, 255, 255, 0.12); --lens-lift: rgba(255, 255, 255, 0.2); --scrim: rgba(0, 0, 0, 0.5);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0B0A0F; --cell: #1A1820; --label: #F4F2F8; --label2: #A09CAB; --label3: #6F6B7A; --sep: #2E2B36;
-  --fill: rgba(140, 130, 170, 0.24); --fill2: rgba(140, 130, 170, 0.12);
-  --accent: #9B87F5; --accent-text: #B3A4FA; --on-accent: #0B0A0F;
-  --pos: #3DD68C; --pos-text: #3DD68C; --neg: #FF6369; --neg-text: #FF7A7F;
-  --glass-tint: rgba(40, 36, 54, 0.42); --sheet-tint: rgba(28, 26, 36, 0.78); --glass-solid: rgba(30, 28, 38, 0.94); --glass-rim: rgba(255, 255, 255, 0.38); --glass-rim2: rgba(255, 255, 255, 0.05);
-  --glass-sheen: rgba(255, 255, 255, 0.07); --glass-edge: rgba(255, 255, 255, 0.07);
-  --glass-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.4); --scrim: rgba(0, 0, 0, 0.5);
-  --amb1: rgba(155, 135, 245, 0.20); --amb2: rgba(61, 214, 140, 0.09); --amb3: rgba(255, 99, 105, 0.06);
+  --kritt: #000000; --flate: #1C1C1E; --blekk: #FFFFFF; --grafitt: #9A9DA5; --dempet: #6E7179; --linje: #38383A;
+  --fyll: rgba(118, 120, 128, 0.32); --fyll2: rgba(118, 120, 128, 0.18);
+  --til-gode: #3DCB7F; --skylder: #FF6B5E; --paa-blekk: #000000;
+  --glass-tint: rgba(36, 36, 40, 0.55); --glass-solid: rgba(28, 28, 30, 0.95); --glass-rim: rgba(255, 255, 255, 0.4); --glass-rim2: rgba(255, 255, 255, 0.05);
+  --glass-sheen: rgba(255, 255, 255, 0.08); --glass-edge: rgba(255, 255, 255, 0.07);
+  --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5);
+  --lens: rgba(255, 255, 255, 0.12); --lens-lift: rgba(255, 255, 255, 0.2); --scrim: rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { background: var(--bg); }
-body { color: var(--label); font-family: var(--font); font-size: 17px; line-height: 22px; letter-spacing: -0.41px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
+html, body { background: var(--kritt); }
+body { color: var(--blekk); font-family: var(--font); font-size: 17px; line-height: 22px; letter-spacing: -0.41px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%; }
 button, input, select { font: inherit; color: inherit; letter-spacing: inherit; }
 button { cursor: pointer; border: 0; background: none; padding: 0; -webkit-user-select: none; user-select: none; }
-:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 60%, transparent); outline-offset: 2px; }
-.num { font-variant-numeric: tabular-nums; }
-.pos { color: var(--pos-text); }
-.neg { color: var(--neg-text); }
-.acc { color: var(--accent-text); }
-.sec { color: var(--label2); }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--blekk) 45%, transparent); outline-offset: 2px; }
+.pos { color: var(--til-gode); }
+.neg { color: var(--skylder); }
+.sec { color: var(--grafitt); }
+.n { font-family: var(--font-round); font-variant-numeric: tabular-nums; letter-spacing: 0; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.ambient { position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(70% 45% at 10% -5%, var(--amb1), transparent 70%),
-    radial-gradient(55% 35% at 105% 12%, var(--amb2), transparent 70%),
-    radial-gradient(60% 40% at 90% 105%, var(--amb1), transparent 70%),
-    radial-gradient(45% 30% at 0% 95%, var(--amb3), transparent 70%),
-    var(--bg); }
 
 /* ---------- Liquid Glass ----------
-   Lag (samme i Safari på iPhone og i andre nettlesere):
-   ::before  uskarphet + metning av det som ligger bak, tone, glans øverst, lysende kant innerst og et lys som følger fingeren
-   ::after   lyskant (spekulær) som er sterkest øverst til venstre og nederst til høyre
-   selve elementet  myk skygge under */
+   ::before  uskarphet og metning av det som ligger bak, tone, glans øverst, lysende kant innerst, lys der fingeren trykker
+   ::after   spekulær lyskant */
 .glass { position: relative; isolation: isolate; background: transparent; box-shadow: var(--glass-shadow); --gx: 50%; --gy: 0%; transition: --glow 0.35s var(--ease); }
 .glass::before {
   content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  -webkit-backdrop-filter: blur(10px) saturate(185%) brightness(1.04);
-  backdrop-filter: blur(10px) saturate(185%) brightness(1.04);
+  -webkit-backdrop-filter: blur(12px) saturate(180%); backdrop-filter: blur(12px) saturate(180%);
   background:
-    radial-gradient(circle at var(--gx) var(--gy), rgba(255, 255, 255, calc(var(--glow) * 0.45)), transparent 60%),
-    radial-gradient(farthest-side, transparent 74%, var(--glass-edge)),
-    linear-gradient(180deg, var(--glass-sheen), transparent 48%),
+    radial-gradient(circle at var(--gx) var(--gy), rgba(255, 255, 255, calc(var(--glow) * 0.4)), transparent 60%),
+    radial-gradient(farthest-side, transparent 72%, var(--glass-edge)),
+    linear-gradient(180deg, var(--glass-sheen), transparent 50%),
     var(--glass-tint);
 }
 .glass::after {
   content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; padding: 1px;
   background: linear-gradient(135deg, var(--glass-rim), var(--glass-rim2) 38%, var(--glass-rim2) 62%, var(--glass-rim));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
 }
 .glass.lit { --glow: 1; }
-.frost { --glass-tint: var(--sheet-tint); }
-.frost::before { -webkit-backdrop-filter: blur(24px) saturate(190%) brightness(1.03); backdrop-filter: blur(24px) saturate(190%) brightness(1.03); }
-.glass.tint { --glass-tint: color-mix(in srgb, var(--accent) 88%, transparent); --glass-sheen: rgba(255, 255, 255, 0.25); color: var(--on-accent); box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 38%, transparent); }
+.glass.frost::before { -webkit-backdrop-filter: blur(26px) saturate(180%); backdrop-filter: blur(26px) saturate(180%); background: linear-gradient(180deg, var(--glass-sheen), transparent 40%), var(--glass-solid); }
+.glass.ink { color: var(--paa-blekk); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18); }
+.glass.ink::before { background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 50%), var(--blekk); }
 .press { transition: transform 0.4s var(--spring), --glow 0.35s var(--ease); }
 .press:active { transform: scale(0.92); }
-@media (prefers-reduced-transparency: reduce) {
-  .glass::before { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid); }
-  .glass.tint::before { background: var(--accent); }
-}
-@media (prefers-contrast: more) {
-  .glass::before { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--cell); }
-  .glass::after { background: var(--label); }
-}
+@media (prefers-reduced-transparency: reduce) { .glass::before { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid); } .glass.ink::before { background: var(--blekk); } }
+@media (prefers-contrast: more) { .glass::before { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--flate); } .glass::after { background: var(--blekk); } }
 
-.circle { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex: none; }
-.circle svg { width: 20px; height: 20px; }
-.circle:disabled { opacity: 0.5; }
-.capsule-btn { height: 48px; border-radius: 999px; display: inline-flex; align-items: center; gap: 2px; padding: 0 18px 0 12px; font-weight: 500; }
-.capsule-btn svg { width: 20px; height: 20px; }
+.circle { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.circle svg { width: 19px; height: 19px; }
+.circle:disabled { opacity: 0.45; }
+.backbtn { height: 46px; border-radius: 999px; display: inline-flex; align-items: center; gap: 2px; padding: 0 18px 0 12px; font-weight: 500; }
+.backbtn svg { width: 19px; height: 19px; }
 
-/* ---------- Ramme ---------- */
-.app { max-width: 680px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0; }
-.view { padding-top: 64px; padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; outline: none; }
-.view.enter > * { animation: rowIn 0.55s var(--spring) both; animation-delay: calc(var(--i, 0) * 32ms); }
-@keyframes rowIn { from { opacity: 0; transform: translateY(14px) scale(0.985); } }
+/* ---------- Ramme og paneler ---------- */
+.app { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0; }
+.pane { padding-top: 60px; padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; outline: none; }
+.pane.show { animation: paneIn 0.18s var(--ease); }
+.pane.push { animation: pushIn 0.38s var(--sheet); }
+@keyframes paneIn { from { opacity: 0; } }
+@keyframes pushIn { from { transform: translateX(28%); opacity: 0; } }
 .large { margin: 4px 0; font-size: 34px; line-height: 41px; font-weight: 700; letter-spacing: 0.37px; overflow-wrap: anywhere; text-wrap: balance; }
 
-.edge-top, .edge-bottom { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-.edge-top { -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
-.edge-bottom { -webkit-mask-image: linear-gradient(transparent, #000 60%); mask-image: linear-gradient(transparent, #000 60%); }
-.edge-top { position: fixed; z-index: 8; top: 0; left: 0; right: 0; height: calc(env(safe-area-inset-top, 0px) + 60px); pointer-events: none; background: linear-gradient(color-mix(in srgb, var(--bg) 85%, transparent) 40%, color-mix(in srgb, var(--bg) 0%, transparent)); }
-.edge-bottom { position: fixed; z-index: 8; bottom: 0; left: 0; right: 0; height: calc(env(safe-area-inset-bottom, 0px) + 110px); pointer-events: none; background: linear-gradient(color-mix(in srgb, var(--bg) 0%, transparent), color-mix(in srgb, var(--bg) 70%, transparent)); }
-.navbar { position: fixed; z-index: 9; top: env(safe-area-inset-top, 0px); left: 0; right: 0; height: 60px; pointer-events: none; }
-.navbar-in { max-width: 680px; margin: 0 auto; height: 100%; display: flex; align-items: center; gap: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.edge-top { position: fixed; z-index: 8; top: 0; left: 0; right: 0; height: calc(env(safe-area-inset-top, 0px) + 58px); pointer-events: none; background: linear-gradient(var(--kritt) 45%, color-mix(in srgb, var(--kritt) 0%, transparent)); opacity: 0; transition: opacity 0.2s; }
+body.scrolled .edge-top { opacity: 1; }
+.edge-bottom { position: fixed; z-index: 8; bottom: 0; left: 0; right: 0; height: calc(env(safe-area-inset-bottom, 0px) + 104px); pointer-events: none; background: linear-gradient(color-mix(in srgb, var(--kritt) 0%, transparent), color-mix(in srgb, var(--kritt) 78%, transparent)); }
+.navbar { position: fixed; z-index: 9; top: env(safe-area-inset-top, 0px); left: 0; right: 0; height: 58px; pointer-events: none; }
+.navbar-in { max-width: 640px; margin: 0 auto; height: 100%; display: flex; align-items: center; gap: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .navbar-in > * { pointer-events: auto; }
-.navtitle { flex: 1; text-align: center; font-weight: 600; opacity: 0; transform: translateY(6px); transition: opacity 0.2s, transform 0.3s var(--ease); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none !important; }
-.navtitle.show { opacity: 1; transform: none; }
-.navslot { min-width: 48px; display: flex; flex: none; }
-.navslot.end { justify-content: flex-end; }
+.navtitle { flex: 1; text-align: center; font-weight: 600; opacity: 0; transition: opacity 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none !important; }
+body.scrolled .navtitle { opacity: 1; }
+.navslot { min-width: 46px; display: flex; flex: none; }
 
-/* ---------- Fanelinje ---------- */
+/* ---------- Fanelinje med linse ---------- */
 .dock { position: fixed; z-index: 10; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); pointer-events: none; }
-.dock-in { max-width: 680px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.dock-in { max-width: 640px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
 .dock-in > * { pointer-events: auto; }
-.tabbar { display: grid; grid-template-columns: repeat(3, minmax(0, 84px)); padding: 4px; border-radius: 999px; min-width: 0; }
-.tab { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 0 6px; border-radius: 999px; font-size: 10px; line-height: 12px; font-weight: 600; letter-spacing: 0.1px; color: var(--label); transition: color 0.25s; }
+.tabbar { position: relative; display: grid; grid-template-columns: repeat(3, 86px); padding: 4px; border-radius: 999px; touch-action: none; }
+.tab { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 0 6px; border-radius: 999px; font-size: 10px; line-height: 12px; font-weight: 600; letter-spacing: 0.1px; color: var(--grafitt); transition: color 0.2s, transform 0.35s var(--spring); }
 .tab svg { width: 25px; height: 25px; }
-.tab[aria-current="page"] { color: var(--accent-text); }
-.pill { position: absolute; z-index: 0; top: 4px; left: 4px; width: calc((100% - 8px) / 3); bottom: 4px; border-radius: 999px; background: var(--fill); transition: transform 0.55s var(--spring), scale 0.3s var(--ease); }
-.pill.stretch { scale: 1.22 0.9; }
+.tab[aria-current="page"], .tab.hover { color: var(--blekk); }
+.tabbar.dragging .tab.hover { transform: scale(1.08); }
+.lens { position: absolute; z-index: 1; top: 4px; bottom: 4px; left: 0; width: 86px; border-radius: 999px; background: var(--lens); transform-origin: center; will-change: transform; transition: background 0.25s, box-shadow 0.25s, scale 0.35s var(--spring); pointer-events: none; }
+.tabbar.dragging .lens { scale: 1.16 1.12; background: var(--lens-lift); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16), inset 0 0 0 0.5px rgba(255, 255, 255, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.9); -webkit-backdrop-filter: blur(1.5px) saturate(160%) brightness(1.08); backdrop-filter: blur(1.5px) saturate(160%) brightness(1.08); }
 .plusbtn { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .plusbtn svg { width: 24px; height: 24px; }
-.plusbtn:disabled { opacity: 0.5; }
+.plusbtn:disabled { opacity: 0.45; }
 
 /* ---------- Innhold ---------- */
-.card { background: var(--cell); border-radius: 26px; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
-.cap { font-size: 15px; line-height: 20px; font-weight: 500; color: var(--label2); letter-spacing: -0.24px; }
-.big { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 3px; font-family: var(--font-round); font-weight: 700; letter-spacing: -0.5px; }
-.big .i { font-size: clamp(40px, 13vw, 52px); line-height: 1.12; font-variant-numeric: tabular-nums; }
-.big .d { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.tile { background: var(--fill2); border-radius: 18px; padding: 10px 14px; min-width: 0; }
-.tile span { display: flex; align-items: center; gap: 6px; font-size: 13px; line-height: 18px; color: var(--label2); letter-spacing: -0.08px; }
-.tile span::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--dot); flex: none; }
-.tile b { display: block; font-family: var(--font-round); font-size: 20px; line-height: 26px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0; }
-.head { display: flex; align-items: baseline; gap: 12px; padding: 10px 4px 0; }
+.ledger { padding: 4px 4px 10px; margin: 0; font-size: clamp(26px, 7.4vw, 32px); line-height: 1.18; font-weight: 600; letter-spacing: -0.6px; text-wrap: balance; max-width: 22ch; }
+.ledger .n { font-weight: 700; }
+.ledger .soft { color: var(--grafitt); }
+.head { display: flex; align-items: baseline; gap: 12px; padding: 12px 4px 0; }
 .head h2 { flex: 1; margin: 0; font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: 0.35px; }
-.head button, .linkbtn { color: var(--accent-text); font-weight: 500; }
-.dayhead { padding: 10px 4px 0; margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; color: var(--label2); letter-spacing: -0.24px; }
-.footer { padding: 0 16px; margin: 0; font-size: 13px; line-height: 18px; color: var(--label2); letter-spacing: -0.08px; }
+.head button, .linkbtn { color: var(--blekk); font-weight: 600; font-size: 15px; letter-spacing: -0.24px; }
+.head button { color: var(--grafitt); }
+.dayhead { padding: 10px 4px 0; margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; color: var(--grafitt); letter-spacing: -0.24px; }
+.footer { padding: 0 16px; margin: 0; font-size: 13px; line-height: 18px; color: var(--grafitt); letter-spacing: -0.08px; max-width: 60ch; }
 .stack { display: flex; flex-direction: column; gap: 12px; }
 
-.group { background: var(--cell); border-radius: 26px; overflow: hidden; }
-.row { display: flex; align-items: center; gap: 12px; padding-left: 16px; width: 100%; text-align: left; background: var(--cell); transition: background 0.2s; }
-button.row:active, button.row[aria-current="true"] { background: color-mix(in srgb, var(--label) 6%, var(--cell)); }
-.cell { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 11px 16px 11px 0; border-bottom: 0.5px solid var(--sep); min-height: 62px; }
+.group { background: var(--flate); border-radius: 22px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; padding-left: 16px; width: 100%; text-align: left; background: var(--flate); transition: background 0.15s; }
+button.row:active, button.row[aria-current="true"] { background: color-mix(in srgb, var(--blekk) 6%, var(--flate)); }
+.cell { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 11px 16px 11px 0; border-bottom: 0.5px solid var(--linje); min-height: 60px; }
 .group > :last-child .cell { border-bottom: 0; }
 .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .t { overflow-wrap: anywhere; }
-.sub { font-size: 15px; line-height: 20px; color: var(--label2); letter-spacing: -0.24px; overflow-wrap: anywhere; }
-.meta { font-size: 13px; line-height: 18px; color: var(--label3); letter-spacing: -0.08px; }
+.sub { font-size: 15px; line-height: 20px; color: var(--grafitt); letter-spacing: -0.24px; overflow-wrap: anywhere; }
+.meta { font-size: 13px; line-height: 18px; color: var(--dempet); letter-spacing: -0.08px; }
 .amt { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; flex: none; }
-.amt b { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.amt small { font-size: 13px; line-height: 18px; color: var(--label3); letter-spacing: -0.08px; }
-.void .t, .void .amt b { text-decoration: line-through; color: var(--label2); }
-.void .av { filter: grayscale(1); opacity: 0.5; }
-.av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #fff; font-family: var(--font-round); font-weight: 700; font-size: 15px; letter-spacing: 0; background: linear-gradient(160deg, var(--a1), var(--a2)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
-.av.xl { width: 56px; height: 56px; font-size: 20px; }
-.chev { width: 14px; height: 14px; color: var(--label3); flex: none; display: grid; }
-.chev svg { width: 14px; height: 14px; }
+.amt b { font-family: var(--font-round); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0; white-space: nowrap; }
+.amt small { font-size: 13px; line-height: 18px; color: var(--dempet); letter-spacing: -0.08px; }
+.void .t, .void .amt b { text-decoration: line-through; color: var(--grafitt); }
+.void .av { opacity: 0.45; }
+.av { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--fyll); color: var(--blekk); font-family: var(--font-round); font-weight: 600; font-size: 15px; letter-spacing: 0; }
+.av.xl { width: 60px; height: 60px; font-size: 22px; }
+.chev { width: 13px; height: 13px; color: var(--dempet); flex: none; display: grid; }
+.chev svg { width: 13px; height: 13px; }
 .person .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.searchf { display: flex; align-items: center; gap: 6px; background: var(--fill); border-radius: 999px; padding: 0 12px; }
-.searchf svg { width: 17px; height: 17px; color: var(--label2); flex: none; }
+.searchf { display: flex; align-items: center; gap: 6px; background: var(--fyll); border-radius: 999px; padding: 0 12px; }
+.searchf svg { width: 17px; height: 17px; color: var(--grafitt); flex: none; }
 .searchf input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; padding: 9px 0; font-size: 17px; -webkit-appearance: none; appearance: none; }
-.searchf:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent); }
-.seg { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 2px; border-radius: 999px; background: var(--fill); }
+.searchf:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--blekk) 25%, transparent); }
+.seg { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 2px; border-radius: 999px; background: var(--fyll); }
 .seg button { position: relative; z-index: 1; padding: 7px 6px; border-radius: 999px; font-size: 14px; line-height: 18px; font-weight: 500; letter-spacing: -0.15px; min-width: 0; overflow-wrap: anywhere; }
 .seg button[aria-checked="true"] { font-weight: 600; }
-.seg .thumb { position: absolute; z-index: 0; top: 2px; bottom: 2px; left: 2px; border-radius: 999px; background: var(--cell); box-shadow: 0 3px 8px rgba(30, 20, 60, 0.12), 0 0 0 0.5px rgba(30, 20, 60, 0.05); transition: transform 0.5s var(--spring), scale 0.25s var(--ease); }
-.seg .thumb.stretch { scale: 1.08 0.94; }
+.seg .thumb { position: absolute; z-index: 0; top: 2px; bottom: 2px; left: 2px; border-radius: 999px; background: var(--flate); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04); transition: transform 0.45s var(--spring); }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; }
-.pick { position: relative; display: inline-flex; align-items: center; background: var(--cell); border-radius: 999px; color: var(--accent-text); font-weight: 500; font-size: 15px; letter-spacing: -0.24px; max-width: 100%; }
+.pick { position: relative; display: inline-flex; align-items: center; background: var(--flate); border-radius: 999px; font-weight: 500; font-size: 15px; letter-spacing: -0.24px; max-width: 100%; }
 .pick select { appearance: none; -webkit-appearance: none; border: 0; background: transparent; color: inherit; padding: 7px 30px 7px 14px; border-radius: 999px; max-width: 100%; font-size: 15px; font-weight: 500; }
-.pick svg { position: absolute; right: 11px; width: 12px; height: 12px; pointer-events: none; }
+.pick svg { position: absolute; right: 11px; width: 12px; height: 12px; pointer-events: none; color: var(--grafitt); }
 .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.fillbtn { display: inline-flex; justify-content: center; align-items: center; min-height: 50px; padding: 0 16px; border-radius: 999px; background: var(--fill); font-weight: 600; color: var(--accent-text); transition: transform 0.4s var(--spring), background 0.2s; }
+.fillbtn { display: inline-flex; justify-content: center; align-items: center; min-height: 50px; padding: 0 16px; border-radius: 999px; background: var(--fyll); font-weight: 600; transition: transform 0.4s var(--spring); }
 .fillbtn:active { transform: scale(0.96); }
-.fillbtn.danger { color: var(--neg-text); }
-.fillbtn.prominent { background: var(--accent); color: var(--on-accent); }
+.fillbtn.danger { color: var(--skylder); }
+.fillbtn.ink { background: var(--blekk); color: var(--paa-blekk); }
 .fillbtn:disabled { opacity: 0.4; cursor: not-allowed; }
-.empty { background: var(--cell); border-radius: 26px; padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; }
+.empty { background: var(--flate); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
 .empty h3 { margin: 0; font-size: 20px; line-height: 25px; font-weight: 600; letter-spacing: 0.38px; }
-.empty p { margin: 0; font-size: 15px; line-height: 20px; color: var(--label2); letter-spacing: -0.24px; }
-.notice { background: var(--cell); border-radius: 20px; padding: 14px 16px; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; }
-.skel { height: 64px; border-radius: 26px; background: var(--cell); position: relative; overflow: hidden; }
-.skel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--fill2), transparent); animation: sh 1.3s infinite; }
-@keyframes sh { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.empty p { margin: 0; font-size: 15px; line-height: 20px; color: var(--grafitt); letter-spacing: -0.24px; max-width: 52ch; }
+.notice { background: var(--flate); border-radius: 18px; padding: 14px 16px; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; }
+.skel { height: 64px; border-radius: 22px; background: var(--flate); }
 .inline { display: flex; gap: 14px; padding: 10px 16px; align-items: center; }
 .inline input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; padding: 6px 0; font-size: 17px; }
 
-/* ---------- Toppfelt på Oversikt (etter Framer-designet) ---------- */
-:root { --hero: linear-gradient(165deg, #241552 0%, #5B44C4 48%, #2A9D7A 100%); --hero-glow: rgba(155, 135, 245, 0.55); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --hero: linear-gradient(165deg, #0F0828 0%, #3B2B8E 50%, #136049 100%); --hero-glow: rgba(120, 100, 230, 0.45); } }
-:root[data-theme="dark"] { --hero: linear-gradient(165deg, #0F0828 0%, #3B2B8E 50%, #136049 100%); --hero-glow: rgba(120, 100, 230, 0.45); }
-.view.has-hero { padding-top: 0; }
-.hero { position: relative; overflow: hidden; color: #fff; background: var(--hero);
-  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
-  padding: calc(env(safe-area-inset-top, 0px) + 22px) max(20px, env(safe-area-inset-right, 0px)) 72px max(20px, env(safe-area-inset-left, 0px));
-  border-radius: 0 0 34px 34px; display: flex; flex-direction: column; gap: 18px; }
-@media (min-width: 712px) { .hero { margin-left: 0; margin-right: 0; margin-top: 12px; border-radius: 34px; } }
-.hero::before { content: ""; position: absolute; width: 280px; height: 280px; top: -90px; right: -90px; border-radius: 50%; background: var(--hero-glow); filter: blur(50px); pointer-events: none; }
-.hero::after { content: ""; position: absolute; width: 220px; height: 220px; bottom: -110px; left: -60px; border-radius: 50%; background: rgba(61, 214, 140, 0.35); filter: blur(60px); pointer-events: none; }
-.hero > * { position: relative; z-index: 1; }
-.hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.hero h1 { margin: 0; font-size: 30px; line-height: 36px; font-weight: 700; letter-spacing: 0.2px; }
-.eyebrow { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.72); }
-.hero .big { color: #fff; }
-.hero .big .i { font-size: clamp(48px, 15vw, 60px); line-height: 1.05; }
-.hero .big .d { color: rgba(255, 255, 255, 0.85); }
-.hero-sub { font-size: 15px; line-height: 20px; color: rgba(255, 255, 255, 0.78); letter-spacing: -0.24px; }
-.bars { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; align-items: end; height: 46px; }
-.bars span { display: block; border-radius: 6px; background: rgba(255, 255, 255, 0.28); min-height: 6px; transform-origin: bottom; animation: barUp 0.7s var(--spring) both; animation-delay: calc(var(--i) * 40ms + 120ms); }
-.bars span:last-child { background: rgba(255, 255, 255, 0.95); }
-@keyframes barUp { from { transform: scaleY(0.1); opacity: 0; } }
-.bars-cap { display: flex; justify-content: space-between; font-size: 11px; line-height: 14px; color: rgba(255, 255, 255, 0.6); margin-top: -10px; }
-.quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.quick button { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #fff; font-size: 12px; line-height: 15px; font-weight: 500; letter-spacing: 0; text-align: center; }
-.quick .qb { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; }
-.quick .qb svg { width: 22px; height: 22px; }
-.quick button:disabled { opacity: 0.5; }
-.on-dark { --glass-tint: rgba(255, 255, 255, 0.14); --glass-sheen: rgba(255, 255, 255, 0.22); --glass-edge: rgba(255, 255, 255, 0.18); --glass-rim: rgba(255, 255, 255, 0.85); --glass-rim2: rgba(255, 255, 255, 0.18); --glass-shadow: 0 10px 26px rgba(10, 5, 40, 0.28); color: #fff; }
-.float-card { position: relative; z-index: 2; margin-top: -58px; background: var(--cell); border-radius: 26px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; box-shadow: 0 1px 2px rgba(30, 20, 60, 0.06), 0 10px 28px rgba(30, 20, 60, 0.10); }
-.float-card > div { border-radius: 16px; padding: 10px 12px; min-width: 0; }
-.float-card .fp { background: color-mix(in srgb, var(--pos) 14%, var(--cell)); }
-.float-card .fn { background: color-mix(in srgb, var(--neg) 12%, var(--cell)); }
-.float-card span { display: block; font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--label2); }
-.float-card b { display: block; font-family: var(--font-round); font-size: 22px; line-height: 28px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0; }
-body.hero-view:not(.past-title) .edge-top { opacity: 0; }
-.edge-top { transition: opacity 0.25s var(--ease); }
-
-/* ---------- Ark (alle kommer fra bunnen) ---------- */
+/* ---------- Ark: alt kommer fra bunnen ---------- */
 dialog:modal { position: fixed; }
-dialog { border: 0; padding: 0; color: var(--label); max-width: 100%; max-height: 100%; background: transparent; overflow: visible; }
+dialog { border: 0; padding: 0; color: var(--blekk); max-width: 100%; max-height: 100%; background: transparent; overflow: visible; }
 dialog::backdrop { background: var(--scrim); animation: fadeIn 0.35s var(--ease); }
-dialog[open] { animation: up 0.55s var(--sheet); }
-dialog.closing { animation: down 0.3s cubic-bezier(0.4, 0, 1, 1) forwards; }
-dialog.closing::backdrop { animation: fadeOut 0.3s forwards; }
+dialog[open] { animation: up 0.5s var(--sheet); }
+dialog.closing { animation: down 0.28s cubic-bezier(0.4, 0, 1, 1) forwards; }
+dialog.closing::backdrop { animation: fadeOut 0.28s forwards; }
 @keyframes up { from { transform: translateY(105%); } }
 @keyframes down { to { transform: translateY(110%); } }
 @keyframes fadeIn { from { opacity: 0; } }
 @keyframes fadeOut { to { opacity: 0; } }
 dialog.full { width: 100%; max-width: 560px; height: calc(100dvh - env(safe-area-inset-top, 0px) - 10px); max-height: 900px; margin: auto auto 0; }
-.full .sheet { height: 100%; background: var(--bg); border-radius: 38px 38px 0 0; overflow: auto; overscroll-behavior: contain; }
-dialog.float { width: calc(100% - 16px); max-width: 520px; margin: auto auto calc(8px + env(safe-area-inset-bottom, 0px)); border-radius: 44px; }
+.full .sheet { height: 100%; background: var(--kritt); border-radius: 38px 38px 0 0; overflow: auto; overscroll-behavior: contain; }
+dialog.float { width: calc(100% - 16px); max-width: 520px; margin: auto auto calc(8px + env(safe-area-inset-bottom, 0px)); border-radius: 42px; }
 .float > .sheet { max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 24px); overflow: auto; overscroll-behavior: contain; border-radius: inherit; }
 .sheet { padding: 8px max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 14px; }
 .float > .sheet { padding: 8px 16px 22px; }
 .drag { touch-action: none; cursor: grab; display: flex; flex-direction: column; gap: 8px; }
-.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--label3); opacity: 0.45; align-self: center; margin-top: 2px; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--dempet); opacity: 0.5; align-self: center; margin-top: 2px; }
 .sheetbar { display: flex; align-items: center; gap: 12px; }
 .sheetbar h2 { flex: 1; margin: 0; text-align: center; font-size: 17px; line-height: 22px; font-weight: 600; }
-.lbl { padding: 6px 16px 0; margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; color: var(--label2); letter-spacing: -0.24px; }
+.lbl { padding: 6px 16px 0; margin: 0; font-size: 15px; line-height: 20px; font-weight: 600; color: var(--grafitt); letter-spacing: -0.24px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { padding: 8px 16px; border-radius: 999px; background: var(--cell); font-size: 16px; line-height: 20px; letter-spacing: -0.31px; max-width: 100%; overflow-wrap: anywhere; transition: transform 0.4s var(--spring), background 0.2s, color 0.2s; }
+.chip { padding: 8px 16px; border-radius: 999px; background: var(--flate); font-size: 16px; line-height: 20px; letter-spacing: -0.31px; max-width: 100%; overflow-wrap: anywhere; transition: transform 0.4s var(--spring); }
 .chip:active { transform: scale(0.94); }
-.chip[aria-checked="true"] { background: var(--accent); color: var(--on-accent); font-weight: 600; }
-.chip.add { background: var(--fill); color: var(--accent-text); }
-.amountcard { background: var(--cell); border-radius: 26px; padding: 14px 16px 16px; display: flex; flex-direction: column; align-items: center; }
-.amountcard label { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--label2); }
+.chip[aria-checked="true"] { background: var(--blekk); color: var(--paa-blekk); font-weight: 600; }
+.chip.add { background: var(--fyll); }
+.amountcard { background: var(--flate); border-radius: 22px; padding: 14px 16px 16px; display: flex; flex-direction: column; align-items: center; }
+.amountcard label { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--grafitt); }
 .amountrow { display: flex; align-items: baseline; justify-content: center; gap: 6px; max-width: 100%; }
-.amountrow input { font-family: var(--font-round); font-weight: 700; font-size: 56px; line-height: 64px; letter-spacing: -0.5px; border: 0; outline: none; background: transparent; text-align: center; width: 2.5ch; min-width: 2ch; max-width: 100%; padding: 0; caret-color: var(--accent); font-variant-numeric: tabular-nums; }
-.amountrow span { font-family: var(--font-round); font-weight: 600; font-size: 24px; color: var(--label2); }
-.formrow { display: flex; align-items: center; gap: 12px; padding: 0 16px; min-height: 48px; border-bottom: 0.5px solid var(--sep); }
+.amountrow input { font-family: var(--font-round); font-weight: 700; font-size: 56px; line-height: 64px; letter-spacing: -0.5px; border: 0; outline: none; background: transparent; text-align: center; width: 2.5ch; min-width: 2ch; max-width: 100%; padding: 0; caret-color: var(--blekk); font-variant-numeric: tabular-nums; }
+.amountrow span { font-family: var(--font-round); font-weight: 600; font-size: 24px; color: var(--grafitt); }
+.formrow { display: flex; align-items: center; gap: 12px; padding: 0 16px; min-height: 48px; border-bottom: 0.5px solid var(--linje); }
 .formrow:last-child { border-bottom: 0; }
 .formrow > span:first-child { flex: none; }
-.formrow input, .formrow select { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; text-align: right; padding: 13px 0; color: var(--label2); font-size: 17px; appearance: none; -webkit-appearance: none; }
+.formrow input, .formrow select { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; text-align: right; padding: 13px 0; color: var(--grafitt); font-size: 17px; appearance: none; -webkit-appearance: none; }
 .formrow select { text-align-last: right; }
-.formrow input:focus { color: var(--label); }
-.formrow svg { width: 12px; height: 12px; color: var(--label2); flex: none; }
-.err { margin: 0; padding: 0 16px; color: var(--neg-text); font-size: 15px; line-height: 20px; font-weight: 500; animation: shake 0.4s var(--ease); }
+.formrow input:focus { color: var(--blekk); }
+.formrow svg { width: 12px; height: 12px; color: var(--grafitt); flex: none; }
+.err { margin: 0; padding: 0 16px; color: var(--skylder); font-size: 15px; line-height: 20px; font-weight: 500; animation: shake 0.4s var(--ease); }
 .err:empty { display: none; }
 @keyframes shake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
-.dhead { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.dhead .big { justify-content: center; }
-.dhead .big .i { font-size: 44px; }
-.dhead .big .d { font-size: 20px; }
-.kv { background: color-mix(in srgb, var(--cell) 88%, transparent); }
+.dhead { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.dhead .who { font-size: 17px; font-weight: 600; }
+.dhead .sum { font-family: var(--font-round); font-weight: 700; font-size: 44px; line-height: 50px; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
+.kv { background: color-mix(in srgb, var(--flate) 86%, transparent); }
 .kv .formrow { min-height: 44px; }
-.kv .formrow > span:last-child { flex: 1; text-align: right; color: var(--label2); overflow-wrap: anywhere; padding: 11px 0; }
+.kv .formrow > span:last-child { flex: 1; text-align: right; color: var(--grafitt); overflow-wrap: anywhere; padding: 11px 0; }
 .hist .row { align-items: flex-start; background: transparent; }
-.hist .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); margin-top: 17px; flex: none; }
-.hist .row:last-child .dot { background: var(--label3); }
+.hist .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--blekk); margin-top: 18px; flex: none; }
+.hist .row:last-child .dot { background: var(--dempet); }
 .hist .cell { flex-direction: column; align-items: stretch; gap: 1px; min-height: 0; }
 .hist b { font-weight: 600; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; }
 .hist .c { font-size: 15px; line-height: 20px; letter-spacing: -0.24px; overflow-wrap: anywhere; }
-.confirm { background: var(--kv, var(--cell)); border-radius: 26px; padding: 16px; display: flex; flex-direction: column; gap: 12px; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; }
-
-/* Handlingsark fra plussknappen */
-dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto calc(8px + env(safe-area-inset-bottom, 0px)); }
+.confirm { border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; font-size: 15px; line-height: 20px; letter-spacing: -0.24px; }
+dialog.actions { width: calc(100% - 16px); max-width: 420px; margin: auto auto calc(8px + env(safe-area-inset-bottom, 0px)); }
 .actions .wrap { display: flex; flex-direction: column; gap: 8px; }
 .actgroup { border-radius: 30px; padding: 6px; display: flex; flex-direction: column; }
 .actgroup .drag { padding: 4px 0 2px; }
 .actgroup button { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 14px 18px; border-radius: 24px; text-align: left; }
-.actgroup button:active, .actgroup button:focus-visible { background: var(--fill2); }
+.actgroup button:active, .actgroup button:focus-visible { background: var(--fyll2); }
 .actgroup b { font-size: 17px; font-weight: 600; }
-.actgroup small { font-size: 14px; line-height: 19px; color: var(--label2); letter-spacing: -0.15px; }
-.actcancel { min-height: 58px; border-radius: 30px; font-weight: 600; color: var(--accent-text); }
-
-.toast { position: fixed; z-index: 30; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); translate: -50% 0; padding: 12px 20px; border-radius: 999px; font-weight: 600; font-size: 15px; animation: toastUp 0.55s var(--spring); max-width: calc(100% - 32px); text-align: center; }
-.toast.out { animation: toastDown 0.3s var(--ease) forwards; }
+.actgroup small { font-size: 14px; line-height: 19px; color: var(--grafitt); letter-spacing: -0.15px; }
+.actcancel { min-height: 58px; border-radius: 30px; font-weight: 600; }
+.toast { position: fixed; z-index: 30; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 94px); translate: -50% 0; padding: 12px 20px; border-radius: 999px; font-weight: 600; font-size: 15px; animation: toastUp 0.5s var(--spring); max-width: calc(100% - 32px); text-align: center; }
+.toast.out { animation: toastDown 0.28s var(--ease) forwards; }
 @keyframes toastUp { from { transform: translateY(60px) scale(0.9); opacity: 0; } }
 @keyframes toastDown { to { transform: translateY(60px) scale(0.9); opacity: 0; } }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
-}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 </style>
 
-<div class="ambient" aria-hidden="true"></div>
 <div class="edge-top" aria-hidden="true"></div>
 <header class="navbar"><div class="navbar-in">
   <div class="navslot" id="navStart"></div>
   <div class="navtitle" id="navTitle" aria-hidden="true"></div>
-  <div class="navslot end"></div>
+  <div class="navslot"></div>
 </div></header>
 
-<div class="app"><main id="view" class="view" tabindex="-1"></main></div>
+<div class="app">
+  <main class="pane" id="pane-oversikt" tabindex="-1"></main>
+  <main class="pane" id="pane-personer" tabindex="-1" hidden></main>
+  <main class="pane" id="pane-logg" tabindex="-1" hidden></main>
+  <main class="pane" id="pane-person" tabindex="-1" hidden></main>
+</div>
 
 <div class="edge-bottom" aria-hidden="true"></div>
 <div class="dock"><div class="dock-in">
-  <nav class="tabbar glass" aria-label="Faner">
-    <span class="pill" id="pill" aria-hidden="true"></span>
-    <button class="tab press" type="button" data-tab="oversikt"></button>
-    <button class="tab press" type="button" data-tab="personer"></button>
-    <button class="tab press" type="button" data-tab="logg"></button>
+  <nav class="tabbar glass" id="tabbar" aria-label="Faner">
+    <span class="lens" id="lens" aria-hidden="true"></span>
+    <button class="tab" type="button" data-tab="oversikt"></button>
+    <button class="tab" type="button" data-tab="personer"></button>
+    <button class="tab" type="button" data-tab="logg"></button>
   </nav>
   <button class="plusbtn glass press" type="button" id="plus" aria-label="Ny post" aria-haspopup="dialog"></button>
 </div></div>
@@ -374,7 +295,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
   <div class="actgroup glass frost">
     <div class="drag" data-drag><span class="grab" aria-hidden="true"></span></div>
     <button type="button" data-new="debt"><b>Skylder</b><small>Noen skylder meg penger, eller jeg skylder noen</small></button>
-    <button type="button" data-new="transfer"><b>Overføring</b><small>Penger som faktisk er sendt, for eksempel med Vipps</small></button>
+    <button type="button" data-new="transfer"><b>Overføring</b><small>Penger som er sendt, for eksempel med Vipps</small></button>
   </div>
   <button class="actcancel glass frost press" type="button" data-act="close-act">Avbryt</button>
 </div></dialog>
@@ -386,7 +307,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
 (() => {
   "use strict";
 
-  /* ---------- Ikoner (standardsymboler) ---------- */
+  /* ---------- Ikoner ---------- */
   const svg = (p, w = 2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
   const fillSvg = (p) => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${p}</svg>`;
   const I = {
@@ -394,8 +315,6 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     people: fillSvg('<circle cx="9" cy="7.6" r="3.7"/><path d="M2.4 19.6c0-3.4 3-5.8 6.6-5.8s6.6 2.4 6.6 5.8c0 .6-.4 1-1 1H3.4c-.6 0-1-.4-1-1z"/><circle cx="16.8" cy="8.6" r="2.9" opacity=".6"/><path d="M17.2 14.1c2.8.2 4.6 2.1 4.6 4.8 0 .5-.3.8-.8.8h-3.6c.1-2-.3-3.9-1.6-5.4z" opacity=".6"/>'),
     list: fillSvg('<circle cx="4.5" cy="6" r="1.7"/><circle cx="4.5" cy="12" r="1.7"/><circle cx="4.5" cy="18" r="1.7"/><rect x="8.5" y="5" width="13" height="2" rx="1"/><rect x="8.5" y="11" width="13" height="2" rx="1"/><rect x="8.5" y="17" width="13" height="2" rx="1"/>'),
     plus: svg('<path d="M5 12h14"/><path d="M12 5v14"/>', 2.6),
-    inn: svg('<path d="M17 7 7 17"/><path d="M17 17H7V7"/>', 2.4),
-    ut: svg('<path d="M7 7h10v10"/><path d="M7 17 17 7"/>', 2.4),
     chev: svg('<path d="m9 18 6-6-6-6"/>', 2.8),
     back: svg('<path d="m15 18-6-6 6-6"/>', 2.6),
     x: svg('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', 2.5),
@@ -410,13 +329,12 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
   const nf0 = new Intl.NumberFormat("nb-NO", { maximumFractionDigits: 0 });
   const kr = (ore) => nf.format(Math.abs(ore) / 100);
   const krShort = (ore) => (Math.abs(ore) % 100 === 0 ? nf0.format(Math.abs(ore) / 100) : nf.format(Math.abs(ore) / 100)) + " kr";
-  const splitKr = (ore) => { const s = kr(ore); const i = s.lastIndexOf(","); return [s.slice(0, i), s.slice(i) + " kr"]; };
   const dtf = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "short", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
   const dayFmt = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "long", day: "numeric", month: "long" });
   const dayFmtY = new Intl.DateTimeFormat("nb-NO", { timeZone: TZ, weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const parts = (d) => { const o = {}; for (const p of dtf.formatToParts(d)) o[p.type] = p.value; return o; };
-  const stamp = (iso) => { const p = parts(new Date(iso)); return `${p.weekday} ${p.day}.${p.month}.${p.year} · ${p.hour}.${p.minute}`; };
-  const clock = (iso) => { const p = parts(new Date(iso)); return `${p.hour}.${p.minute}`; };
+  const stamp = (iso) => { const p = parts(new Date(iso)); return `${p.weekday} ${p.day}.${p.month}.${p.year} kl. ${p.hour}.${p.minute}`; };
+  const clock = (iso) => { const p = parts(new Date(iso)); return `kl. ${p.hour}.${p.minute}`; };
   const dayKey = (d) => { const p = parts(d); return `${p.year}-${p.month}-${p.day}`; };
   const shortDate = (iso) => { const p = parts(new Date(iso)); return `${p.day}.${p.month}.`; };
   const relDay = (iso) => {
@@ -426,13 +344,11 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     const s = (parts(d).year === parts(now).year ? dayFmt : dayFmtY).format(d);
     return s.charAt(0).toUpperCase() + s.slice(1);
   };
-  const shortStamp = (iso) => { const r = relDay(iso); return (r === "I dag" || r === "I går") ? `${r} ${clock(iso)}` : `${shortDate(iso)}${parts(new Date(iso)).year}`; };
+  const when = (iso) => { const r = relDay(iso); return (r === "I dag" || r === "I går") ? `${r} ${clock(iso)}` : `${shortDate(iso)}${parts(new Date(iso)).year}`; };
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const initials = (n) => (n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
   const firstName = (n) => (n || "personen").trim().split(/\s+/)[0];
-  const AV = [["#A796F7", "#6E56CF"], ["#5FD3A6", "#1F9D6B"], ["#F7A97A", "#DF6E3B"], ["#7DBEF7", "#3B7FD4"], ["#F58BB4", "#CF4A82"], ["#C9B27A", "#93783E"]];
-  const avColor = (id) => { let h = 0; for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return AV[h % AV.length]; };
-  const avatar = (id, name, cls = "") => { const [a, b] = avColor(id); return `<span class="av ${cls}" style="--a1:${a};--a2:${b}" aria-hidden="true">${esc(initials(name))}</span>`; };
+  const listNames = (arr) => arr.length <= 1 ? (arr[0] || "") : arr.slice(0, -1).join(", ") + " og " + arr[arr.length - 1];
 
   function parseAmount(raw) {
     let s = String(raw || "").replace(/[\s ]/g, "").replace(/kr/gi, "");
@@ -453,10 +369,11 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     : (e.dir === "in" ? `${n} betalte meg` : `Jeg betalte ${n}`);
   const amtLabel = (e) => e.kind === "debt" ? (e.dir === "in" ? "til gode" : "skylder") : (e.dir === "in" ? "mottatt" : "sendt");
   const effectText = (e, n) => e.kind === "debt"
-    ? (e.dir === "in" ? `Gjeld · ${n} skylder deg dette` : `Gjeld · du skylder ${n} dette`)
-    : (e.dir === "in" ? `Overføring inn · teller som betaling fra ${n}` : `Overføring ut · ${n} skylder deg mer`);
+    ? (e.dir === "in" ? `${n} skylder deg dette.` : `Du skylder ${n} dette.`)
+    : (e.dir === "in" ? `${n} betalte deg. Det trekkes fra det ${n} skylder.` : `Du sendte penger til ${n}, så ${n} skylder deg mer.`);
 
   /* ---------- Tilstand ---------- */
+  const TABS = ["oversikt", "personer", "logg"];
   const S = {
     db: null, canWrite: false, ready: false, status: "loading", banner: "",
     people: new Map(), entries: [],
@@ -480,41 +397,33 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     return { b, n, last };
   }
 
-  function trend(n) {
-    const now = Date.now(), out = [];
-    for (let w = n - 1; w >= 0; w--) {
-      const cut = now - w * 7 * 864e5; let sum = 0;
-      for (const e of S.entries) if (e.status !== "void" && new Date(e.loggedAt).getTime() <= cut) sum += effect(e);
-      out.push(sum);
-    }
-    return out;
-  }
-
   /* ---------- Byggeklosser ---------- */
-  function rowHTML(e, o = {}) {
+  const avatar = (name, cls = "") => `<span class="av ${cls}" aria-hidden="true">${esc(initials(name))}</span>`;
+  function rowHTML(e, timeOnly) {
     const n = personName(e.personId), void_ = e.status === "void";
     const cls = e.kind === "debt" ? (e.dir === "in" ? "pos" : "neg") : "";
     const sign = e.kind === "debt" ? (e.dir === "in" ? "+" : "−") : "";
     const edited = (e.history || []).some((h) => h.action === "edited");
-    const kind = e.kind === "debt" ? "Gjeld" : "Overføring" + (e.method ? " · " + (METHODS[e.method] || e.method) : "");
-    const when = o.timeOnly ? clock(e.loggedAt) : shortStamp(e.loggedAt);
-    const meta = [kind, when, edited ? "Redigert" : "", void_ ? "Annullert" : ""].filter(Boolean).join(" · ");
+    const bits = [timeOnly ? clock(e.loggedAt) : when(e.loggedAt)];
+    if (e.kind === "transfer" && e.method) bits.push(METHODS[e.method] || e.method);
+    if (edited) bits.push("redigert");
+    if (void_) bits.push("annullert");
+    const meta = bits.join(", ");
     return `<button type="button" class="row${void_ ? " void" : ""}" data-entry="${esc(e.id)}" aria-current="${S.sel === e.id}">
-      ${avatar(e.personId, n)}
-      <span class="cell"><span class="txt"><span class="t">${esc(title(e, n))}</span><span class="sub">${esc(e.reason)}</span><span class="meta">${esc(meta)}</span></span>
+      ${avatar(n)}
+      <span class="cell"><span class="txt"><span class="t">${esc(title(e, n))}</span><span class="sub">${esc(e.reason)}</span><span class="meta">${esc(meta.charAt(0).toUpperCase() + meta.slice(1))}</span></span>
       <span class="amt"><b class="${void_ ? "" : cls}">${sign}${kr(e.amountOre)} kr</b><small>${amtLabel(e)}</small></span></span></button>`;
   }
   function personRow(p, B) {
     const v = B.b.get(p.id) || 0, cnt = B.n.get(p.id) || 0;
     const cls = v > 0 ? "pos" : v < 0 ? "neg" : "sec";
     const lab = v > 0 ? "skylder deg" : v < 0 ? "du skylder" : "gjort opp";
-    const sub = `${cnt} ${cnt === 1 ? "post" : "poster"}${B.last.has(p.id) ? " · " + shortDate(B.last.get(p.id)) : ""}`;
+    const sub = `${cnt} ${cnt === 1 ? "post" : "poster"}${B.last.has(p.id) ? ", sist " + shortDate(B.last.get(p.id)) : ""}`;
     return `<button type="button" class="row person" data-person="${esc(p.id)}">
-      ${avatar(p.id, p.name)}
+      ${avatar(p.name)}
       <span class="cell"><span class="txt"><span class="t">${esc(p.name)}</span><span class="meta">${esc(sub)}</span></span>
       <span class="amt"><b class="${cls}">${krShort(v)}</b><small>${lab}</small></span><span class="chev">${I.chev}</span></span></button>`;
   }
-  const big = (ore, cls, key) => { const [i, d] = splitKr(ore); return `<div class="big ${cls}" ${key ? `data-count="${ore}" data-key="${esc(key)}"` : ""}><span class="i">${ore < 0 ? "−" : ""}${i}</span><span class="d">${d}</span></div>`; };
   const skel = (n) => Array.from({ length: n }, () => '<div class="skel"></div>').join("");
   function dayGroups(list) {
     const groups = [];
@@ -523,7 +432,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
       if (!groups.length || groups[groups.length - 1].k !== k) groups.push({ k, d: e.loggedAt, items: [] });
       groups[groups.length - 1].items.push(e);
     }
-    return groups.map((g) => `<h3 class="dayhead">${esc(relDay(g.d))}</h3><div class="group">${g.items.map((e) => rowHTML(e, { timeOnly: true })).join("")}</div>`).join("");
+    return groups.map((g) => `<h3 class="dayhead">${esc(relDay(g.d))}</h3><div class="group">${g.items.map((e) => rowHTML(e, true)).join("")}</div>`).join("");
   }
   function notice() {
     const m = {
@@ -535,68 +444,77 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     return m ? `<div class="notice">${m}</div>` : "";
   }
 
-  /* ---------- Visninger ---------- */
-  function vOversikt() {
+  /* ---------- Paneler ---------- */
+  function ledgerSentence(B) {
+    const owe = [], owed = []; let pos = 0, neg = 0;
+    for (const p of S.people.values()) { const v = B.b.get(p.id) || 0; if (v > 0) { owe.push([p, v]); pos += v; } else if (v < 0) { owed.push([p, v]); neg += v; } }
+    owe.sort((a, b) => b[1] - a[1]); owed.sort((a, b) => a[1] - b[1]);
+    const names = (arr) => { const ns = arr.map(([p]) => esc(p.name)); return ns.length > 3 ? listNames([...ns.slice(0, 2), `${ns.length - 2} til`]) : listNames(ns); };
+    if (!owe.length && !owed.length) return `Ingen skylder deg noe, <span class="soft">og du skylder ingen.</span>`;
+    let s = "";
+    if (owe.length) s += `${names(owe)} skylder deg <span class="n">${krShort(pos)}</span>.`;
+    if (owed.length) s += `${s ? " " : ""}${owe.length ? '<span class="soft">' : ""}Du skylder ${names(owed)} <span class="n">${krShort(neg)}</span>.${owe.length ? "</span>" : ""}`;
+    else s += ` <span class="soft">Du skylder ingen.</span>`;
+    return s;
+  }
+  function renderOversikt() {
+    const el = $("pane-oversikt");
     const B = balances();
-    let pos = 0, neg = 0;
-    for (const v of B.b.values()) { if (v > 0) pos += v; else neg += v; }
-    const net = pos + neg;
-    const weeks = trend(8), maxW = Math.max(1, ...weeks.map((w) => Math.abs(w)));
-    const owing = [...B.b.values()].filter((v) => v > 0).length, owed = [...B.b.values()].filter((v) => v < 0).length;
-    const sub = !S.ready ? "Henter gjeldsboken …" : !S.entries.length ? "Ingen poster ennå"
-      : `${owing ? `${owing} ${owing === 1 ? "person" : "personer"} skylder deg` : "Ingen skylder deg"} · ${owed ? `du skylder ${owed} ${owed === 1 ? "person" : "personer"}` : "ingen du skylder"}`;
-    const dis = S.canWrite ? "" : "disabled";
-    let h = `<section class="hero" aria-label="Saldo">
-        <div class="hero-top"><h1 id="largeTitle">Gjeldsbok</h1></div>
-        <div><div class="eyebrow">${net > 0 ? "Netto til gode" : net < 0 ? "Netto skylder du" : "Netto"}</div>${big(net, "", "net")}<div class="hero-sub">${esc(sub)}</div></div>
-        <div class="bars" role="img" aria-label="Saldo de siste 8 ukene">${weeks.map((w, i) => `<span style="--i:${i};height:${Math.max(12, Math.round(Math.abs(w) / maxW * 100))}%"></span>`).join("")}</div>
-        <div class="bars-cap" aria-hidden="true"><span>8 uker siden</span><span>Nå</span></div>
-        <div class="quick">
-          <button type="button" data-quick="debt:in" ${dis}><span class="qb glass on-dark press">${I.inn}</span>Skylder meg</button>
-          <button type="button" data-quick="debt:out" ${dis}><span class="qb glass on-dark press">${I.ut}</span>Jeg skylder</button>
-          <button type="button" data-quick="transfer:in" ${dis}><span class="qb glass on-dark press">${I.inn}</span>Fikk betalt</button>
-          <button type="button" data-quick="transfer:out" ${dis}><span class="qb glass on-dark press">${I.ut}</span>Betalte</button>
-        </div>
-      </section>
-      <div class="float-card"><div class="fp"><span>Skylder meg</span><b class="pos">${krShort(pos)}</b></div><div class="fn"><span>Jeg skylder</span><b class="neg">${krShort(neg)}</b></div></div>
-      ${notice()}`;
-    if (blocked()) return h;
-    if (!S.ready) return h + skel(3);
+    let h = `<h1 class="large" data-title="Oversikt">Oversikt</h1>${notice()}`;
+    if (blocked()) { el.innerHTML = h; return; }
+    if (!S.ready) { el.innerHTML = h + skel(3); return; }
+    h += `<p class="ledger">${ledgerSentence(B)}</p>`;
     if (!S.entries.length) {
-      return h + `<div class="empty"><h3>Ingen poster ennå</h3>
-        <p>Velg Skylder når noen skylder deg penger, eller du skylder noen. Velg Overføring når penger faktisk er sendt. Dato og klokkeslett settes automatisk når du lagrer.</p>
-        <p>Bruk knappene i det fargede feltet over, eller plussknappen nederst.</p></div>`;
+      h += `<div class="empty"><h3>Ingen poster ennå</h3><p>Trykk på pluss nederst og velg Skylder eller Overføring. Dato og klokkeslett settes når du lagrer.</p></div>`;
+      el.innerHTML = h; return;
     }
-    const ppl = [...S.people.values()].sort((a, c) => Math.abs(B.b.get(c.id) || 0) - Math.abs(B.b.get(a.id) || 0)).slice(0, 4);
-    h += `<div class="head"><h2>Personer</h2><button type="button" data-tab="personer">Vis alle</button></div><div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div>`;
-    h += `<div class="head"><h2>Sist loggført</h2><button type="button" data-tab="logg">Logg</button></div><div class="group">${S.entries.slice(0, 5).map((e) => rowHTML(e)).join("")}</div>`;
-    return h;
+    const ppl = [...S.people.values()].filter((p) => (B.b.get(p.id) || 0) !== 0).sort((a, c) => Math.abs(B.b.get(c.id) || 0) - Math.abs(B.b.get(a.id) || 0)).slice(0, 4);
+    if (ppl.length) h += `<div class="head"><h2>Utestående</h2><button type="button" data-tab="personer">Alle personer</button></div><div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div>`;
+    h += `<div class="head"><h2>Sist ført</h2><button type="button" data-tab="logg">Hele loggen</button></div><div class="group">${S.entries.slice(0, 5).map((e) => rowHTML(e)).join("")}</div>`;
+    el.innerHTML = h;
   }
-  function vPersoner() {
-    const B = balances();
-    const h = `<h1 class="large" id="largeTitle">Personer</h1>${notice()}`;
-    if (blocked()) return h;
-    if (!S.ready) return h + skel(2);
+  function renderPersoner() {
+    const el = $("pane-personer"), B = balances();
+    let h = `<h1 class="large" data-title="Personer">Personer</h1>${notice()}`;
+    if (blocked()) { el.innerHTML = h; return; }
+    if (!S.ready) { el.innerHTML = h + skel(2); return; }
     const ppl = sortedPeople();
-    if (!ppl.length) return h + `<div class="empty"><h3>Ingen personer ennå</h3><p>Personene dukker opp her med saldo når du logger den første posten.</p></div>`;
-    return h + `<div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div><p class="footer">Grønt betyr at personen skylder deg. Rødt betyr at du skylder personen.</p>`;
+    h += ppl.length ? `<div class="group">${ppl.map((p) => personRow(p, B)).join("")}</div><p class="footer">Grønt betyr at personen skylder deg. Rødt betyr at du skylder personen.</p>`
+      : `<div class="empty"><h3>Ingen personer ennå</h3><p>En person legges til første gang du fører en post på dem.</p></div>`;
+    el.innerHTML = h;
   }
-  function vPerson() {
-    const p = S.people.get(S.personView);
-    if (!p) { S.personView = null; return vPersoner(); }
+  function renderPerson() {
+    const el = $("pane-person"), p = S.people.get(S.personView);
+    if (!p) { if (S.personView) closePerson(); return; }
     const v = balances().b.get(p.id) || 0;
-    const cls = v > 0 ? "pos" : v < 0 ? "neg" : "";
-    const lab = v > 0 ? `${esc(firstName(p.name))} skylder deg` : v < 0 ? `Du skylder ${esc(firstName(p.name))}` : "Gjort opp";
+    const fn = esc(firstName(p.name));
+    const line = v > 0 ? `${fn} skylder deg <span class="n">${krShort(v)}</span>.` : v < 0 ? `Du skylder ${fn} <span class="n">${krShort(v)}</span>.` : `${fn} og du er skuls.`;
     const list = S.entries.filter((e) => e.personId === p.id);
-    return `<h1 class="large" id="largeTitle">${esc(p.name)}</h1>
-      <section class="card"><div><div class="cap">${lab}</div>${big(Math.abs(v), cls, "p:" + p.id)}</div>
-        ${S.canWrite ? `<div class="btns"><button class="fillbtn" type="button" data-new="debt">Skylder</button><button class="fillbtn" type="button" data-new="transfer">Overføring</button></div>` : ""}
-      </section>
-      ${S.canWrite ? `<div class="group">${S.renaming
-        ? `<div class="inline"><input id="renameIn" value="${esc(p.name)}" aria-label="Nytt navn" maxlength="60" autocomplete="off"><button class="linkbtn" type="button" data-act="rename-cancel">Avbryt</button><button class="linkbtn" type="button" data-act="rename-save" style="font-weight:600">Lagre</button></div>`
-        : `<button class="row" type="button" data-act="rename"><span class="cell" style="min-height:48px"><span class="txt"><span class="t acc">Endre navn</span></span></span></button>`}</div>` : ""}
+    el.innerHTML = `<h1 class="large" data-title="${esc(p.name)}">${esc(p.name)}</h1>
+      <p class="ledger">${line}</p>
+      ${S.canWrite ? `<div class="btns"><button class="fillbtn" type="button" data-new="debt">Skylder</button><button class="fillbtn" type="button" data-new="transfer">Overføring</button></div>
+      <div class="group">${S.renaming
+        ? `<div class="inline"><input id="renameIn" value="${esc(p.name)}" aria-label="Nytt navn" maxlength="60" autocomplete="off"><button class="linkbtn" type="button" data-act="rename-cancel" style="color:var(--grafitt)">Avbryt</button><button class="linkbtn" type="button" data-act="rename-save">Lagre</button></div>`
+        : `<button class="row" type="button" data-act="rename"><span class="cell" style="min-height:48px"><span class="txt"><span class="t">Endre navn</span></span><span class="chev">${I.chev}</span></span></button>`}</div>` : ""}
       <div class="head"><h2>Logg</h2></div>
       ${list.length ? dayGroups(list) : '<p class="footer">Ingen poster for denne personen.</p>'}`;
+  }
+  function segHTML(name, opts, val) {
+    const idx = Math.max(0, opts.findIndex(([v]) => v === val));
+    return `<div class="seg" role="radiogroup" aria-label="${esc(name === "type" ? "Type" : name === "kind" ? "Type post" : "Retning")}">
+      <span class="thumb" style="width:calc((100% - 4px) / ${opts.length});transform:translateX(${idx * 100}%)"></span>
+      ${opts.map(([v, l]) => `<button type="button" role="radio" aria-checked="${v === val}" data-seg="${esc(name)}" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div>`;
+  }
+  const personOptions = () => `<option value="">Alle personer</option>${sortedPeople().map((p) => `<option value="${esc(p.id)}" ${S.f.person === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}`;
+  function buildLogg() {
+    $("pane-logg").innerHTML = `<h1 class="large" data-title="Logg">Logg</h1><div id="logNotice"></div>
+      <div id="logTools" class="stack">
+      <label class="searchf">${I.search}<span class="sr">Søk</span><input id="q" type="search" enterkeyhint="search" placeholder="Søk i grunn eller navn" autocomplete="off"></label>
+      ${segHTML("type", [["all", "Alle"], ["debt", "Skylder"], ["transfer", "Overføringer"]], S.f.type)}
+      <div class="filters">
+        <label class="pick"><span class="sr">Person</span><select id="fPerson">${personOptions()}</select>${I.updown}</label>
+        <label class="pick"><span class="sr">Periode</span><select id="fPeriod"><option value="all">Hele perioden</option><option value="7">Siste 7 dager</option><option value="30">Siste 30 dager</option><option value="year">I år</option></select>${I.updown}</label>
+      </div></div><div id="logList" class="stack"></div>`;
   }
   function filtered() {
     const f = S.f, q = f.q.trim().toLowerCase(), now = Date.now();
@@ -615,103 +533,124 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
       return true;
     });
   }
-  function segHTML(name, opts, val) {
-    const idx = Math.max(0, opts.findIndex(([v]) => v === val));
-    return `<div class="seg" role="radiogroup" aria-label="${esc(name === "type" ? "Type" : name === "kind" ? "Type post" : "Retning")}">
-      <span class="thumb" style="width:calc((100% - 4px) / ${opts.length});transform:translateX(${idx * 100}%)"></span>
-      ${opts.map(([v, l]) => `<button type="button" role="radio" aria-checked="${v === val}" data-seg="${esc(name)}" data-v="${esc(v)}">${esc(l)}</button>`).join("")}</div>`;
-  }
-  const personOptions = () => `<option value="">Alle personer</option>${sortedPeople().map((p) => `<option value="${esc(p.id)}" ${S.f.person === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}`;
-  function vLogg() {
-    const h = `<h1 class="large" id="largeTitle">Logg</h1>${notice()}`;
-    if (blocked()) return h;
-    return h + `<label class="searchf">${I.search}<span class="sr">Søk</span><input id="q" type="search" enterkeyhint="search" placeholder="Søk i grunn eller navn" autocomplete="off" value="${esc(S.f.q)}"></label>
-      ${segHTML("type", [["all", "Alle"], ["debt", "Skylder"], ["transfer", "Overføringer"]], S.f.type)}
-      <div class="filters">
-        <label class="pick"><span class="sr">Person</span><select id="fPerson">${personOptions()}</select>${I.updown}</label>
-        <label class="pick"><span class="sr">Periode</span><select id="fPeriod">${[["all", "Hele perioden"], ["7", "Siste 7 dager"], ["30", "Siste 30 dager"], ["year", "I år"]].map(([v, l]) => `<option value="${v}" ${S.f.period === v ? "selected" : ""}>${l}</option>`).join("")}</select>${I.updown}</label>
-      </div><div id="logList" class="stack"></div>`;
-  }
-  function renderLogList() {
-    const el = $("logList"); if (!el) return;
+  function renderLogg() {
+    $("logNotice").innerHTML = notice();
+    $("logTools").hidden = blocked();
+    const fp = $("fPerson"); if (document.activeElement !== fp) { fp.innerHTML = personOptions(); fp.value = S.f.person; }
+    const el = $("logList");
+    if (blocked()) { el.innerHTML = ""; return; }
     if (!S.ready) { el.innerHTML = skel(3); return; }
-    if (!S.entries.length) { el.innerHTML = `<div class="empty"><h3>Loggen er tom</h3><p>Trykk på plussknappen nederst for å føre den første posten.</p></div>`; return; }
+    if (!S.entries.length) { el.innerHTML = `<div class="empty"><h3>Loggen er tom</h3><p>Trykk på pluss nederst for å føre den første posten.</p></div>`; return; }
     const list = filtered();
     if (!list.length) { el.innerHTML = '<div class="empty"><h3>Ingen treff</h3><p>Ingen poster passer filteret. Prøv et annet søk eller en lengre periode.</p></div>'; return; }
-    el.innerHTML = dayGroups(list) + `<p class="footer">${list.length === S.entries.length ? `${list.length} ${list.length === 1 ? "post" : "poster"}` : `Viser ${list.length} av ${S.entries.length} poster`}. Ingenting slettes. Annullerte poster står igjen, men teller ikke i saldoen.</p>`;
+    el.innerHTML = dayGroups(list) + `<p class="footer">${list.length === S.entries.length ? `${list.length} ${list.length === 1 ? "post" : "poster"}.` : `Viser ${list.length} av ${S.entries.length} poster.`} Ingenting slettes. Annullerte poster står igjen, men teller ikke i saldoen.</p>`;
   }
 
   /* ---------- Gjengivelse ---------- */
-  let lastKey = "";
-  const shown = new Map();
+  const shownPane = () => S.personView ? "person" : S.tab;
   function render() {
-    const key = S.personView ? "person:" + S.personView : S.tab;
-    const v = $("view");
-    if (key === "logg" && lastKey === "logg" && $("logList")) {
-      const fp = $("fPerson"); if (fp) { fp.innerHTML = personOptions(); fp.value = S.f.person; }
-      v.querySelector(".notice")?.remove();
-      const n = notice(); if (n) $("largeTitle").insertAdjacentHTML("afterend", n);
-    } else {
-      v.innerHTML = S.personView ? vPerson() : S.tab === "personer" ? vPersoner() : S.tab === "logg" ? vLogg() : vOversikt();
-      if (key !== lastKey) {
-        [...v.children].forEach((c, i) => c.style.setProperty("--i", Math.min(i, 12)));
-        v.classList.remove("enter"); void v.offsetWidth; v.classList.add("enter");
-      }
-    }
-    lastKey = key;
-    const heroView = key === "oversikt";
-    v.classList.toggle("has-hero", heroView); document.body.classList.toggle("hero-view", heroView);
-    renderLogList();
-    renderChrome();
-    renderDetail();
-    observeTitle();
-    animateCounts();
+    renderOversikt(); renderPersoner(); renderLogg();
+    if (S.personView) renderPerson();
+    renderChrome(); renderDetail(); observeTitle();
   }
-  function animateCounts() {
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.querySelectorAll("[data-count]").forEach((el) => {
-      const to = Number(el.dataset.count), k = el.dataset.key, from = shown.has(k) ? shown.get(k) : 0;
-      shown.set(k, to);
-      if (from === to || reduce) return;
-      const t0 = performance.now(), dur = 700;
-      const step = (t) => {
-        const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3), val = Math.round(from + (to - from) * e);
-        const [i, d] = splitKr(val);
-        const ie = el.querySelector(".i"), de = el.querySelector(".d");
-        if (!ie || !el.isConnected) return;
-        ie.textContent = (val < 0 ? "−" : "") + i; de.textContent = d;
-        if (p < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    });
-  }
-  let pillIdx = 0;
   function renderChrome() {
-    const tabs = ["oversikt", "personer", "logg"], idx = tabs.indexOf(S.tab);
-    document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-current", b.dataset.tab === S.tab ? "page" : "false"));
-    const pill = $("pill");
-    if (idx !== pillIdx) { pill.classList.add("stretch"); setTimeout(() => pill.classList.remove("stretch"), 220); pillIdx = idx; }
-    pill.style.transform = `translateX(${idx * 100}%)`;
-    $("navStart").innerHTML = S.personView ? `<button class="capsule-btn glass press" type="button" data-act="back">${I.back}<span>Personer</span></button>` : "";
-    $("navTitle").textContent = S.personView ? personName(S.personView) : { oversikt: "Gjeldsbok", personer: "Personer", logg: "Logg" }[S.tab];
+    $("navStart").innerHTML = S.personView ? `<button class="backbtn glass press" type="button" data-act="back">${I.back}<span>${{ oversikt: "Oversikt", personer: "Personer", logg: "Logg" }[S.tab]}</span></button>` : "";
+    const t = document.querySelector(`#pane-${shownPane()} .large`);
+    $("navTitle").textContent = t ? t.dataset.title : "";
     $("plus").disabled = !S.canWrite;
   }
   let io, observed = null;
   function observeTitle() {
-    const t = $("largeTitle");
+    const t = document.querySelector(`#pane-${shownPane()} .large`);
     if (t === observed) return;
     io?.disconnect(); observed = t;
     if (!t || !("IntersectionObserver" in window)) return;
-    io = new IntersectionObserver(([en]) => { $("navTitle").classList.toggle("show", !en.isIntersecting); document.body.classList.toggle("past-title", !en.isIntersecting); }, { rootMargin: "-56px 0px 0px 0px" });
+    io = new IntersectionObserver(([en]) => document.body.classList.toggle("scrolled", !en.isIntersecting), { rootMargin: "-50px 0px 0px 0px" });
     io.observe(t);
   }
+
+  /* Bytte panel uten å bygge alt på nytt; hvert panel husker rulleposisjonen */
+  const scrollMem = {};
+  function showPane(name, how) {
+    for (const p of ["oversikt", "personer", "logg", "person"]) {
+      const el = $("pane-" + p), on = p === name;
+      if (el.hidden !== !on) el.hidden = !on;
+      if (on) { el.classList.remove("show", "push"); void el.offsetWidth; el.classList.add(how === "push" ? "push" : "show"); }
+    }
+    window.scrollTo(0, how === "push" ? 0 : (scrollMem[name] || 0));
+    renderChrome(); observeTitle();
+  }
+  function selectTab(tab) {
+    if (S.tab === tab && !S.personView) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+    scrollMem[shownPane()] = window.scrollY;
+    if (S.personView) { S.personView = null; S.renaming = false; }
+    S.tab = tab; moveLens(TABS.indexOf(tab), true); markTabs();
+    showPane(tab);
+    $("pane-person").innerHTML = "";
+  }
+  function openPerson(id) { scrollMem[shownPane()] = window.scrollY; S.personView = id; S.renaming = false; renderPerson(); showPane("person", "push"); }
+  function closePerson() { S.personView = null; S.renaming = false; showPane(S.tab); $("pane-person").innerHTML = ""; }
+
+  /* ---------- Fanelinje: linse som kan dras ---------- */
+  const tabbar = $("tabbar"), lens = $("lens"), tabEls = [...tabbar.querySelectorAll(".tab")];
+  let lensX = 0;
+  const tabX = (i) => tabEls[i].offsetLeft;
+  function setLens(x) { lensX = x; lens.style.transform = `translateX(${x}px)`; }
+  function moveLens(i, animate) {
+    const to = tabX(i), from = lensX;
+    if (animate && from !== to && lens.animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const mid = from + (to - from) * 0.55;
+      lens.animate([
+        { transform: `translateX(${from}px) scale(1, 1)` },
+        { transform: `translateX(${mid}px) scale(1.28, 0.86)`, offset: 0.45 },
+        { transform: `translateX(${to}px) scale(0.97, 1.03)`, offset: 0.78 },
+        { transform: `translateX(${to}px) scale(1, 1)` },
+      ], { duration: 460, easing: "cubic-bezier(0.3, 0.9, 0.35, 1)" });
+    }
+    setLens(to);
+  }
+  function markTabs(hoverIdx = -1) {
+    tabEls.forEach((b, i) => { b.setAttribute("aria-current", TABS[i] === S.tab ? "page" : "false"); b.classList.toggle("hover", i === hoverIdx); });
+  }
+  const hitTab = (x) => tabEls.findIndex((b) => { const r = b.getBoundingClientRect(); return x >= r.left && x <= r.right; });
+  let drag = null;
+  tabbar.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    drag = { x0: e.clientX, moved: false, barLeft: tabbar.getBoundingClientRect().left };
+    try { tabbar.setPointerCapture(e.pointerId); } catch {}
+    tabbar.classList.add("dragging");
+    markTabs(hitTab(e.clientX));
+  });
+  tabbar.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    if (Math.abs(e.clientX - drag.x0) > 6) drag.moved = true;
+    if (!drag.moved) return;
+    const w = tabEls[0].offsetWidth, min = tabX(0), max = tabX(2);
+    const x = Math.min(max + 8, Math.max(min - 8, e.clientX - drag.barLeft - w / 2));
+    setLens(x);
+    markTabs(Math.max(0, Math.min(2, Math.round((x - min) / w))));
+  });
+  const endDrag = (e) => {
+    if (!drag) return;
+    tabbar.classList.remove("dragging");
+    const moved = drag.moved; drag = null;
+    if (e.type === "pointercancel") { moveLens(TABS.indexOf(S.tab), true); markTabs(); return; }
+    let idx = moved ? Math.max(0, Math.min(2, Math.round((lensX - tabX(0)) / tabEls[0].offsetWidth))) : hitTab(e.clientX);
+    if (idx < 0) idx = TABS.indexOf(S.tab);
+    if (TABS[idx] !== S.tab || S.personView) selectTab(TABS[idx]);
+    else { moveLens(idx, true); markTabs(); if (!moved) window.scrollTo({ top: 0, behavior: "smooth" }); }
+  };
+  tabbar.addEventListener("pointerup", endDrag);
+  tabbar.addEventListener("pointercancel", endDrag);
+  tabbar.addEventListener("click", (e) => { const t = e.target.closest(".tab"); if (t && e.detail === 0) selectTab(t.dataset.tab); });
+  if ("ResizeObserver" in window) new ResizeObserver(() => setLens(tabX(TABS.indexOf(S.tab)))).observe(tabbar);
 
   /* ---------- Ark: åpne, lukke, dra ned ---------- */
   function openSheet(d) { if (!d.open) { d.classList.remove("closing"); d.style.transform = ""; d.showModal(); } }
   function closeSheet(d, after) {
     if (!d.open || d.classList.contains("closing")) return;
     d.classList.add("closing");
-    setTimeout(() => { d.close(); d.classList.remove("closing"); d.style.transform = ""; d.style.transition = ""; after?.(); }, 290);
+    setTimeout(() => { d.close(); d.classList.remove("closing"); d.style.transform = ""; d.style.transition = ""; after?.(); }, 280);
   }
   function enableDrag(d, onClose) {
     let y0 = null, dy = 0, t0 = 0;
@@ -733,21 +672,21 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     };
     d.addEventListener("pointerup", end); d.addEventListener("pointercancel", end);
   }
+  const renderSel = () => document.querySelectorAll("[data-entry]").forEach((b) => b.setAttribute("aria-current", b.dataset.entry === S.sel));
   const closeDetail = () => closeSheet($("detailDlg"), () => { S.sel = null; S.confirmVoid = false; renderSel(); });
   const closeForm = () => closeSheet($("formDlg"), () => { if (!S.busy) S.form = null; });
-  const closeAct = () => closeSheet($("actDlg"));
-  for (const [id, fn] of [["detailDlg", closeDetail], ["formDlg", closeForm], ["actDlg", closeAct]]) {
+  const closeAct = (after) => closeSheet($("actDlg"), after);
+  for (const [id, fn] of [["detailDlg", closeDetail], ["formDlg", closeForm], ["actDlg", () => closeAct()]]) {
     const d = $(id);
     d.addEventListener("cancel", (e) => { e.preventDefault(); fn(); });
     d.addEventListener("click", (e) => { if (e.target === d) fn(); });
     enableDrag(d, fn);
   }
-  const renderSel = () => document.querySelectorAll("[data-entry]").forEach((b) => b.setAttribute("aria-current", b.dataset.entry === S.sel));
 
   /* ---------- Post-ark ---------- */
   const FIELD_LABEL = { amountOre: "Sum", reason: "Grunn", personId: "Person", kind: "Type", dir: "Retning", method: "Betalt med" };
   function fmtField(f, v) {
-    if (v == null || v === "") return "–";
+    if (v == null || v === "") return "ingen";
     if (f === "amountOre") return kr(v) + " kr";
     if (f === "personId") return personName(v);
     if (f === "kind") return v === "debt" ? "Skylder" : "Overføring";
@@ -758,12 +697,13 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
   function detailHTML(e) {
     const n = personName(e.personId), void_ = e.status === "void";
     const cls = void_ ? "sec" : e.kind === "debt" ? (e.dir === "in" ? "pos" : "neg") : "";
+    const sign = e.kind === "debt" ? (e.dir === "in" ? "+" : "−") : "";
     const hist = [...(e.history || [])].reverse().map((h) => {
       let head = "", body = "";
-      if (h.action === "created") { head = "Opprettet"; body = `${kr(h.snapshot?.amountOre ?? e.amountOre)} kr · ${esc(h.snapshot?.reason ?? "")}`; }
+      if (h.action === "created") { head = "Ført"; body = `${kr(h.snapshot?.amountOre ?? e.amountOre)} kr, ${esc(h.snapshot?.reason ?? "")}`; }
       else if (h.action === "edited") { head = "Endret"; body = Object.entries(h.changes || {}).map(([f, [a, b]]) => `${FIELD_LABEL[f] || f}: ${esc(fmtField(f, a))} → ${esc(fmtField(f, b))}`).join("<br>"); }
-      else if (h.action === "voided") { head = "Annullert"; body = "Teller ikke lenger i saldoen"; }
-      else if (h.action === "restored") { head = "Gjenopprettet"; body = "Teller igjen i saldoen"; }
+      else if (h.action === "voided") { head = "Annullert"; body = "Teller ikke lenger i saldoen."; }
+      else if (h.action === "restored") { head = "Gjenopprettet"; body = "Teller igjen i saldoen."; }
       return `<div class="row"><span class="dot"></span><span class="cell"><b>${head}</b><span class="c">${body}</span><span class="meta">${stamp(h.at)}</span></span></div>`;
     }).join("");
     const actions = !S.canWrite ? "" : S.confirmVoid
@@ -772,13 +712,12 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
       : `<div class="btns"><button class="fillbtn" type="button" data-act="edit" ${void_ || S.busy ? "disabled" : ""}>Rediger</button>
          ${void_ ? `<button class="fillbtn" type="button" data-act="restore" ${S.busy ? "disabled" : ""}>Gjenopprett</button>` : `<button class="fillbtn danger" type="button" data-act="void" ${S.busy ? "disabled" : ""}>Annuller post</button>`}</div>`;
     return `<div class="drag" data-drag><span class="grab" aria-hidden="true"></span>
-      <div class="sheetbar"><button class="circle glass press" type="button" data-act="close-detail" aria-label="Lukk">${I.x}</button><h2>Post${void_ ? " · annullert" : ""}</h2><span class="navslot"></span></div></div>
-      <div class="dhead">${avatar(e.personId, n, "xl")}<span class="cap">${esc(title(e, n))}</span><div ${void_ ? 'style="text-decoration:line-through"' : ""}>${big(e.amountOre, cls)}</div><span class="sub">${esc(effectText(e, firstName(n)))}</span></div>
+      <div class="sheetbar"><button class="circle glass press" type="button" data-act="close-detail" aria-label="Lukk">${I.x}</button><h2>${void_ ? "Annullert post" : "Post"}</h2><span class="navslot"></span></div></div>
+      <div class="dhead">${avatar(n, "xl")}<span class="who">${esc(title(e, n))}</span><span class="sum ${cls}" ${void_ ? 'style="text-decoration:line-through"' : ""}>${sign}${kr(e.amountOre)} kr</span><span class="sub">${esc(effectText(e, firstName(n)))}</span></div>
       <div class="group kv">
-        <div class="formrow"><span>Person</span><span>${esc(n)}</span></div>
         <div class="formrow"><span>Grunn</span><span>${esc(e.reason)}</span></div>
-        ${e.kind === "transfer" ? `<div class="formrow"><span>Betalt med</span><span>${esc(METHODS[e.method] || "–")}</span></div>` : ""}
-        <div class="formrow"><span>Dato</span><span class="num">${stamp(e.loggedAt)}</span></div>
+        ${e.kind === "transfer" ? `<div class="formrow"><span>Betalt med</span><span>${esc(METHODS[e.method] || "Ikke oppgitt")}</span></div>` : ""}
+        <div class="formrow"><span>Dato</span><span>${stamp(e.loggedAt)}</span></div>
       </div>
       ${actions}
       <div class="head"><h2 style="font-size:20px">Historikk</h2></div>
@@ -791,18 +730,18 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
       $("detailSheet").innerHTML = detailHTML(e);
       if (!dlg.open) { openSheet(dlg); dlg.querySelector('[data-act="close-detail"]')?.focus({ preventScroll: true }); }
       sc.scrollTop = keep;
-    } else if (dlg.open) closeSheet(dlg);
+    } else if (dlg.open && !dlg.classList.contains("closing")) closeSheet(dlg);
   }
 
   /* ---------- Skjema ---------- */
-  function openForm(kind, editId, dir) {
+  function openForm(kind, editId) {
     if (!S.canWrite) return;
     if (editId) {
       const e = S.entries.find((x) => x.id === editId); if (!e) return;
       S.form = { mode: "edit", id: e.id, kind: e.kind, personId: e.personId, newName: "", dir: e.dir, amount: oreToInput(e.amountOre), reason: e.reason, method: e.method || "vipps", loggedAt: e.loggedAt, err: "" };
     } else {
-      const pre = S.personView || S.f.person || "";
-      S.form = { mode: "new", kind, personId: pre || (S.people.size ? "" : "__new"), newName: "", dir: dir || "in", amount: "", reason: "", method: "vipps", err: "" };
+      const pre = S.personView || "";
+      S.form = { mode: "new", kind, personId: pre || (S.people.size ? "" : "__new"), newName: "", dir: "in", amount: "", reason: "", method: "vipps", err: "" };
     }
     renderForm();
     openSheet($("formDlg"));
@@ -832,7 +771,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
       <div class="sheetbar">
         <button class="circle glass press" type="button" data-act="close-form" aria-label="Avbryt">${I.x}</button>
         <h2 id="formTitle">${F.mode === "edit" ? "Rediger post" : isT ? "Ny overføring" : "Ny gjeld"}</h2>
-        <button class="circle glass tint press" type="submit" aria-label="${F.mode === "edit" ? "Lagre endring" : "Loggfør"}" ${S.busy ? "disabled" : ""}>${I.check}</button>
+        <button class="circle glass ink press" type="submit" aria-label="${F.mode === "edit" ? "Lagre endring" : "Lagre"}" ${S.busy ? "disabled" : ""}>${I.check}</button>
       </div></div>
       ${segHTML("kind", [["debt", "Skylder"], ["transfer", "Overføring"]], F.kind)}
       <p class="lbl" id="whoLbl">Hvem</p>
@@ -849,9 +788,9 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
       </div>
       <p class="err" role="alert">${esc(F.err)}</p>
       <p class="footer">${F.mode === "edit"
-        ? `Dato for posten: ${stamp(F.loggedAt)}. Endringen lagres i historikken med dato og klokkeslett.`
-        : `Dato og klokkeslett settes automatisk når du lagrer: <span id="clock" class="num">${stamp(new Date().toISOString())}</span>.${isT ? " Lånte du bort penger med Vipps, holder det å føre én overføring ut. Da skylder personen deg beløpet." : ""}`}</p>
-      <button class="fillbtn prominent" type="submit" ${S.busy ? "disabled" : ""}>${F.mode === "edit" ? "Lagre endring" : isT ? "Loggfør overføring" : "Loggfør gjeld"}</button>`;
+        ? `Posten er datert ${stamp(F.loggedAt)}. Endringen lagres i historikken med dato og klokkeslett.`
+        : `Dato og klokkeslett settes når du lagrer: <span id="clock">${stamp(new Date().toISOString())}</span>.${isT ? " Lånte du bort penger med Vipps, holder det å føre én overføring ut. Da skylder personen deg beløpet." : ""}`}</p>
+      <button class="fillbtn ink" type="submit" ${S.busy ? "disabled" : ""}>${F.mode === "edit" ? "Lagre endring" : isT ? "Lagre overføring" : "Lagre gjeld"}</button>`;
     $("form").scrollTop = sc;
     sizeAmount();
   }
@@ -877,7 +816,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
       const now = new Date().toISOString();
       if (F.mode === "new") {
         await db.collection("entries").doc().set({ ...data, loggedAt: now, status: "active", history: [{ at: now, action: "created", snapshot: { amountOre, reason } }] });
-        toast(F.kind === "debt" ? "Gjeld loggført" : "Overføring loggført");
+        toast(F.kind === "debt" ? "Gjeld lagret" : "Overføring lagret");
       } else {
         const cur = S.entries.find((x) => x.id === F.id), changes = {};
         for (const k of Object.keys(data)) if ((cur[k] ?? null) !== (data[k] ?? null)) changes[k] = [cur[k] ?? null, data[k] ?? null];
@@ -899,7 +838,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     try {
       const now = new Date().toISOString();
       await S.db.doc("entries/" + id).update({ status, history: [...(e.history || []), { at: now, action }] });
-      toast(action === "voided" ? "Posten er annullert" : "Posten er gjenopprettet");
+      toast(action === "voided" ? "Post annullert" : "Post gjenopprettet");
     } catch { toast("Kunne ikke lagre. Prøv igjen."); }
     S.busy = false; S.confirmVoid = false; render();
   }
@@ -907,7 +846,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     const id = S.personView, name = $("renameIn")?.value.trim();
     if (!id || !name || S.busy) return;
     S.busy = true;
-    try { await S.db.doc("people/" + id).update({ name }); toast("Navnet er endret"); S.renaming = false; }
+    try { await S.db.doc("people/" + id).update({ name }); toast("Navn lagret"); S.renaming = false; }
     catch { toast("Kunne ikke lagre navnet."); }
     S.busy = false; render();
   }
@@ -916,7 +855,7 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
   function toast(msg) {
     $("toastHost").innerHTML = `<div class="toast glass frost" role="status">${esc(msg)}</div>`;
     clearTimeout(toastT);
-    toastT = setTimeout(() => { const t = $("toastHost").firstElementChild; if (!t) return; t.classList.add("out"); setTimeout(() => t.remove(), 300); }, 2200);
+    toastT = setTimeout(() => { const t = $("toastHost").firstElementChild; if (!t) return; t.classList.add("out"); setTimeout(() => t.remove(), 280); }, 2200);
   }
 
   /* ---------- Lys som følger fingeren på glasset ---------- */
@@ -932,27 +871,18 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
 
   /* ---------- Hendelser ---------- */
   document.addEventListener("click", (ev) => {
-    const t = ev.target.closest("button"); if (!t) return;
+    const t = ev.target.closest("button"); if (!t || t.closest("#tabbar")) return;
     if (t.id === "plus") { if (S.canWrite) openSheet($("actDlg")); return; }
-    if (t.dataset.quick) { const [k, d] = t.dataset.quick.split(":"); openForm(k, null, d); return; }
-    if (t.dataset.new) { const k = t.dataset.new; if ($("actDlg").open) closeSheet($("actDlg"), () => openForm(k)); else openForm(k); return; }
-    if (t.dataset.tab) { if (S.tab === t.dataset.tab && !S.personView) { window.scrollTo({ top: 0, behavior: "smooth" }); return; } S.tab = t.dataset.tab; S.personView = null; S.renaming = false; window.scrollTo({ top: 0 }); render(); return; }
-    if (t.dataset.person) { S.personView = t.dataset.person; S.renaming = false; window.scrollTo({ top: 0 }); render(); return; }
+    if (t.dataset.new) { const k = t.dataset.new; if ($("actDlg").open) closeAct(() => openForm(k)); else openForm(k); return; }
+    if (t.dataset.tab) { selectTab(t.dataset.tab); return; }
+    if (t.dataset.person) { openPerson(t.dataset.person); return; }
     if (t.dataset.entry) { S.sel = t.dataset.entry; S.confirmVoid = false; renderSel(); renderDetail(); return; }
     if (t.dataset.seg) {
-      const name = t.dataset.seg, v = t.dataset.v, seg = t.parentElement, bs = [...seg.querySelectorAll("button")], th = seg.querySelector(".thumb");
-      th.classList.add("stretch"); setTimeout(() => th.classList.remove("stretch"), 200);
-      if (name === "type") {
-        S.f.type = v; bs.forEach((b) => b.setAttribute("aria-checked", b === t));
-        th.style.transform = `translateX(${bs.indexOf(t) * 100}%)`;
-        renderLogList(); return;
-      }
-      if (S.form) {
-        readForm(); S.form[name] = v; S.form.err = "";
-        bs.forEach((b) => b.setAttribute("aria-checked", b === t)); th.style.transform = `translateX(${bs.indexOf(t) * 100}%)`;
-        if (name === "kind") setTimeout(renderForm, 260);
-        return;
-      }
+      const name = t.dataset.seg, v = t.dataset.v, seg = t.parentElement, bs = [...seg.querySelectorAll("button")];
+      bs.forEach((b) => b.setAttribute("aria-checked", b === t));
+      seg.querySelector(".thumb").style.transform = `translateX(${bs.indexOf(t) * 100}%)`;
+      if (name === "type") { S.f.type = v; renderLogg(); return; }
+      if (S.form) { readForm(); S.form[name] = v; S.form.err = ""; if (name === "kind") setTimeout(renderForm, 240); return; }
     }
     if (t.dataset.f && S.form) {
       readForm(); S.form[t.dataset.f] = t.dataset.v; S.form.err = ""; renderForm();
@@ -968,15 +898,15 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
       case "void-no": S.confirmVoid = false; renderDetail(); break;
       case "void-yes": setStatusOf(S.sel, "void", "voided"); break;
       case "restore": setStatusOf(S.sel, "active", "restored"); break;
-      case "back": S.personView = null; S.renaming = false; render(); break;
-      case "rename": S.renaming = true; render(); $("renameIn")?.focus(); break;
-      case "rename-cancel": S.renaming = false; render(); break;
+      case "back": closePerson(); break;
+      case "rename": S.renaming = true; renderPerson(); $("renameIn")?.focus(); break;
+      case "rename-cancel": S.renaming = false; renderPerson(); break;
       case "rename-save": renamePerson(); break;
     }
   });
   document.addEventListener("input", (ev) => {
     const id = ev.target.id;
-    if (id === "q") { S.f.q = ev.target.value; renderLogList(); }
+    if (id === "q") { S.f.q = ev.target.value; renderLogg(); }
     else if (id === "amt") sizeAmount();
     else if (id === "newName" && S.form) {
       S.form.newName = ev.target.value;
@@ -985,8 +915,8 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
     }
   });
   document.addEventListener("change", (ev) => {
-    if (ev.target.id === "fPerson") { S.f.person = ev.target.value; renderLogList(); }
-    if (ev.target.id === "fPeriod") { S.f.period = ev.target.value; renderLogList(); }
+    if (ev.target.id === "fPerson") { S.f.person = ev.target.value; renderLogg(); }
+    if (ev.target.id === "fPeriod") { S.f.period = ev.target.value; renderLogg(); }
   });
   document.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && ev.target.id === "renameIn") renamePerson(); });
   $("form").addEventListener("submit", (ev) => { ev.preventDefault(); submitForm(); });
@@ -994,8 +924,10 @@ dialog.actions { width: calc(100% - 16px); max-width: 440px; margin: auto auto c
   /* ---------- Oppstart ---------- */
   const TAB_LABEL = { oversikt: "Oversikt", personer: "Personer", logg: "Logg" };
   const TAB_ICON = { oversikt: I.house, personer: I.people, logg: I.list };
-  document.querySelectorAll(".tab").forEach((b) => { b.innerHTML = TAB_ICON[b.dataset.tab] + `<span>${TAB_LABEL[b.dataset.tab]}</span>`; });
+  tabEls.forEach((b) => { b.innerHTML = TAB_ICON[b.dataset.tab] + `<span>${TAB_LABEL[b.dataset.tab]}</span>`; });
   $("plus").innerHTML = I.plus;
+  buildLogg();
+  markTabs(); setLens(tabX(0));
   setInterval(() => { const c = $("clock"); if (c) c.textContent = stamp(new Date().toISOString()); }, 15000);
   render();
 
