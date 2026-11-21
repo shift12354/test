@@ -9,7 +9,9 @@ import { add, bounds, mul, norm, perp, pointInPolygon, polygonCentroid, sub, wal
 import type { Item, Level, Opening, Project, Room, Run, Wall } from "../model/types"
 import { isSelected, useStore } from "../store/store"
 import { ItemModel, mat } from "./models"
+import { DEFAULT_FACADE, DEFAULT_ROOF, RoofMesh } from "./roof"
 import { claddingTexture, floorTexture, noiseTexture } from "./textures"
+import type { Facade } from "../model/types"
 
 const CUT_HEIGHT = 115
 
@@ -81,7 +83,7 @@ function Floor({ room, elevation, ceiling, height }: { room: Room; elevation: nu
   )
 }
 
-function WallMesh({ wall, walls, openings, rooms, elevation, cut, cladding, selected }: { wall: Wall; walls: Wall[]; openings: Opening[]; rooms: Room[]; elevation: number; cut: boolean; cladding: string; selected: boolean }) {
+function WallMesh({ wall, walls, openings, rooms, elevation, cut, cladding, facade, plinth, selected }: { wall: Wall; walls: Wall[]; openings: Opening[]; rooms: Room[]; elevation: number; cut: boolean; cladding: string; facade: Facade; plinth: boolean; selected: boolean }) {
   const select = useStore((s) => s.setSelection)
   const { ea, eb } = wallJoints(wall, walls)
   const ops = openings.filter((o) => o.wallId === wall.id)
@@ -96,12 +98,12 @@ function WallMesh({ wall, walls, openings, rooms, elevation, cut, cladding, sele
   const minus = roomOn(-1)
 
   const materials = useMemo(() => {
-    const clad = new THREE.MeshStandardMaterial({ map: claddingTexture(cladding), roughness: 0.85 })
+    const clad = new THREE.MeshStandardMaterial({ map: claddingTexture(cladding, facade.style), roughness: 0.85 })
     const side = (r: Room | undefined) => (r ? mat(r.wallColor, { rough: 0.92 }) : clad)
     const top = mat(selected ? "#8b7bff" : "#3a3b3f", { rough: 0.9 })
     const end = mat("#e8e5df", { rough: 0.9 })
     return [end, end, top, end, side(plus), side(minus)]
-  }, [cladding, plus, minus, selected])
+  }, [cladding, facade.style, plus, minus, selected])
 
   const pieces: { from: number; to: number; y0: number; y1: number }[] = []
   for (const sp of spans) {
@@ -121,8 +123,13 @@ function WallMesh({ wall, walls, openings, rooms, elevation, cut, cladding, sele
           <WallPiece key={i} len={p.to - p.from} h={p.y1 - p.y0} t={t} x={(p.from + p.to) / 2} y={(p.y0 + p.y1) / 2} materials={materials} onSelect={() => select([{ kind: "wall", id: wall.id }])} />
         ))}
       {ops.map((o) => (
-        <OpeningModel key={o.id} o={o} t={t} cutH={H} />
+        <OpeningModel key={o.id} o={o} t={t} cutH={H} trim={facade.trim} />
       ))}
+      {plinth && wall.exterior && facade.plinth > 0 && (
+        <mesh position={[(spans[0].from + spans[spans.length - 1].to) / 2, -facade.plinth / 2, 0]} scale={[spans[spans.length - 1].to - spans[0].from + 2, facade.plinth, t + 2]} material={mat("#9a9893", { rough: 0.95 })} castShadow receiveShadow>
+          <boxGeometry />
+        </mesh>
+      )}
     </group>
   )
 }
@@ -145,8 +152,8 @@ function WallPiece({ len, h, t, x, y, materials, onSelect }: { len: number; h: n
   )
 }
 
-function OpeningModel({ o, t, cutH }: { o: Opening; t: number; cutH: number }) {
-  const frame = mat("#f2f0ea", { rough: 0.6 })
+function OpeningModel({ o, t, cutH, trim }: { o: Opening; t: number; cutH: number; trim: string }) {
+  const frame = mat(trim, { rough: 0.6 })
   const glass = mat("#bcd9e6", { opacity: 0.25, rough: 0.05, metal: 0.1 })
   const leafMat = mat("#f7f5f0", { rough: 0.55 })
   const handle = mat("#b9bcc0", { rough: 0.3, metal: 0.7 })
@@ -496,6 +503,11 @@ function House() {
     return t
   }, [dark])
   const cladding = project.cladding ?? "#ebe8e1"
+  const facade = project.facade ?? DEFAULT_FACADE
+  const roof = project.roof ?? DEFAULT_ROOF
+  const topLevel = project.levels[project.levels.length - 1]
+  const showRoof = view3d.roof && !view3d.cutaway && !view3d.walk && levels[levels.length - 1]?.id === topLevel.id
+  const groundY = -(facade.plinth + 2) / 100
 
   return (
     <>
@@ -510,7 +522,7 @@ function House() {
         </>
       )}
       <ScreenshotBridge />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[center.x, -0.08, center.z]} receiveShadow onClick={() => useStore.getState().setSelection([])}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[center.x, groundY, center.z]} receiveShadow onClick={() => useStore.getState().setSelection([])}>
         <planeGeometry args={[400, 400]} />
         <meshStandardMaterial map={groundTex} roughness={1} />
       </mesh>
@@ -527,7 +539,7 @@ function House() {
               ))}
               {layers.konstruksjon &&
                 walls.map((w) => (
-                  <WallMesh key={w.id} wall={w} walls={walls} openings={project.openings} rooms={rooms} elevation={l.elevation} cut={cut} cladding={cladding} selected={isSelected(selection, w.id)} />
+                  <WallMesh key={w.id} wall={w} walls={walls} openings={project.openings} rooms={rooms} elevation={l.elevation} cut={cut} cladding={cladding} facade={facade} plinth={i === 0} selected={isSelected(selection, w.id)} />
                 ))}
               {project.items
                 .filter((it) => it.level === l.id)
@@ -548,11 +560,14 @@ function House() {
                   return lay === "elektro" ? layers.elektro : lay === "vann" ? layers.vann : layers.avlop
                 })
                 .map((r) => (
-                  <RunMesh key={r.id} run={r} level={l} xray={view3d.xray} selected={isSelected(selection, r.id)} />
+                  <RunMesh key={r.id} run={r} level={l} xray={view3d.xray && !showRoof} selected={isSelected(selection, r.id)} />
                 ))}
             </group>
           )
         })}
+        {showRoof && layers.konstruksjon && (
+          <RoofMesh roof={roof} facade={facade} cladding={cladding} walls={project.walls.filter((w) => w.level === topLevel.id)} level={topLevel} />
+        )}
       </group>
     </>
   )

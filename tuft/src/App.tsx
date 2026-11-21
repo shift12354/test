@@ -7,6 +7,7 @@ import { LayerBar, RAIL, Rail, TopBar, View3DBar } from "./ui/Chrome"
 import { Inspector } from "./ui/Inspector"
 import { LibraryPanel } from "./ui/LibraryPanel"
 import { ChecksPanel, ListsPanel } from "./ui/ListsPanel"
+import { Toast } from "./ui/Projects"
 
 const Scene3D = lazy(() => import("./view3d/Scene3D").then((m) => ({ default: m.Scene3D })))
 
@@ -131,6 +132,7 @@ export default function App() {
           <Inspector />
         </aside>
       </div>
+      <Toast />
     </div>
   )
 }

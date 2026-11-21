@@ -10,6 +10,7 @@ import {
   DoorOpen,
   Download,
   FileBraces,
+  FolderOpen,
   FilePlus,
   Footprints,
   Hand,
@@ -39,6 +40,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react"
 import type { ReactNode } from "react"
 
+import { saveFile } from "../cloud/files"
 import { CATALOG_BY_ID } from "../model/catalog"
 import { runChecks } from "../model/checks"
 import { emptyProject, sampleProject } from "../model/sample"
@@ -46,12 +48,13 @@ import type { LayerKey, Project, Tool, ViewMode } from "../model/types"
 import { useCursor, useStore } from "../store/store"
 import { screenshot } from "../view3d/Scene3D"
 import { Seg } from "./common"
+import { ProjectsDialog, SyncBadge } from "./Projects"
 
 function download(name: string, href: string) {
-  const a = document.createElement("a")
-  a.href = href
-  a.download = name
-  a.click()
+  void saveFile(name, href, { dataUrl: href.startsWith("data:") })
+}
+function saveJson(project: Project) {
+  void saveFile(`${project.name || "tuft"}.tuft.json`, JSON.stringify(project, null, 2))
 }
 
 export function exportPlanPng(name: string) {
@@ -144,6 +147,7 @@ export function TopBar() {
   const fileRef = useRef<HTMLInputElement>(null)
   const st = useStore.getState
   const [textDialog, setTextDialog] = useState<{ mode: "import" | "export"; error?: string } | null>(null)
+  const [projectsOpen, setProjectsOpen] = useState(false)
 
   return (
     <header className="topbar">
@@ -162,9 +166,21 @@ export function TopBar() {
         onChange={(e) => st().update((p) => ({ ...p, name: e.target.value }), false)}
         onBlur={() => st().checkpoint()}
       />
+      <SyncBadge onOpen={() => setProjectsOpen(true)} />
+      {projectsOpen && <ProjectsDialog onClose={() => setProjectsOpen(false)} />}
       <Menu label="Fil" icon={null}>
         {(close) => (
           <>
+            <button
+              role="menuitem"
+              onClick={() => {
+                setProjectsOpen(true)
+                close()
+              }}
+            >
+              <FolderOpen size={15} /> Prosjekter og deling …
+            </button>
+            <hr />
             <button
               role="menuitem"
               onClick={() => {
@@ -190,10 +206,7 @@ export function TopBar() {
             <button
               role="menuitem"
               onClick={() => {
-                const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" })
-                const url = URL.createObjectURL(blob)
-                download(`${project.name || "tuft"}.tuft.json`, url)
-                URL.revokeObjectURL(url)
+                saveJson(project)
                 close()
               }}
             >
@@ -309,12 +322,7 @@ export function TopBar() {
       </button>
       <button
         className="btn primary"
-        onClick={() => {
-          const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" })
-          const url = URL.createObjectURL(blob)
-          download(`${project.name || "tuft"}.tuft.json`, url)
-          URL.revokeObjectURL(url)
-        }}
+        onClick={() => saveJson(project)}
       >
         <Download size={15} /> Lagre
       </button>
@@ -446,6 +454,9 @@ export function View3DBar() {
           { value: "walk", label: <><Footprints size={14} /> <span className="lbl">Gå</span></>, title: "WASD eller piltaster, dra for å se rundt" },
         ]}
       />
+      <button className={`chip-btn ${v.roof && !v.cutaway ? "on" : ""}`} onClick={() => set({ roof: !v.roof, cutaway: false })} aria-pressed={v.roof && !v.cutaway} title="Vis taket">
+        <House size={14} /> <span className="lbl">Tak</span>
+      </button>
       <button className={`chip-btn ${v.cutaway ? "on" : ""}`} onClick={() => set({ cutaway: !v.cutaway })} aria-pressed={v.cutaway} title="Kutt veggene i brysthøyde">
         <Scissors size={14} /> <span className="lbl">Snitt</span>
       </button>

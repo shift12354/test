@@ -28,8 +28,20 @@ Fargene og typografien i `src/styles.css` er de samme som variablene der.
 - **3D**: bane-kamera, «Gå»-modus (WASD), snitt i brysthøyde, røntgen for rør og kabler,
   sol etter klokkeslett og lamper som lyser.
 - **Etasjer**: legg til en etasje over. Ytterveggene kopieres opp, og etasjen under vises som skygge.
-- Prosjektet lagres automatisk i nettleseren. Det kan også lagres og åpnes som `.json`,
-  eller kopieres og limes inn som tekst.
+- **Tak og fasade**: saltak, valmtak, pulttak eller flatt tak med vinkel, utstikk og tekking
+  (betong, tegl, shingel, stål, torv). Kledning stående, liggende, puss eller tegl, farge på
+  listverk og synlig grunnmur.
+- **Plantegning under**: legg inn et bilde eller en PDF per etasje, klikk to punkter med kjent
+  avstand og skriv lengden, så får tegningen riktig målestokk. Tegn veggene oppå.
+- **Produkter fra IKEA, Elkjøp og Byggmakker** kan velges for møbler, hvitevarer, gulv, tak,
+  kledning, dører og vinduer. Materiallisten viser sum per butikk. Prisene er sjekket i
+  november 2026 der vi fant en norsk kilde (se `src/model/products.ts`); ellers lenker
+  produktet til butikken.
+- **Prosjekter og deling** (når Tuft er åpnet på claude.ai): «Mine» lagres privat i skyen,
+  «Delt med andre» kan åpnes og endres av alle Tuft er delt med som bidragsyter. Endringer
+  vises hos de andre med en gang, og du ser hvem som er inne. Utenfor claude.ai lagres
+  prosjektet i nettleseren.
+- Prosjektet kan også lagres og åpnes som `.json`, eller kopieres og limes inn som tekst.
 
 ## Snarveier
 
@@ -54,6 +66,9 @@ Shift mens du tegner skrur av festing og vinkellås.
 - `src/view3d/` – 3D med React Three Fiber: vegger med åpninger, gulv med teksturer tegnet i kode,
   møbler bygd av enkle former, rør som tuber, sol og lamper.
 - `src/store/store.ts` – tilstand med angre/gjør om og autolagring.
+- `src/cloud/` – skylagring, deling og tilstedeværelse (claude.ai-funksjonene `db`, `user`,
+  `room` og `downloads`), og lagring av filer.
+- `src/view3d/roof.tsx` – tak og gavler. `src/ui/Underlay.tsx` – bilde/PDF under planen (pdf.js).
 - `src/ui/` – toppfelt, verktøylinje, bibliotek, egenskapspanel, lister og sjekk.
 
 Sjekkene er tommelfingerregler. Elektrisk anlegg skal prosjekteres og bygges av registrert

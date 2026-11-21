@@ -16,6 +16,11 @@ export type Settings = {
   theme: "light" | "dark"
 }
 
+export type ProjectMeta = { id: string; where: "local" | "mine" | "shared"; ownerId?: string }
+export type SyncState = "local" | "saving" | "saved" | "error" | "readonly" | "connecting"
+export type CloudInfo = { me: { id: string; name: string; avatarUrl: string; color: string }; canWriteShared: boolean | null }
+export type PeerInfo = { peer: string; by: string | null; isMe: boolean; level?: string }
+
 export type View3D = {
   cutaway: boolean
   xray: boolean
@@ -23,6 +28,7 @@ export type View3D = {
   timeOfDay: number
   walk: boolean
   allLevels: boolean
+  roof: boolean
 }
 
 type State = {
@@ -39,12 +45,18 @@ type State = {
   panel: "catalog" | "lists" | "checks" | null
   /** Bumps when the plan should re-fit the view. */
   fitToken: number
+  meta: ProjectMeta
+  sync: SyncState
+  syncMsg: string | null
+  cloud: CloudInfo | null
+  peers: PeerInfo[]
+  toast: string | null
 
   update: (fn: (p: Project) => Project, record?: boolean) => void
   checkpoint: () => void
   undo: () => void
   redo: () => void
-  load: (p: Project) => void
+  load: (p: Project, meta?: ProjectMeta) => void
   setSelection: (s: Selection[]) => void
   setTool: (t: Tool) => void
   setView: (v: ViewMode) => void
@@ -88,6 +100,19 @@ function loadSettings(): Settings {
   return base
 }
 
+function loadMeta(): ProjectMeta {
+  try {
+    const raw = localStorage.getItem("tuft.meta")
+    if (raw) {
+      const m = JSON.parse(raw) as ProjectMeta
+      if (m && m.id && (m.where === "local" || m.where === "mine" || m.where === "shared")) return m
+    }
+  } catch {
+    // ignore
+  }
+  return { id: uid("prj"), where: "local" }
+}
+
 const initial = loadInitial()
 const narrowScreen = typeof window !== "undefined" && window.innerWidth < 720
 
@@ -101,9 +126,15 @@ export const useStore = create<State>((set, get) => ({
   levelId: initial.levels[0].id,
   layers: { konstruksjon: true, interior: true, elektro: true, vann: true, avlop: true, mal: true },
   settings: loadSettings(),
-  view3d: { cutaway: false, xray: true, lightsOn: false, timeOfDay: 14, walk: false, allLevels: true },
+  view3d: { cutaway: false, xray: true, lightsOn: false, timeOfDay: 14, walk: false, allLevels: true, roof: true },
   panel: narrowScreen ? null : "catalog",
   fitToken: 0,
+  meta: loadMeta(),
+  sync: "local",
+  syncMsg: null,
+  cloud: null,
+  peers: [],
+  toast: null,
 
   update: (fn, record = true) =>
     set((s) => {
@@ -126,7 +157,16 @@ export const useStore = create<State>((set, get) => ({
       if (!next) return {}
       return { project: next, future: s.future.slice(1), past: [...s.past, s.project], selection: [] }
     }),
-  load: (p) => set((s) => ({ project: p, past: [...s.past, s.project], future: [], selection: [], levelId: p.levels[0].id, fitToken: s.fitToken + 1 })),
+  load: (p, meta) =>
+    set((s) => ({
+      project: p,
+      past: [...s.past, s.project],
+      future: [],
+      selection: [],
+      levelId: p.levels[0].id,
+      fitToken: s.fitToken + 1,
+      meta: meta ?? { id: uid("prj"), where: "local" },
+    })),
   setSelection: (selection) => set({ selection }),
   setTool: (tool) => set({ tool, selection: tool.type === "select" ? get().selection : [] }),
   setView: (view) => set({ view }),
@@ -217,6 +257,13 @@ useStore.subscribe((s, prev) => {
         // storage full or blocked: the project still lives in memory and can be exported
       }
     }, 400)
+  }
+  if (s.meta !== prev.meta) {
+    try {
+      localStorage.setItem("tuft.meta", JSON.stringify(s.meta))
+    } catch {
+      // ignore
+    }
   }
   if (s.settings !== prev.settings) {
     try {

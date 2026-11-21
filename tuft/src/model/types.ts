@@ -38,6 +38,7 @@ export type Opening = {
   flip: boolean
   /** Hinge at the end nearer to b instead of a. */
   hingeEnd: boolean
+  productId?: string
 }
 
 export type RoomType =
@@ -65,6 +66,8 @@ export type Room = {
   floor: FloorMaterial
   wallColor: string
   underfloorHeating: boolean
+  /** Chosen store product for the floor (see products.ts). */
+  floorProductId?: string
 }
 
 export type Item = {
@@ -84,6 +87,8 @@ export type Item = {
   color?: string
   circuitId?: string
   note?: string
+  /** Chosen store product (see products.ts). */
+  productId?: string
 }
 
 export type RunSystem = "kaldt" | "varmt" | "avlop" | "el" | "data" | "gulvvarme"
@@ -128,6 +133,50 @@ export type Project = {
   dimensions: Dimension[]
   /** Colour of the exterior cladding in 3D. */
   cladding?: string
+  roof?: Roof
+  facade?: Facade
+  /** A drawing to trace over, per level id. */
+  underlays?: Record<string, Underlay>
+}
+
+export type RoofType = "saltak" | "valmtak" | "pulttak" | "flatt" | "ingen"
+export type RoofMaterial = "betong" | "tegl" | "shingel" | "stal" | "torv"
+export type Roof = {
+  type: RoofType
+  /** Degrees. */
+  pitch: number
+  /** Eave overhang, cm. */
+  overhang: number
+  material: RoofMaterial
+  color: string
+  /** Ridge direction: along the longer side (auto), or forced along x or y. */
+  ridge: "auto" | "x" | "y"
+  productId?: string
+}
+
+export type CladdingStyle = "staende" | "liggende" | "puss" | "tegl"
+export type Facade = {
+  style: CladdingStyle
+  /** Window frames and trim. */
+  trim: string
+  /** Visible foundation (grunnmur) above ground, cm. */
+  plinth: number
+  productId?: string
+}
+
+export type Underlay = {
+  /** Image as a data URL. */
+  src: string
+  name: string
+  /** Top-left corner in plan cm. */
+  x: number
+  y: number
+  /** Size in plan cm. */
+  width: number
+  height: number
+  opacity: number
+  visible: boolean
+  locked: boolean
 }
 
 export type EntityKind = "wall" | "opening" | "room" | "item" | "run" | "dimension"
@@ -144,5 +193,6 @@ export type Tool =
   | { type: "item"; catalogId: string }
   | { type: "run"; system: RunSystem }
   | { type: "measure" }
+  | { type: "calibrate" }
 
 export type ViewMode = "2d" | "split" | "3d"

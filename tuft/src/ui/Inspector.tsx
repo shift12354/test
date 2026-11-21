@@ -7,7 +7,12 @@ import { add, dist, formatArea, formatLength, mul, norm, pointInPolygon, polygon
 import { roomSummary, runLength } from "../model/lists"
 import type { Item, Opening, OpeningKind, Project, Room, Run, Wall } from "../model/types"
 import { useStore } from "../store/store"
+import { OPENING_PRICE } from "../model/lists"
+import { productsForCatalog, productsForFloor, productsForOpening } from "../model/products"
 import { Field, NumField, Section, Swatches, TextField, Toggle } from "./common"
+import { ProductPicker } from "./Products"
+import { RoofFacadeSection } from "./RoofFacade"
+import { UnderlaySection } from "./Underlay"
 
 const WALL_COLORS = [
   { color: "#f4f2ee", name: "Brukket hvit" },
@@ -18,14 +23,6 @@ const WALL_COLORS = [
   { color: "#cdbfae", name: "Leire" },
   { color: "#b9b4ab", name: "Grå" },
   { color: "#5d6b62", name: "Mørk grønn" },
-]
-const CLADDING = [
-  { color: "#ebe8e1", name: "Hvit kledning" },
-  { color: "#8e2f25", name: "Låverød" },
-  { color: "#c9b48a", name: "Oker" },
-  { color: "#7d8580", name: "Grå" },
-  { color: "#2f3132", name: "Sort" },
-  { color: "#a6845c", name: "Ubehandlet tre" },
 ]
 const ITEM_COLORS = ["#7d8a8f", "#a3896b", "#c08a5a", "#3c3d40", "#e8e3da", "#5d6b62", "#9fb0b8", "#b08a5e", "#f2f0eb", "#8e2f25"]
 
@@ -171,7 +168,7 @@ function OpeningInspector({ opening: o }: { opening: Opening }) {
       <Head kind={isDoor ? "Dør" : "Vindu"} title={`${OPENING_DEFAULTS[o.kind].name} ${o.width} × ${o.height}`} />
       <div className="fields">
         <Field label="Type">
-          <select value={o.kind} onChange={(e) => patchOpening(o.id, { kind: e.target.value as OpeningKind, sill: e.target.value === "window" ? Math.max(o.sill, 60) : 0 })}>
+          <select value={o.kind} onChange={(e) => patchOpening(o.id, { kind: e.target.value as OpeningKind, productId: undefined, sill: e.target.value === "window" ? Math.max(o.sill, 60) : 0 })}>
             {(Object.keys(OPENING_DEFAULTS) as OpeningKind[]).map((k) => (
               <option key={k} value={k}>
                 {OPENING_DEFAULTS[k].name}
@@ -204,6 +201,7 @@ function OpeningInspector({ opening: o }: { opening: Opening }) {
           </div>
         )}
       </div>
+      <ProductPicker products={productsForOpening(o.kind)} value={o.productId} onChange={(productId) => patchOpening(o.id, { productId })} estimate={{ price: OPENING_PRICE[o.kind], unit: "" }} />
       <Actions />
     </div>
   )
@@ -267,7 +265,7 @@ function RoomInspector({ room }: { room: Room }) {
         <Field label="Gulv">
           <div className="floor-swatches">
             {FLOORS.map((f) => (
-              <button key={f.id} className={`floor-sw ${room.floor === f.id ? "on" : ""}`} onClick={() => patchRoom(room.id, { floor: f.id })} title={f.name} aria-label={f.name} aria-pressed={room.floor === f.id}>
+              <button key={f.id} className={`floor-sw ${room.floor === f.id ? "on" : ""}`} onClick={() => patchRoom(room.id, { floor: f.id, floorProductId: undefined })} title={f.name} aria-label={f.name} aria-pressed={room.floor === f.id}>
                 <span style={{ background: f.color }} />
               </button>
             ))}
@@ -278,6 +276,13 @@ function RoomInspector({ room }: { room: Room }) {
           <Swatches value={room.wallColor} colors={WALL_COLORS} onChange={(c) => patchRoom(room.id, { wallColor: c })} label="Veggfarge" />
         </Field>
         <Toggle label="Gulvvarme" checked={room.underfloorHeating} onChange={(v) => patchRoom(room.id, { underfloorHeating: v })} />
+        <ProductPicker
+          products={productsForFloor(room.floor)}
+          value={room.floorProductId}
+          onChange={(floorProductId) => patchRoom(room.id, { floorProductId })}
+          estimate={{ price: FLOORS.find((f) => f.id === room.floor)?.price ?? 0, unit: "/m²" }}
+          label="Gulv fra butikk"
+        />
       </div>
       <div className="insp-actions">
         <button
@@ -312,7 +317,7 @@ function ItemInspector({ item }: { item: Item }) {
       <Head kind={c.layer === "elektro" ? "Elektro" : c.layer === "vvs" ? "Rør og vann" : "Møbel"} title={c.name} />
       <div className="fields">
         <Field label="Bytt til">
-          <select value={item.catalogId} onChange={(e) => patchItem(item.id, { catalogId: e.target.value, w: undefined, d: undefined, h: undefined, elevation: undefined, color: undefined })}>
+          <select value={item.catalogId} onChange={(e) => patchItem(item.id, { catalogId: e.target.value, productId: undefined, w: undefined, d: undefined, h: undefined, elevation: undefined, color: undefined })}>
             {same.map((x) => (
               <option key={x.id} value={x.id}>
                 {x.name}
@@ -372,6 +377,7 @@ function ItemInspector({ item }: { item: Item }) {
           <TextField value={item.note ?? ""} placeholder="F.eks. «Ekstra uttak for lader»" onCommit={(v) => patchItem(item.id, { note: v || undefined })} />
         </Field>
       </div>
+      <ProductPicker products={productsForCatalog(item.catalogId)} value={item.productId} onChange={(productId) => patchItem(item.id, { productId })} estimate={c.price ? { price: c.price, unit: "" } : undefined} />
       <Actions rotate duplicate />
     </div>
   )
@@ -492,11 +498,8 @@ function ProjectInspector({ project }: { project: Project }) {
             ))}
         </ul>
       </Section>
-      <Section title="Utseende">
-        <Field label="Kledning">
-          <Swatches value={project.cladding ?? "#ebe8e1"} colors={CLADDING} onChange={(c) => upd((p) => ({ ...p, cladding: c }))} label="Kledning" />
-        </Field>
-      </Section>
+      <UnderlaySection />
+      <RoofFacadeSection project={project} />
       <Section title="Kom i gang">
         <ol className="howto">
           <li>

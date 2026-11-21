@@ -40,6 +40,7 @@ type Draft =
   | { type: "run"; points: Vec[] }
   | { type: "measure"; a: Vec }
   | { type: "marquee"; a: Vec; b: Vec; additive: boolean }
+  | { type: "calib"; a: Vec; b?: Vec }
 
 type Drag =
   | { type: "pan"; sx: number; sy: number; view: ViewT }
@@ -51,6 +52,7 @@ type Drag =
   | { type: "opening"; openingId: string }
   | { type: "room-rect" }
   | { type: "marquee" }
+  | { type: "underlay"; start: Vec; x: number; y: number }
 
 /** Lets the app-level key handler give drafting keys (Enter, Esc, digits) to the plan first. */
 export const planKeys: { handle: ((e: KeyboardEvent) => boolean) | null } = { handle: null }
@@ -64,6 +66,7 @@ const HINTS: Record<string, string> = {
   item: "Klikk for å plassere, eller dra fra biblioteket. Q roterer 90°, Shift+Q 15°. Veggpunkter fester seg til nærmeste vegg.",
   run: "Klikk for hvert knekkpunkt. Rørene låses til 45°. Dobbeltklikk eller Enter avslutter.",
   measure: "Klikk på to punkter for å lage et mål.",
+  calibrate: "Klikk på to punkter på tegningen med kjent avstand, for eksempel endene av en yttervegg. Skriv så den virkelige lengden.",
 }
 
 export function Plan2D() {
@@ -110,6 +113,7 @@ export function Plan2D() {
   const items = useMemo(() => project.items.filter((i) => i.level === level.id), [project.items, level.id])
   const runs = useMemo(() => project.runs.filter((r) => r.level === level.id), [project.runs, level.id])
   const dims = useMemo(() => project.dimensions.filter((d) => d.level === level.id), [project.dimensions, level.id])
+  const underlay = project.underlays?.[level.id]
 
   // ---------- view fitting ----------
   useLayoutEffect(() => {
@@ -426,6 +430,12 @@ export function Plan2D() {
           drag.current = { type: "move", start: raw, project: st.project, ids: new Set(sel.map((s) => s.id)), moved: false }
           return
         }
+        const und = st.project.underlays?.[st.levelId]
+        if ((e.target as Element).closest("[data-underlay]") && und && !und.locked) {
+          st.checkpoint()
+          drag.current = { type: "underlay", start: raw, x: und.x, y: und.y }
+          return
+        }
         if (!e.shiftKey) setSelection([])
         drag.current = { type: "marquee" }
         setDraft({ type: "marquee", a: raw, b: raw, additive: e.shiftKey })
@@ -503,6 +513,14 @@ export function Plan2D() {
         setLengthInput("")
         return
       }
+      case "calibrate": {
+        const d = draftRef.current
+        const p = shiftDown.current ? raw : snapAngle(d?.type === "calib" && !d.b ? d.a : raw, raw, 15)
+        if (d?.type === "calib" && !d.b) {
+          if (dist(d.a, p) * viewRef.current.s > 8) setDraft({ ...d, b: p })
+        } else setDraft({ type: "calib", a: raw })
+        return
+      }
       case "measure": {
         const d = draftRef.current
         const { p } = snap(raw, { from: d?.type === "measure" ? d.a : undefined })
@@ -557,6 +575,8 @@ export function Plan2D() {
       hint = r.hint
     } else if (t.type === "item") {
       c = { x: round(raw.x, st.settings.snapGrid), y: round(raw.y, st.settings.snapGrid) }
+    } else if (t.type === "calibrate" && d?.type === "calib" && !d.b && !e.shiftKey) {
+      c = snapAngle(d.a, raw, 15)
     }
     setLocalCursor(c)
     setSnapHint(hint)
@@ -614,6 +634,15 @@ export function Plan2D() {
         }),
         false,
       )
+      return
+    }
+    if (g.type === "underlay") {
+      const lv = st.levelId
+      const und = st.project.underlays?.[lv]
+      if (!und) return
+      const x = g.x + raw.x - g.start.x
+      const y = g.y + raw.y - g.start.y
+      update((p) => ({ ...p, underlays: { ...p.underlays, [lv]: { ...und, x, y } } }), false)
       return
     }
     if (g.type === "opening") {
@@ -794,6 +823,19 @@ export function Plan2D() {
         </defs>
         <g transform={`translate(${view.x} ${view.y}) scale(${s})`}>
           <rect x={-100000} y={-100000} width={200000} height={200000} fill="url(#grid-major)" />
+          {underlay?.visible && (
+            <image
+              href={underlay.src}
+              x={underlay.x}
+              y={underlay.y}
+              width={underlay.width}
+              height={underlay.height}
+              opacity={underlay.opacity}
+              preserveAspectRatio="none"
+              className={`underlay-img ${!underlay.locked && tool.type === "select" ? "is-movable" : ""}`}
+              data-underlay={underlay.locked ? undefined : "1"}
+            />
+          )}
 
           {/* level below, as a faint reference */}
           {below &&
@@ -933,6 +975,14 @@ export function Plan2D() {
               <DimLine a={draft.a} b={cursor} s={s} offset={0} live />
             </g>
           )}
+          {draft?.type === "calib" && (
+            <g className="draft calib">
+              <DimLine a={draft.a} b={draft.b ?? cursor ?? draft.a} s={s} offset={0} live />
+              {[draft.a, draft.b ?? cursor].filter(Boolean).map((p, i) => (
+                <circle key={i} cx={p!.x} cy={p!.y} r={px(5)} className="draft-dot" />
+              ))}
+            </g>
+          )}
           {draft?.type === "marquee" && (
             <rect
               x={Math.min(draft.a.x, draft.b.x)}
@@ -943,7 +993,7 @@ export function Plan2D() {
             />
           )}
           {itemGhost && tool.type === "item" && (
-            <g transform={`translate(${itemGhost.x} ${itemGhost.y}) rotate(${itemGhost.rotation})`} className="ghost">
+            <g transform={`translate(${itemGhost.x} ${itemGhost.y}) rotate(${itemGhost.rotation})`} className="plan-ghost">
               <ItemSymbol c={CATALOG_BY_ID[tool.catalogId]} w={CATALOG_BY_ID[tool.catalogId].w} d={CATALOG_BY_ID[tool.catalogId].d} />
             </g>
           )}
@@ -972,6 +1022,31 @@ export function Plan2D() {
             </span>
           )}
         </div>
+      )}
+      {draft?.type === "calib" && draft.b && (
+        <CalibrateBox
+          left={((draft.a.x + draft.b.x) / 2) * s + view.x}
+          top={((draft.a.y + draft.b.y) / 2) * s + view.y}
+          measured={dist(draft.a, draft.b)}
+          onCancel={() => setDraft(null)}
+          onApply={(real) => {
+            if (!draft.b) return
+            const st = useStore.getState()
+            const lv = st.levelId
+            const und = st.project.underlays?.[lv]
+            const k = real / dist(draft.a, draft.b)
+            if (und && Number.isFinite(k) && k > 0) {
+              const a = draft.a
+              update((p) => ({
+                ...p,
+                underlays: { ...p.underlays, [lv]: { ...und, x: a.x + (und.x - a.x) * k, y: a.y + (und.y - a.y) * k, width: und.width * k, height: und.height * k, locked: true } },
+              }))
+            }
+            setDraft(null)
+            st.setTool({ type: "select" })
+            requestAnimationFrame(fitView)
+          }}
+        />
       )}
       {lengthInput && cursor && (
         <div className="length-input" style={{ left: cursor.x * s + view.x + 16, top: cursor.y * s + view.y + 16 }}>
@@ -1115,7 +1190,7 @@ function OpeningGhost({ opening, wall, s }: { opening: Opening; wall: Wall; s: n
   const c = add(wall.a, mul(d, opening.offset))
   return (
     <>
-      <g transform={`translate(${wall.a.x} ${wall.a.y}) rotate(${ang})`} className="ghost">
+      <g transform={`translate(${wall.a.x} ${wall.a.y}) rotate(${ang})`} className="plan-ghost">
         <OpeningShape o={opening} t={wall.thickness} ghost />
       </g>
       <text x={c.x} y={c.y - wall.thickness / 2 - 10 / s} fontSize={11 / s} textAnchor="middle" className="ghost-label">
@@ -1234,5 +1309,48 @@ function SelectionOverlay({ project, selection, s }: { project: Project; selecti
         return null
       })}
     </g>
+  )
+}
+
+function CalibrateBox({ left, top, measured, onApply, onCancel }: { left: number; top: number; measured: number; onApply: (cm: number) => void; onCancel: () => void }) {
+  const [text, setText] = useState("")
+  const apply = () => {
+    const raw = text.trim().toLowerCase().replace(",", ".")
+    const n = parseFloat(raw)
+    if (!(n > 0)) return
+    // "11 m" or "11" metres when small, otherwise centimetres
+    const cm = raw.endsWith("mm") ? n / 10 : raw.endsWith("m") && !raw.endsWith("cm") ? n * 100 : n < 50 ? n * 100 : n
+    onApply(cm)
+  }
+  return (
+    <form
+      className="calib-box"
+      style={{ left, top }}
+      onSubmit={(e) => {
+        e.preventDefault()
+        apply()
+      }}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
+      <label htmlFor="calib-length">Virkelig lengde</label>
+      <input
+        id="calib-length"
+        autoFocus
+        inputMode="decimal"
+        placeholder="f.eks. 11 m eller 1100"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => e.key === "Escape" && onCancel()}
+      />
+      <span className="sub mono">Målt nå: {formatLength(measured)}</span>
+      <div className="row-btns">
+        <button type="button" className="btn ghost sm" onClick={onCancel}>
+          Avbryt
+        </button>
+        <button type="submit" className="btn primary sm">
+          Bruk målestokk
+        </button>
+      </div>
+    </form>
   )
 }

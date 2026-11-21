@@ -9,7 +9,10 @@ import type { Circuit } from "../model/types"
 import { useStore } from "../store/store"
 import { NumField, Seg, TextField } from "./common"
 
-const kr = (n: number) => `${Math.round(n).toLocaleString("nb-NO")} kr`
+import { saveFile } from "../cloud/files"
+import { PRICES_CHECKED } from "../model/products"
+import type { Store } from "../model/products"
+import { StoreChip, kr } from "./Products"
 
 export function ListsPanel() {
   const [tab, setTab] = useState<"rom" | "materialer" | "kurser">("materialer")
@@ -68,14 +71,14 @@ function MaterialList() {
   const rows = useMemo(() => materialList(project), [project])
   const groups = [...new Set(rows.map((r) => r.group))]
   const sum = rows.reduce((s, r) => s + (r.total ?? 0), 0)
+  const byStore = new Map<string, number>()
+  for (const r of rows) if (r.total) byStore.set(r.store ?? "Anslag", (byStore.get(r.store ?? "Anslag") ?? 0) + r.total)
   const csv = () => {
-    const lines = [["Gruppe", "Navn", "Mengde", "Enhetspris", "Sum"].join(";"), ...rows.map((r) => [r.group, r.name, r.qty, r.unit ?? "", r.total ?? ""].join(";"))]
-    const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" })
-    const a = document.createElement("a")
-    a.href = URL.createObjectURL(blob)
-    a.download = `${project.name || "tuft"} – materialliste.csv`
-    a.click()
-    URL.revokeObjectURL(a.href)
+    const lines = [
+      ["Gruppe", "Navn", "Butikk", "Mengde", "Enhetspris", "Sum", "Lenke"].join(";"),
+      ...rows.map((r) => [r.group, r.name, r.store ?? "", r.qty, r.unit ?? "", r.total ?? "", r.url ?? ""].join(";")),
+    ]
+    void saveFile(`${project.name || "tuft"} – materialliste.csv`, new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" }))
   }
   return (
     <>
@@ -85,6 +88,14 @@ function MaterialList() {
         <button className="btn ghost sm" onClick={csv}>
           <Download size={14} /> CSV
         </button>
+        <ul className="store-sums">
+          {[...byStore].map(([s, v]) => (
+            <li key={s}>
+              {s === "Anslag" ? <span className="store-chip neutral">Anslag</span> : <StoreChip store={s as Store} />}
+              <span className="mono">{kr(v)}</span>
+            </li>
+          ))}
+        </ul>
       </div>
       {groups.map((g) => (
         <table key={g} className="table">
@@ -94,15 +105,26 @@ function MaterialList() {
               .filter((r) => r.group === g)
               .map((r, i) => (
                 <tr key={i}>
-                  <td>{r.name}</td>
+                  <td>
+                    {r.store && <StoreChip store={r.store} />}{" "}
+                    {r.url ? (
+                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="row-link">
+                        {r.name}
+                      </a>
+                    ) : (
+                      r.name
+                    )}
+                  </td>
                   <td className="num-cell muted">{r.qty}</td>
-                  <td className="num-cell">{r.total != null ? kr(r.total) : ""}</td>
+                  <td className="num-cell">{r.total != null ? `${r.approx ? "~" : ""}${kr(r.total)}` : ""}</td>
                 </tr>
               ))}
           </tbody>
         </table>
       ))}
-      <p className="note">Prisene er veiledende for å gi en størrelsesorden. Arbeid, frakt og småmateriell er ikke med.</p>
+      <p className="note">
+        Velg produkter i egenskapspanelet for å bruke butikkens pris. «~» betyr anslag. Prisene er sjekket {PRICES_CHECKED} og kan ha endret seg. Arbeid, frakt og småmateriell er ikke med.
+      </p>
     </>
   )
 }
